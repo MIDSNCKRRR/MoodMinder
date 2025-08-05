@@ -97,7 +97,6 @@ export default function Home() {
           <AlertTriangle className="mr-2 h-4 w-4" />
           {crisisMutation.isPending ? "CONNECTING..." : "NEED IMMEDIATE SUPPORT"}
         </Button>
-        <div className="botanical-accent relative"></div>
       </div>
 
       {/* Today's Question Card */}
