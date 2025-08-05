@@ -1,0 +1,216 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(46, 24%, 96%);
+  --foreground: hsl(25, 20%, 25%);
+  --muted: hsl(45, 15%, 92%);
+  --muted-foreground: hsl(25, 10%, 45%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(25, 20%, 25%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(25, 20%, 25%);
+  --border: hsl(25, 15%, 88%);
+  --input: hsl(25, 15%, 88%);
+  --primary: hsl(20, 50%, 70%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(45, 15%, 92%);
+  --secondary-foreground: hsl(25, 15%, 15%);
+  --accent: hsl(45, 15%, 92%);
+  --accent-foreground: hsl(25, 15%, 15%);
+  --destructive: hsl(0, 60%, 70%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(25, 20%, 25%);
+  --radius: 1rem;
+
+  /* Soft Moves Custom Colors */
+  --peach-50: hsl(25, 45%, 97%);
+  --peach-100: hsl(25, 40%, 95%);
+  --peach-200: hsl(25, 35%, 85%);
+  --peach-300: hsl(25, 30%, 78%);
+  --peach-400: hsl(25, 25%, 68%);
+  --peach-500: hsl(25, 20%, 58%);
+
+  --sage-50: hsl(120, 15%, 96%);
+  --sage-100: hsl(120, 12%, 91%);
+  --sage-200: hsl(120, 10%, 83%);
+  --sage-300: hsl(120, 8%, 72%);
+  --sage-400: hsl(120, 6%, 61%);
+  --sage-500: hsl(120, 4%, 50%);
+
+  --lavender-50: hsl(260, 50%, 98%);
+  --lavender-100: hsl(260, 45%, 96%);
+  --lavender-200: hsl(260, 40%, 91%);
+  --lavender-300: hsl(260, 35%, 84%);
+  --lavender-400: hsl(260, 30%, 77%);
+  --lavender-500: hsl(260, 25%, 70%);
+
+  --coral-50: hsl(15, 60%, 97%);
+  --coral-100: hsl(15, 55%, 93%);
+  --coral-200: hsl(15, 50%, 78%);
+  --coral-300: hsl(15, 45%, 68%);
+  --coral-400: hsl(15, 40%, 58%);
+  --coral-500: hsl(15, 35%, 48%);
+
+  --stone-50: hsl(45, 10%, 98%);
+  --stone-100: hsl(45, 8%, 96%);
+  --stone-200: hsl(45, 6%, 88%);
+  --stone-300: hsl(45, 4%, 80%);
+  --stone-400: hsl(45, 2%, 72%);
+  --stone-500: hsl(45, 0%, 64%);
+
+  --crisis: hsl(0, 45%, 65%);
+}
+
+.dark {
+  --background: hsl(25, 15%, 8%);
+  --foreground: hsl(45, 20%, 90%);
+  --muted: hsl(25, 10%, 15%);
+  --muted-foreground: hsl(45, 10%, 60%);
+  --popover: hsl(25, 15%, 8%);
+  --popover-foreground: hsl(45, 20%, 90%);
+  --card: hsl(25, 15%, 8%);
+  --card-foreground: hsl(45, 20%, 90%);
+  --border: hsl(25, 10%, 20%);
+  --input: hsl(25, 10%, 20%);
+  --primary: hsl(20, 50%, 70%);
+  --primary-foreground: hsl(25, 15%, 8%);
+  --secondary: hsl(25, 10%, 15%);
+  --secondary-foreground: hsl(45, 20%, 90%);
+  --accent: hsl(25, 10%, 15%);
+  --accent-foreground: hsl(45, 20%, 90%);
+  --destructive: hsl(0, 60%, 60%);
+  --destructive-foreground: hsl(45, 20%, 90%);
+  --ring: hsl(45, 20%, 90%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .stone-shadow {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+
+  .gentle-glow {
+    box-shadow: 0 0 20px hsla(var(--crisis), 0.3);
+  }
+
+  .botanical-accent::before {
+    content: '🌿';
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    font-size: 1rem;
+    opacity: 0.6;
+  }
+
+  .rounded-organic {
+    border-radius: 2rem 1.5rem 2rem 1.5rem;
+  }
+
+  .rounded-stone {
+    border-radius: 1.5rem 2rem 1.5rem 2rem;
+  }
+
+  .emotion-face {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+  }
+
+  .wave-chart {
+    background: linear-gradient(135deg, hsl(var(--lavender-200)) 0%, hsl(var(--sage-200)) 100%);
+    border-radius: 1rem;
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wave-line {
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    right: 10px;
+    height: 60px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'%3E%3Cpath d='M0,30 Q50,10 100,30 T200,30' stroke='%23B0A0E0' stroke-width='3' fill='none'/%3E%3C/svg%3E") no-repeat center;
+    background-size: contain;
+  }
+}
+
+/* Custom color utilities */
+.bg-peach-50 { background-color: hsl(var(--peach-50)); }
+.bg-peach-100 { background-color: hsl(var(--peach-100)); }
+.bg-peach-200 { background-color: hsl(var(--peach-200)); }
+.bg-peach-300 { background-color: hsl(var(--peach-300)); }
+.bg-peach-400 { background-color: hsl(var(--peach-400)); }
+.bg-peach-500 { background-color: hsl(var(--peach-500)); }
+
+.bg-sage-50 { background-color: hsl(var(--sage-50)); }
+.bg-sage-100 { background-color: hsl(var(--sage-100)); }
+.bg-sage-200 { background-color: hsl(var(--sage-200)); }
+.bg-sage-300 { background-color: hsl(var(--sage-300)); }
+.bg-sage-400 { background-color: hsl(var(--sage-400)); }
+.bg-sage-500 { background-color: hsl(var(--sage-500)); }
+
+.bg-lavender-50 { background-color: hsl(var(--lavender-50)); }
+.bg-lavender-100 { background-color: hsl(var(--lavender-100)); }
+.bg-lavender-200 { background-color: hsl(var(--lavender-200)); }
+.bg-lavender-300 { background-color: hsl(var(--lavender-300)); }
+.bg-lavender-400 { background-color: hsl(var(--lavender-400)); }
+.bg-lavender-500 { background-color: hsl(var(--lavender-500)); }
+
+.bg-coral-50 { background-color: hsl(var(--coral-50)); }
+.bg-coral-100 { background-color: hsl(var(--coral-100)); }
+.bg-coral-200 { background-color: hsl(var(--coral-200)); }
+.bg-coral-300 { background-color: hsl(var(--coral-300)); }
+.bg-coral-400 { background-color: hsl(var(--coral-400)); }
+.bg-coral-500 { background-color: hsl(var(--coral-500)); }
+
+.bg-stone-50 { background-color: hsl(var(--stone-50)); }
+.bg-stone-100 { background-color: hsl(var(--stone-100)); }
+.bg-stone-200 { background-color: hsl(var(--stone-200)); }
+.bg-stone-300 { background-color: hsl(var(--stone-300)); }
+.bg-stone-400 { background-color: hsl(var(--stone-400)); }
+.bg-stone-500 { background-color: hsl(var(--stone-500)); }
+
+.bg-crisis { background-color: hsl(var(--crisis)); }
+
+.text-peach-300 { color: hsl(var(--peach-300)); }
+.text-peach-400 { color: hsl(var(--peach-400)); }
+.text-peach-500 { color: hsl(var(--peach-500)); }
+
+.text-sage-300 { color: hsl(var(--sage-300)); }
+.text-sage-400 { color: hsl(var(--sage-400)); }
+.text-sage-500 { color: hsl(var(--sage-500)); }
+
+.text-lavender-300 { color: hsl(var(--lavender-300)); }
+.text-lavender-400 { color: hsl(var(--lavender-400)); }
+.text-lavender-500 { color: hsl(var(--lavender-500)); }
+
+.text-coral-300 { color: hsl(var(--coral-300)); }
+.text-coral-400 { color: hsl(var(--coral-400)); }
+.text-coral-500 { color: hsl(var(--coral-500)); }
+
+.text-stone-400 { color: hsl(var(--stone-400)); }
+.text-stone-500 { color: hsl(var(--stone-500)); }
+.text-stone-600 { color: hsl(var(--stone-500)); }
+
+.border-peach-200 { border-color: hsl(var(--peach-200)); }
+.border-sage-200 { border-color: hsl(var(--sage-200)); }
+.border-lavender-200 { border-color: hsl(var(--lavender-200)); }
+.border-coral-200 { border-color: hsl(var(--coral-200)); }
+.border-stone-200 { border-color: hsl(var(--stone-200)); }
