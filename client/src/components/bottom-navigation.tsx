@@ -11,7 +11,7 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t border-stone-200 stone-shadow">
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t border-stone-200 stone-shadow z-50">
       <div className="flex justify-around py-4">
         {tabs.map((tab) => {
           const Icon = tab.icon;
