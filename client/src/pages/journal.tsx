@@ -62,7 +62,7 @@ export default function Journal() {
   };
 
   return (
-    <div className="px-6 space-y-6 pb-20">
+    <div className="px-6 space-y-6">
       {/* Status Bar */}
       <div className="flex justify-between items-center pt-8 text-stone-400 text-sm">
         <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>

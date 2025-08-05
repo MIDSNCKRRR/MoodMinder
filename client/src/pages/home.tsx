@@ -66,7 +66,7 @@ export default function Home() {
   const recentEntries = journalEntries.slice(0, 3);
 
   return (
-    <div className="px-6 space-y-6 pb-20">
+    <div className="px-6 space-y-6">
       {/* Status Bar */}
       <div className="flex justify-between items-center pt-8 text-stone-400 text-sm">
         <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -186,7 +186,7 @@ export default function Home() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="text-stone-600 text-sm font-medium">
-                      {entry.createdAt.toLocaleDateString()}
+                      {new Date(entry.createdAt).toLocaleDateString()}
                     </p>
                     <p className="text-stone-500 text-sm mt-1 line-clamp-2">
                       {entry.content.substring(0, 50)}...

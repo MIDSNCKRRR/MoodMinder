@@ -11,7 +11,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
   return (
-    <div className="max-w-sm mx-auto bg-white min-h-screen relative overflow-hidden">
+    <div className="max-w-sm mx-auto bg-white min-h-screen relative overflow-hidden pb-20">
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/journal" component={Journal} />
