@@ -48,7 +48,9 @@ export class MemStorage implements IStorage {
     const entry: JournalEntry = {
       ...insertEntry,
       id,
+      journalType: insertEntry.journalType || "emotion",
       createdAt: new Date(),
+      bodyMapping: insertEntry.bodyMapping || {},
     };
     this.journalEntries.set(id, entry);
     return entry;
@@ -70,6 +72,7 @@ export class MemStorage implements IStorage {
       ...insertReflection,
       id,
       date: new Date(),
+      answer: insertReflection.answer || null,
     };
     this.dailyReflections.set(id, reflection);
     return reflection;

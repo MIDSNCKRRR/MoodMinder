@@ -5,6 +5,7 @@ import { z } from "zod";
 
 export const journalEntries = pgTable("journal_entries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  journalType: text("journal_type").notNull().default("emotion"), // emotion, gratitude, reflection
   emotionLevel: integer("emotion_level").notNull(), // 1-5 scale
   emotionType: text("emotion_type").notNull(), // sad, neutral, happy, etc.
   content: text("content").notNull(),
