@@ -105,7 +105,12 @@ export default function Home() {
       </div>
 
       {/* Today's Question Card */}
-      <Card className="bg-gradient-to-br from-peach-200 to-peach-300 rounded-organic stone-shadow border-0 relative">
+      <Card 
+        className="rounded-organic stone-shadow border-0 relative"
+        style={{
+          background: 'linear-gradient(135deg, hsl(25, 35%, 85%) 0%, hsl(25, 30%, 78%) 100%)'
+        }}
+      >
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
           <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">Today's Reflection</h3>
@@ -125,7 +130,12 @@ export default function Home() {
       </Card>
 
       {/* Quick Emotion Check */}
-      <Card className="bg-gradient-to-br from-lavender-200 to-lavender-300 rounded-organic stone-shadow border-0 relative">
+      <Card 
+        className="rounded-organic stone-shadow border-0 relative"
+        style={{
+          background: 'linear-gradient(135deg, hsl(260, 40%, 91%) 0%, hsl(260, 35%, 84%) 100%)'
+        }}
+      >
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
           <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">How are you feeling?</h3>
@@ -147,7 +157,12 @@ export default function Home() {
       </Card>
 
       {/* Mindfulness Moment */}
-      <Card className="bg-gradient-to-br from-sage-200 to-sage-300 rounded-organic stone-shadow border-0 relative">
+      <Card 
+        className="rounded-organic stone-shadow border-0 relative"
+        style={{
+          background: 'linear-gradient(135deg, hsl(120, 10%, 83%) 0%, hsl(120, 8%, 72%) 100%)'
+        }}
+      >
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
           <div className="flex items-center space-x-4">
