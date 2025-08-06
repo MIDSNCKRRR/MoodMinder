@@ -93,8 +93,8 @@ export default function Home() {
           disabled={crisisMutation.isPending}
           className="crisis-button w-full py-4 px-6 rounded-organic stone-shadow transition-all duration-300 font-medium border-2"
           style={{ 
-            backgroundColor: 'hsl(var(--crisis))',
-            borderColor: 'hsl(var(--crisis))',
+            backgroundColor: 'hsl(260, 45%, 65%)',
+            borderColor: 'hsl(260, 45%, 65%)',
             color: 'white'
           }}
           data-testid="crisis-button"
