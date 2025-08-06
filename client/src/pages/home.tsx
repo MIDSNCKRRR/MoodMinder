@@ -86,12 +86,17 @@ export default function Home() {
         <p className="text-stone-400 text-sm mt-1">Your emotional wellness companion</p>
       </div>
 
-      {/* Crisis RED BUTTON */}
+      {/* Crisis Support Button */}
       <div className="relative">
         <Button
           onClick={() => crisisMutation.mutate()}
           disabled={crisisMutation.isPending}
-          className="w-full bg-crisis text-white py-4 px-6 rounded-organic stone-shadow hover:gentle-glow transition-all duration-300 font-medium"
+          className="crisis-button w-full py-4 px-6 rounded-organic stone-shadow transition-all duration-300 font-medium border-2"
+          style={{ 
+            backgroundColor: 'hsl(var(--crisis))',
+            borderColor: 'hsl(var(--crisis))',
+            color: 'white'
+          }}
           data-testid="crisis-button"
         >
           <AlertTriangle className="mr-2 h-4 w-4" />
