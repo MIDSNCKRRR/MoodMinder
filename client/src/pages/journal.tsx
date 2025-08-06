@@ -34,24 +34,24 @@ export default function Journal() {
       title: "Emotion Journal",
       description: "Track your feelings and emotional patterns",
       icon: Heart,
-      color: "text-coral-500",
-      bgColor: "bg-gradient-to-br from-coral-100 to-coral-200"
+      color: "hsl(15, 40%, 58%)",
+      bgColor: "linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)"
     },
     {
       id: "gratitude", 
       title: "Gratitude Journal",
       description: "Reflect on what you're thankful for",
       icon: Sparkles,
-      color: "text-sage-500",
-      bgColor: "bg-gradient-to-br from-sage-100 to-sage-200"
+      color: "hsl(120, 4%, 50%)",
+      bgColor: "linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)"
     },
     {
       id: "reflection",
       title: "Daily Reflection",
       description: "Process your thoughts and experiences",
       icon: BookOpen,
-      color: "text-lavender-500", 
-      bgColor: "bg-gradient-to-br from-lavender-100 to-lavender-200"
+      color: "hsl(260, 25%, 70%)", 
+      bgColor: "linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)"
     }
   ];
 
@@ -104,7 +104,8 @@ export default function Journal() {
             return (
               <Card 
                 key={journalType.id}
-                className={`${journalType.bgColor} rounded-organic stone-shadow border-0 relative cursor-pointer hover:scale-[1.02] transition-all duration-300`}
+                className="rounded-organic stone-shadow border-0 relative cursor-pointer hover:scale-[1.02] transition-all duration-300"
+                style={{ background: journalType.bgColor }}
                 onClick={() => setSelectedJournalType(journalType.id)}
                 data-testid={`journal-type-${journalType.id}`}
               >
@@ -113,7 +114,7 @@ export default function Journal() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center">
-                        <Icon className={`w-6 h-6 ${journalType.color}`} />
+                        <Icon className="w-6 h-6" style={{ color: journalType.color }} />
                       </div>
                       <div>
                         <h3 className="font-serif font-semibold text-stone-600 text-lg">
