@@ -151,7 +151,7 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
                     return (
                       <div
                         key={keyword}
-                        className="inline-flex items-center gap-2 px-3 py-1 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
+                        className="flex items-center justify-center gap-2 px-3 py-1 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
                         data-testid={`selected-keyword-${keyword.toLowerCase()}`}
                       >
                         <span className={`px-2 py-0.5 rounded-full text-xs ${categoryColor}`}>
