@@ -18,12 +18,12 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
   const feelingEmojis = [
     { id: "tense", emoji: "😬", label: "Tense" },
     { id: "relaxed", emoji: "😌", label: "Relaxed" },
-    { id: "tight", emoji: "😣", label: "Tight" },
     { id: "warm", emoji: "🔥", label: "Warm" },
     { id: "cool", emoji: "❄️", label: "Cool" },
-    { id: "heavy", emoji: "⬇️", label: "Heavy" },
-    { id: "light", emoji: "🪶", label: "Light" },
-    { id: "tingling", emoji: "✨", label: "Tingling" },
+    { id: "fluttery", emoji: "🦋", label: "Fluttery" },
+    { id: "racing", emoji: "💓", label: "Racing" },
+    { id: "calm", emoji: "🌊", label: "Calm" },
+    { id: "buzzing", emoji: "⚡", label: "Buzzing" },
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);

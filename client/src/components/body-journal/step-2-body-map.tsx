@@ -91,8 +91,7 @@ export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChang
               <div className="flex flex-wrap gap-1 justify-center">
                 {[
                   { id: "tense", emoji: "😬" }, { id: "relaxed", emoji: "😌" }, { id: "warm", emoji: "🔥" }, { id: "cool", emoji: "❄️" },
-                  { id: "fluttery", emoji: "🦋" }, { id: "racing", emoji: "💓" }, { id: "calm", emoji: "🌊" }, { id: "buzzing", emoji: "⚡" },
-                  { id: "restless", emoji: "🦵" }, { id: "grounded", emoji: "🌳" }, { id: "strong", emoji: "💪" }, { id: "light", emoji: "🪶" }
+                  { id: "fluttery", emoji: "🦋" }, { id: "racing", emoji: "💓" }, { id: "calm", emoji: "🌊" }, { id: "buzzing", emoji: "⚡" }
                 ].map((feeling) => (
                   <div
                     key={feeling.id}

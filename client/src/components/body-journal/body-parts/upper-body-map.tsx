@@ -18,14 +18,14 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
   ];
 
   const feelingEmojis = [
-    { id: "fluttery", emoji: "🦋", label: "Fluttery" },
-    { id: "tight", emoji: "🔒", label: "Tight" },
+    { id: "tense", emoji: "😬", label: "Tense" },
+    { id: "relaxed", emoji: "😌", label: "Relaxed" },
     { id: "warm", emoji: "🔥", label: "Warm" },
-    { id: "heavy", emoji: "🪨", label: "Heavy" },
-    { id: "light", emoji: "🪶", label: "Light" },
-    { id: "buzzing", emoji: "⚡", label: "Buzzing" },
-    { id: "calm", emoji: "🌊", label: "Calm" },
+    { id: "cool", emoji: "❄️", label: "Cool" },
+    { id: "fluttery", emoji: "🦋", label: "Fluttery" },
     { id: "racing", emoji: "💓", label: "Racing" },
+    { id: "calm", emoji: "🌊", label: "Calm" },
+    { id: "buzzing", emoji: "⚡", label: "Buzzing" },
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);

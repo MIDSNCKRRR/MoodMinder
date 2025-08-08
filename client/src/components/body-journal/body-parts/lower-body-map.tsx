@@ -17,14 +17,14 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
   ];
 
   const feelingEmojis = [
-    { id: "restless", emoji: "🦵", label: "Restless" },
-    { id: "grounded", emoji: "🌳", label: "Grounded" },
-    { id: "shaky", emoji: "📳", label: "Shaky" },
-    { id: "solid", emoji: "🗿", label: "Solid" },
-    { id: "weak", emoji: "💔", label: "Weak" },
-    { id: "strong", emoji: "💪", label: "Strong" },
-    { id: "numb", emoji: "😶", label: "Numb" },
-    { id: "alive", emoji: "✨", label: "Alive" },
+    { id: "tense", emoji: "😬", label: "Tense" },
+    { id: "relaxed", emoji: "😌", label: "Relaxed" },
+    { id: "warm", emoji: "🔥", label: "Warm" },
+    { id: "cool", emoji: "❄️", label: "Cool" },
+    { id: "fluttery", emoji: "🦋", label: "Fluttery" },
+    { id: "racing", emoji: "💓", label: "Racing" },
+    { id: "calm", emoji: "🌊", label: "Calm" },
+    { id: "buzzing", emoji: "⚡", label: "Buzzing" },
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
