@@ -1,34 +1,39 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Sparkles, ArrowLeft } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-interface GratitudeJournalProps {
+interface IdentityJournalProps {
   onBack: () => void;
 }
 
-export default function GratitudeJournal({ onBack }: GratitudeJournalProps) {
+export default function IdentityJournal({ onBack }: IdentityJournalProps) {
   const { toast } = useToast();
-  const [gratitudeItems, setGratitudeItems] = useState<string[]>(["", "", ""]);
+  const [identityReflections, setIdentityReflections] = useState<string[]>(["", "", ""]);
 
   // Create journal entry mutation
   const createEntryMutation = useMutation({
     mutationFn: async () => {
-      const filledItems = gratitudeItems.filter(item => item.trim());
-      if (filledItems.length === 0) {
-        throw new Error("Please write at least one thing you're grateful for");
+      const filledReflections = identityReflections.filter(item => item.trim());
+      if (filledReflections.length === 0) {
+        throw new Error("Please write at least one identity reflection");
       }
 
-      const content = filledItems.map((item, index) => `${index + 1}. ${item}`).join('\n');
+      const content = prompts.map((prompt, index) => {
+        if (identityReflections[index].trim()) {
+          return `${prompt}\n${identityReflections[index]}\n`;
+        }
+        return '';
+      }).filter(Boolean).join('\n');
 
       const response = await apiRequest("POST", "/api/journal-entries", {
         journalType: "gratitude",
-        emotionLevel: 4, // Default to positive emotion for gratitude
-        emotionType: "grateful",
+        emotionLevel: 4, // Default to positive emotion for identity work
+        emotionType: "confident",
         content,
         bodyMapping: {},
       });
@@ -37,72 +42,55 @@ export default function GratitudeJournal({ onBack }: GratitudeJournalProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/journal-entries"] });
       toast({
-        title: "Gratitude Saved",
-        description: "Your gratitude entry has been saved successfully.",
+        title: "Identity Reflection Saved",
+        description: "Your identity reflection has been saved successfully.",
       });
-      setGratitudeItems(["", "", ""]);
+      setIdentityReflections(["", "", ""]);
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to save gratitude entry",
+        description: error.message || "Failed to save identity reflection",
         variant: "destructive",
       });
     },
   });
 
-  const updateGratitudeItem = (index: number, value: string) => {
-    const newItems = [...gratitudeItems];
+  const updateIdentityReflection = (index: number, value: string) => {
+    const newItems = [...identityReflections];
     newItems[index] = value;
-    setGratitudeItems(newItems);
+    setIdentityReflections(newItems);
   };
 
   const prompts = [
-    "What made you smile today?",
-    "Who are you thankful for and why?",
-    "What moment brought you peace?",
+    "What values are most important to you?",
+    "What aspects of yourself are you most proud of?",
+    "What goals or dreams feel most authentic to who you are?",
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <div className="flex items-center justify-center space-x-3 mb-2">
-          <Button
-            onClick={onBack}
-            variant="ghost"
-            size="sm"
-            className="p-2"
-            data-testid="back-to-journal-types"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div className="text-center">
-            <h2 className="text-xl font-serif font-semibold text-stone-600">Gratitude Journal</h2>
-            <p className="text-stone-400 text-sm">Reflect on what you're thankful for</p>
-          </div>
-        </div>
+      <div className="text-center pt-4">
+        <h2 className="text-xl font-serif font-semibold text-stone-600">Identity Journal</h2>
+        <p className="text-stone-400 text-sm">Explore your values and sense of self</p>
       </div>
 
-      {/* Gratitude Prompts */}
-      <Card className="bg-gradient-to-br from-sage-100 to-sage-200 rounded-organic stone-shadow border-0">
+      {/* Identity Reflection Prompts */}
+      <Card className="rounded-organic stone-shadow border-0"
+            style={{ background: "linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)" }}>
         <CardContent className="p-6">
-          <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">Three Things I'm Grateful For</h3>
-          <p className="text-stone-500 text-sm mb-6">Take a moment to appreciate the good in your life</p>
-          
           <div className="space-y-4">
-            {gratitudeItems.map((item, index) => (
-              <div key={index} className="bg-white/80 p-4 rounded-stone">
+            {identityReflections.map((item, index) => (
+              <div key={index} style={{ background: "rgba(255, 255, 255, 0.8)" }} className="p-4 rounded-lg">
                 <label className="block text-sm font-medium text-stone-600 mb-2">
                   {prompts[index]}
                 </label>
                 <Textarea
                   value={item}
-                  onChange={(e) => updateGratitudeItem(index, e.target.value)}
-                  className="w-full h-20 p-3 border border-stone-200 rounded-stone focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-transparent resize-none text-sm"
-                  placeholder="I'm grateful for..."
-                  data-testid={`gratitude-item-${index}`}
+                  onChange={(e) => updateIdentityReflection(index, e.target.value)}
+                  className="w-full h-20 p-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent resize-none text-sm"
+                  placeholder="Reflect on yourself..."
+                  data-testid={`identity-item-${index}`}
                 />
               </div>
             ))}
@@ -110,28 +98,19 @@ export default function GratitudeJournal({ onBack }: GratitudeJournalProps) {
         </CardContent>
       </Card>
 
-      {/* Additional Reflection */}
-      <Card className="bg-white rounded-organic stone-shadow border border-stone-100">
-        <CardContent className="p-6">
-          <div className="bg-sage-50 p-4 rounded-stone text-center">
-            <Sparkles className="w-8 h-8 text-sage-500 mx-auto mb-2" />
-            <p className="text-stone-600 text-sm font-medium">
-              "Gratitude makes sense of our past, brings peace for today, and creates a vision for tomorrow."
-            </p>
-            <p className="text-stone-400 text-xs mt-1">- Melody Beattie</p>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Save Entry Button */}
       <Button
         onClick={() => createEntryMutation.mutate()}
-        disabled={createEntryMutation.isPending || gratitudeItems.every(item => !item.trim())}
-        className="w-full bg-gradient-to-r from-sage-300 to-sage-400 text-white py-4 px-6 rounded-organic stone-shadow font-medium hover:from-sage-400 hover:to-sage-500 transition-all"
-        data-testid="save-gratitude-entry-button"
+        disabled={createEntryMutation.isPending || identityReflections.every(item => !item.trim())}
+        className="w-full py-4 px-6 rounded-lg font-medium transition-all"
+        style={{ 
+          background: "linear-gradient(to right, hsl(120, 25%, 65%), hsl(120, 30%, 55%))",
+          color: "white"
+        }}
+        data-testid="save-identity-entry-button"
       >
         <Sparkles className="mr-2 h-4 w-4" />
-        {createEntryMutation.isPending ? "Saving..." : "Save Gratitude Entry"}
+        {createEntryMutation.isPending ? "Saving..." : "Save Identity Entry"}
       </Button>
     </div>
   );

@@ -40,16 +40,16 @@ export default function Journal() {
     },
     {
       id: "gratitude", 
-      title: "Gratitude Journal",
-      description: "Reflect on what you're thankful for",
+      title: "Identity Journal",
+      description: "Explore your values and sense of self",
       icon: Sparkles,
       color: "hsl(120, 4%, 50%)",
       bgColor: "linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)"
     },
     {
       id: "reflection",
-      title: "Daily Reflection",
-      description: "Process your thoughts and experiences",
+      title: "Re-Framing Journal",
+      description: "Transform negative thoughts into positive perspectives",
       icon: BookOpen,
       color: "hsl(260, 25%, 70%)", 
       bgColor: "linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)"
@@ -67,9 +67,9 @@ export default function Journal() {
       case 'emotion':
         return "About Body Journal";
       case 'gratitude':
-        return "About Gratitude Journal";
+        return "About Identity Journal";
       case 'reflection':
-        return "About Daily Reflection";
+        return "About Re-Framing Journal";
       default:
         return "About This Journal";
     }
@@ -95,14 +95,14 @@ export default function Journal() {
       case 'gratitude':
         return (
           <div className="space-y-3">
-            <p>The Gratitude Journal focuses on positive moments and appreciation to cultivate contentment.</p>
+            <p>The Identity Journal helps you explore your values, beliefs, and authentic sense of self.</p>
             <div className="space-y-2">
               <p><strong>How to use:</strong></p>
               <ul className="list-disc list-inside space-y-1 ml-2">
-                <li>Reflect on things you're thankful for today</li>
-                <li>Notice small moments of joy or beauty</li>
-                <li>Write about people who made a positive impact</li>
-                <li>Regular practice shifts focus toward positivity</li>
+                <li>Reflect on your core values and what matters most to you</li>
+                <li>Explore different aspects of your identity and personality</li>
+                <li>Write about your goals, dreams, and aspirations</li>
+                <li>Regular practice builds self-awareness and confidence</li>
               </ul>
             </div>
           </div>
@@ -110,14 +110,14 @@ export default function Journal() {
       case 'reflection':
         return (
           <div className="space-y-3">
-            <p>Daily Reflection helps you process thoughts and experiences through guided self-inquiry.</p>
+            <p>The Re-Framing Journal helps transform negative thought patterns into positive, balanced perspectives.</p>
             <div className="space-y-2">
               <p><strong>How to use:</strong></p>
               <ul className="list-disc list-inside space-y-1 ml-2">
-                <li>Answer thoughtful questions about your day</li>
-                <li>Explore your reactions and responses to events</li>
-                <li>Identify patterns in your thoughts and behaviors</li>
-                <li>Gain deeper self-understanding and clarity</li>
+                <li>Identify negative or unhelpful thoughts</li>
+                <li>Challenge these thoughts with evidence and alternative views</li>
+                <li>Rewrite situations from a more balanced perspective</li>
+                <li>Practice builds resilience and emotional regulation</li>
               </ul>
             </div>
           </div>
@@ -185,8 +185,8 @@ export default function Journal() {
               {selectedJournalType ? getJournalInfoContent(selectedJournalType) : (
                 <>
                   <p><strong>Body Journal:</strong> Start your day by checking in with your emotional and physical state. Choose from 12 different feelings and map where you feel them in your body.</p>
-                  <p><strong>Gratitude Journal:</strong> Focus on positive moments and things you're thankful for to cultivate appreciation and contentment.</p>
-                  <p><strong>Daily Reflection:</strong> Process your thoughts and experiences through guided questions for deeper self-understanding.</p>
+                  <p><strong>Identity Journal:</strong> Explore your values, beliefs, and authentic sense of self to build confidence and self-awareness.</p>
+                  <p><strong>Re-Framing Journal:</strong> Transform negative thought patterns into positive, balanced perspectives for better emotional regulation.</p>
                 </>
               )}
             </div>
