@@ -133,8 +133,8 @@ export default function HeadMap({
               key={part.id}
               className="absolute text-xs text-stone-500 pointer-events-none"
               style={{
-                left: `${part.x - 4}%`,
-                top: `${part.y - 4}%`,
+                left: `${part.x}%`,
+                top: `${part.y}%`,
                 transform: "translate(-50%, -50%)",
               }}
             >
