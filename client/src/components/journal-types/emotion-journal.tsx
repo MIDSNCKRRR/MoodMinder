@@ -15,7 +15,7 @@ interface EmotionJournalProps {
 
 export default function EmotionJournal({ onBack }: EmotionJournalProps) {
   const { toast } = useToast();
-  const [selectedEmotion, setSelectedEmotion] = useState<number>(3);
+  const [selectedEmotion, setSelectedEmotion] = useState<number>(4);
   const [journalContent, setJournalContent] = useState("");
   const [selectedBodyAreas, setSelectedBodyAreas] = useState<string[]>([]);
 
@@ -43,7 +43,7 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
       });
       setJournalContent("");
       setSelectedBodyAreas([]);
-      setSelectedEmotion(3);
+      setSelectedEmotion(4);
     },
     onError: (error: any) => {
       toast({
@@ -54,14 +54,29 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
     },
   });
 
+  const emotionCategories = [
+    { id: 1, emoji: "😭", label: "Overwhelmed", type: "overwhelmed" },
+    { id: 2, emoji: "😰", label: "Anxious", type: "anxious" },
+    { id: 3, emoji: "😔", label: "Sad", type: "sad" },
+    { id: 4, emoji: "😐", label: "Neutral", type: "neutral" },
+    { id: 5, emoji: "😊", label: "Content", type: "content" },
+    { id: 6, emoji: "😄", label: "Happy", type: "happy" },
+    { id: 7, emoji: "🤗", label: "Loving", type: "loving" },
+    { id: 8, emoji: "😌", label: "Peaceful", type: "peaceful" },
+    { id: 9, emoji: "💪", label: "Energized", type: "energized" },
+    { id: 10, emoji: "🔥", label: "Excited", type: "excited" },
+    { id: 11, emoji: "😴", label: "Tired", type: "tired" },
+    { id: 12, emoji: "🧘", label: "Mindful", type: "mindful" },
+  ];
+
   const getEmotionType = (level: number): string => {
-    const types = ["very sad", "sad", "neutral", "happy", "very happy"];
-    return types[level - 1] || "neutral";
+    const category = emotionCategories.find(cat => cat.id === level);
+    return category?.type || "neutral";
   };
 
   const getEmotionLabel = (level: number): string => {
-    const labels = ["Very Low", "Low", "Neutral", "Good", "Excellent"];
-    return labels[level - 1] || "Neutral";
+    const category = emotionCategories.find(cat => cat.id === level);
+    return category?.label || "Neutral";
   };
 
   const handleBodyAreaSelect = (area: string) => {
@@ -74,42 +89,31 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <div className="flex items-center justify-center space-x-3 mb-2">
-          <Button
-            onClick={onBack}
-            variant="ghost"
-            size="sm"
-            className="p-2"
-            data-testid="back-to-journal-types"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div className="text-center">
-            <h2 className="text-xl font-serif font-semibold text-stone-600">Emotion Journal</h2>
-            <p className="text-stone-400 text-sm">Track your feelings and emotional patterns</p>
-          </div>
-        </div>
-      </div>
 
       {/* Emotion Tracking Section */}
-      <Card className="bg-gradient-to-br from-coral-100 to-coral-200 rounded-organic stone-shadow border-0">
+      <Card 
+        className="rounded-organic stone-shadow border-0"
+        style={{ background: 'linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)' }}
+      >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">How are you feeling right now?</h3>
           
-          {/* Emotion Scale Grid */}
-          <div className="grid grid-cols-5 gap-3 mb-6">
-            {[1, 2, 3, 4, 5].map((emotion) => (
-              <div key={emotion} className="text-center">
-                <EmotionFace
-                  emotion={emotion}
-                  size="lg"
-                  selected={selectedEmotion === emotion}
-                  onClick={() => setSelectedEmotion(emotion)}
-                />
-                <span className="text-xs text-stone-400 mt-1 block">
-                  {getEmotionLabel(emotion)}
+          {/* Emotion Categories Grid */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {emotionCategories.map((category) => (
+              <div 
+                key={category.id} 
+                className={`text-center p-3 rounded-stone cursor-pointer transition-all duration-300 ${
+                  selectedEmotion === category.id 
+                    ? "bg-white/80 scale-105 shadow-md" 
+                    : "bg-white/40 hover:bg-white/60"
+                }`}
+                onClick={() => setSelectedEmotion(category.id)}
+                data-testid={`emotion-${category.id}`}
+              >
+                <div className="text-2xl mb-1">{category.emoji}</div>
+                <span className="text-xs text-stone-600 font-medium">
+                  {category.label}
                 </span>
               </div>
             ))}

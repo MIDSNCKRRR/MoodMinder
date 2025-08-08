@@ -31,8 +31,8 @@ export default function Journal() {
   const journalTypes: JournalTypeOption[] = [
     {
       id: "emotion",
-      title: "Emotion Journal",
-      description: "Track your feelings and emotional patterns",
+      title: "Body Journal",
+      description: "Track your physical and emotional state",
       icon: Heart,
       color: "hsl(15, 40%, 58%)",
       bgColor: "linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)"
