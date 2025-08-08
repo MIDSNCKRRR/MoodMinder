@@ -65,13 +65,13 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       const journalData = {
         userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
         journalType: "body" as const,
-        emotionLevel: emotionData.level, // Convert to 1-5 scale
+        emotionLevel: emotionData.level, // Convert to 1-5 scale for database compatibility
         emotionType: emotionData.type,
         content: journalContent,
         bodyMapping: {
-          feelings: selectedBodyFeelings,
-          intensity: emotionIntensity,
-          emotionCategory: selectedEmotion, // Keep original emotion ID for reference
+          feelings: selectedBodyFeelings, // Body part specific emotions
+          emotionCategory: selectedEmotion, // Original emotion selection (1-12)
+          intensity: emotionIntensity, // Overall emotion intensity (0-100)
           timestamp: new Date().toISOString()
         },
       };
