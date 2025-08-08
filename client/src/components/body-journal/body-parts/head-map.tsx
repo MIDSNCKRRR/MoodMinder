@@ -63,9 +63,6 @@ export default function HeadMap({
     }
   };
 
-  // Debug: Log the selectedFeelings to see if data is coming through
-  console.log("Head Map selectedFeelings:", selectedFeelings);
-
   return (
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4>

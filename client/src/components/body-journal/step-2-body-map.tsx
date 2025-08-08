@@ -152,14 +152,14 @@ export default function Step2BodyMap({
             </Tabs>
           </div>
 
-          {totalSelectedFeelings > 0 && (
+          {/* {totalSelectedFeelings > 0 && (
             <div className="mt-4 text-center">
               <p className="text-sm text-stone-600 font-medium">
                 {totalSelectedFeelings} body feeling
                 {totalSelectedFeelings > 1 ? "s" : ""} selected
               </p>
             </div>
-          )}
+          )} */}
         </CardContent>
       </Card>
 

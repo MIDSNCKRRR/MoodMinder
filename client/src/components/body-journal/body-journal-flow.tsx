@@ -58,14 +58,67 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     }
   };
 
-  const handleComplete = () => {
-    // Reset form and go back to journal types
-    setCurrentStep(1);
-    setSelectedEmotion(4);
-    setEmotionIntensity(50);
-    setSelectedBodyFeelings({});
-    setJournalContent("");
-    onBack();
+  const handleComplete = async () => {
+    try {
+      // Prepare journal entry data
+      const journalData = {
+        userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
+        journalType: "body" as const,
+        emotionLevel: selectedEmotion,
+        emotionType: getEmotionTypeFromLevel(selectedEmotion),
+        content: journalContent,
+        bodyMapping: {
+          feelings: selectedBodyFeelings,
+          intensity: emotionIntensity,
+          timestamp: new Date().toISOString()
+        },
+      };
+
+      // Save to backend
+      const response = await fetch('/api/journal-entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(journalData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to save entry: ${response.statusText}`);
+      }
+
+      const savedEntry = await response.json();
+      console.log('Journal entry saved:', savedEntry);
+
+      // Clear localStorage
+      localStorage.removeItem('bodyJournal_emotion');
+      localStorage.removeItem('bodyJournal_intensity');
+      localStorage.removeItem('bodyJournal_bodyFeelings');
+      localStorage.removeItem('bodyJournal_content');
+
+      // Reset form and go back to journal types
+      setCurrentStep(1);
+      setSelectedEmotion(4);
+      setEmotionIntensity(50);
+      setSelectedBodyFeelings({});
+      setJournalContent("");
+      onBack();
+    } catch (error) {
+      console.error('Error saving journal entry:', error);
+      // You could show a toast notification here
+    }
+  };
+
+  // Helper function to convert emotion level to type
+  const getEmotionTypeFromLevel = (level: number): string => {
+    switch (level) {
+      case 1: return "very-sad";
+      case 2: return "sad";
+      case 3: return "neutral";
+      case 4: return "happy";
+      case 5: return "very-happy";
+      default: return "neutral";
+    }
   };
 
   // Memoize the body feelings change handler to prevent re-renders

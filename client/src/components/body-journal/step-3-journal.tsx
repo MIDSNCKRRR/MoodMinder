@@ -16,19 +16,19 @@ interface Step3JournalProps {
   onComplete: () => void;
 }
 
-export default function Step3Journal({ 
-  journalContent, 
-  onJournalChange, 
-  onBack, 
-  selectedEmotion, 
+export default function Step3Journal({
+  journalContent,
+  onJournalChange,
+  onBack,
+  selectedEmotion,
   selectedBodyFeelings,
-  onComplete 
+  onComplete,
 }: Step3JournalProps) {
   const { toast } = useToast();
 
   // Auto-save journal content
   useEffect(() => {
-    localStorage.setItem('bodyJournal_content', journalContent);
+    localStorage.setItem("bodyJournal_content", journalContent);
   }, [journalContent]);
 
   const emotionCategories = [
@@ -41,13 +41,13 @@ export default function Step3Journal({
     { id: 7, emoji: "🤗", label: "Loving", type: "loving" },
     { id: 8, emoji: "😌", label: "Peaceful", type: "peaceful" },
     { id: 9, emoji: "💪", label: "Energized", type: "energized" },
-    { id: 10, emoji: "🔥", label: "Excited", type: "excited" },
-    { id: 11, emoji: "😴", label: "Tired", type: "tired" },
-    { id: 12, emoji: "🧘", label: "Mindful", type: "mindful" },
+    // { id: 10, emoji: "🔥", label: "Excited", type: "excited" },
+    // { id: 11, emoji: "😴", label: "Tired", type: "tired" },
+    // { id: 12, emoji: "🧘", label: "Mindful", type: "mindful" },
   ];
 
   const getEmotionType = (level: number): string => {
-    const category = emotionCategories.find(cat => cat.id === level);
+    const category = emotionCategories.find((cat) => cat.id === level);
     return category?.type || "neutral";
   };
 
@@ -67,9 +67,9 @@ export default function Step3Journal({
         description: "Your body journal entry has been saved successfully.",
       });
       // Clear temporary saved data
-      localStorage.removeItem('bodyJournal_emotion');
-      localStorage.removeItem('bodyJournal_bodyFeelings');
-      localStorage.removeItem('bodyJournal_content');
+      localStorage.removeItem("bodyJournal_emotion");
+      localStorage.removeItem("bodyJournal_bodyFeelings");
+      localStorage.removeItem("bodyJournal_content");
       onComplete();
     },
     onError: (error: any) => {
@@ -81,14 +81,18 @@ export default function Step3Journal({
     },
   });
 
-  const selectedEmotionData = emotionCategories.find(cat => cat.id === selectedEmotion);
+  const selectedEmotionData = emotionCategories.find(
+    (cat) => cat.id === selectedEmotion,
+  );
 
   return (
     <div className="space-y-6">
       {/* Summary Card */}
       <Card className="rounded-organic stone-shadow border-0 bg-white/90">
         <CardContent className="p-4">
-          <h4 className="font-medium text-stone-600 text-sm mb-3">Your selections:</h4>
+          <h4 className="font-medium text-stone-600 text-sm mb-3">
+            Your selections:
+          </h4>
           <div className="flex items-center gap-4 text-sm text-stone-500">
             <div className="flex items-center gap-1">
               <span className="text-lg">{selectedEmotionData?.emoji}</span>
@@ -96,7 +100,8 @@ export default function Step3Journal({
             </div>
             {Object.keys(selectedBodyFeelings).length > 0 && (
               <div>
-                • {Object.keys(selectedBodyFeelings).length} body feeling{Object.keys(selectedBodyFeelings).length > 1 ? 's' : ''}
+                • {Object.keys(selectedBodyFeelings).length} body feeling
+                {Object.keys(selectedBodyFeelings).length > 1 ? "s" : ""}
               </div>
             )}
           </div>
@@ -104,9 +109,12 @@ export default function Step3Journal({
       </Card>
 
       {/* Journal Entry */}
-      <Card 
+      <Card
         className="rounded-organic stone-shadow border-0"
-        style={{ background: 'linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)' }}
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)",
+        }}
       >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-xl mb-2 text-center">
@@ -115,7 +123,7 @@ export default function Step3Journal({
           <p className="text-stone-500 text-sm text-center mb-6">
             Write about your feelings and physical sensations
           </p>
-          
+
           <Textarea
             value={journalContent}
             onChange={(e) => onJournalChange(e.target.value)}
@@ -137,14 +145,15 @@ export default function Step3Journal({
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        
+
         <Button
           onClick={() => createEntryMutation.mutate()}
           disabled={createEntryMutation.isPending || !journalContent.trim()}
           className="px-6 py-3 rounded-stone font-medium transition-all"
-          style={{ 
-            background: "linear-gradient(to right, hsl(15, 60%, 70%), hsl(15, 65%, 60%))",
-            color: "white"
+          style={{
+            background:
+              "linear-gradient(to right, hsl(15, 60%, 70%), hsl(15, 65%, 60%))",
+            color: "white",
           }}
           data-testid="save-body-journal"
         >
