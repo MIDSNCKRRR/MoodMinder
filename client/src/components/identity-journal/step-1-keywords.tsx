@@ -134,31 +134,40 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
                 Selected ({selectedKeywords.length}/2)
               </h4>
               <div className="flex flex-wrap gap-2">
-                {selectedKeywords.map((keyword) => {
-                  const isFromAdjectives = adjectiveWords.includes(keyword);
-                  const categoryLabel = isFromAdjectives ? 'Adjective' : 'Character';
-                  const categoryColor = isFromAdjectives ? 'bg-blue-200 text-blue-700' : 'bg-purple-200 text-purple-700';
-                  
-                  return (
-                    <div
-                      key={keyword}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
-                      data-testid={`selected-keyword-${keyword.toLowerCase()}`}
-                    >
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${categoryColor}`}>
-                        {categoryLabel}
-                      </span>
-                      <span>{keyword}</span>
-                      <button
-                        onClick={() => handleRemoveKeyword(keyword)}
-                        className="ml-1 text-sage-500 hover:text-sage-700 transition-colors"
-                        data-testid={`remove-keyword-${keyword.toLowerCase()}`}
+                {selectedKeywords
+                  .sort((a, b) => {
+                    const aIsAdjective = adjectiveWords.includes(a);
+                    const bIsAdjective = adjectiveWords.includes(b);
+                    // Adjectives first (return -1), Characters second (return 1)
+                    if (aIsAdjective && !bIsAdjective) return -1;
+                    if (!aIsAdjective && bIsAdjective) return 1;
+                    return 0;
+                  })
+                  .map((keyword) => {
+                    const isFromAdjectives = adjectiveWords.includes(keyword);
+                    const categoryLabel = isFromAdjectives ? 'Adjective' : 'Character';
+                    const categoryColor = isFromAdjectives ? 'bg-blue-200 text-blue-700' : 'bg-purple-200 text-purple-700';
+                    
+                    return (
+                      <div
+                        key={keyword}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
+                        data-testid={`selected-keyword-${keyword.toLowerCase()}`}
                       >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  );
-                })}
+                        <span className={`px-2 py-0.5 rounded-full text-xs ${categoryColor}`}>
+                          {categoryLabel}
+                        </span>
+                        <span>{keyword}</span>
+                        <button
+                          onClick={() => handleRemoveKeyword(keyword)}
+                          className="ml-1 text-sage-500 hover:text-sage-700 transition-colors"
+                          data-testid={`remove-keyword-${keyword.toLowerCase()}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
