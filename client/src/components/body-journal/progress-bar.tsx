@@ -20,14 +20,14 @@ export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProp
           <div className="flex flex-col items-center">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
               currentStep === step.number 
-                ? "bg-coral-500 border-coral-500" 
-                : "bg-stone-200 border-stone-200"
+                ? "bg-black border-black" 
+                : "bg-stone-300 border-stone-300"
             }`}>
-              <span className={`text-sm font-medium ${
-                currentStep === step.number ? "text-white" : "text-stone-400"
-              }`}>
-                {step.number}
-              </span>
+              {currentStep === step.number && (
+                <span className="text-sm font-medium text-white">
+                  {step.number}
+                </span>
+              )}
             </div>
             <span className={`text-xs mt-2 font-medium ${
               currentStep === step.number ? "text-stone-600" : "text-stone-400"
