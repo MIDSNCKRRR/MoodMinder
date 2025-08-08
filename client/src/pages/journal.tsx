@@ -14,10 +14,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import EmotionJournal from "@/components/journal-types/emotion-journal";
 import GratitudeJournal from "@/components/journal-types/gratitude-journal";
-import ReflectionJournal from "@/components/journal-types/reflection-journal";
+import { ReframingJournalFlow } from "@/components/reframing-journal/reframing-journal-flow";
 import type { JournalEntry } from "@shared/schema";
 
-type JournalType = "emotion" | "gratitude" | "reflection";
+type JournalType = "emotion" | "gratitude" | "reframing";
 
 interface JournalTypeOption {
   id: JournalType;
@@ -58,7 +58,7 @@ export default function Journal() {
         "linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)",
     },
     {
-      id: "reflection",
+      id: "reframing",
       title: "Re-Framing Journal",
       description: "Transform negative thoughts into positive perspectives",
       icon: BookOpen,
@@ -80,7 +80,7 @@ export default function Journal() {
         return "About Body Journal";
       case "gratitude":
         return "About Identity Journal";
-      case "reflection":
+      case "reframing":
         return "About Re-Framing Journal";
       default:
         return "About This Journal";
@@ -138,7 +138,7 @@ export default function Journal() {
             </div>
           </div>
         );
-      case "reflection":
+      case "reframing":
         return (
           <div className="space-y-3">
             <p>
@@ -323,8 +323,8 @@ export default function Journal() {
         <GratitudeJournal onBack={() => setSelectedJournalType(null)} />
       )}
 
-      {selectedJournalType === "reflection" && (
-        <ReflectionJournal onBack={() => setSelectedJournalType(null)} />
+      {selectedJournalType === "reframing" && (
+        <ReframingJournalFlow onBack={() => setSelectedJournalType(null)} />
       )}
     </div>
   );
