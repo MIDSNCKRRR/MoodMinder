@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -62,6 +62,11 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     onBack();
   };
 
+  // Memoize the body feelings change handler to prevent re-renders
+  const handleBodyFeelingsChange = useCallback((feelings: Record<string, string>) => {
+    setSelectedBodyFeelings(feelings);
+  }, []);
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
@@ -76,7 +81,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
         return (
           <Step2BodyMap
             selectedBodyFeelings={selectedBodyFeelings}
-            onBodyFeelingsChange={setSelectedBodyFeelings}
+            onBodyFeelingsChange={handleBodyFeelingsChange}
             onNext={handleNext}
             onBack={handleBack}
           />

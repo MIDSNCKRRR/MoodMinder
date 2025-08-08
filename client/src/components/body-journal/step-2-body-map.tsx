@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,56 +15,28 @@ interface Step2BodyMapProps {
 }
 
 export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChange, onNext, onBack }: Step2BodyMapProps) {
-  const [headFeelings, setHeadFeelings] = useState<Record<string, string>>({});
-  const [upperBodyFeelings, setUpperBodyFeelings] = useState<Record<string, string>>({});
-  const [lowerBodyFeelings, setLowerBodyFeelings] = useState<Record<string, string>>({});
   const [draggedFeeling, setDraggedFeeling] = useState<string | null>(null);
 
-  // Initialize feelings from props
-  useEffect(() => {
-    const headParts = ["forehead", "eyes", "jaw", "neck"];
-    const upperBodyParts = ["chest", "heart", "shoulders", "arms", "hands", "stomach"];
-    const lowerBodyParts = ["hips", "thighs", "knees", "calves", "feet"];
+  const handleFeelingChange = useCallback((part: string, feeling: string) => {
+    const newFeelings = { ...selectedBodyFeelings, [part]: feeling };
+    localStorage.setItem('bodyJournal_bodyFeelings', JSON.stringify(newFeelings));
+    onBodyFeelingsChange(newFeelings);
+  }, [selectedBodyFeelings, onBodyFeelingsChange]);
 
-    setHeadFeelings(Object.fromEntries(
-      Object.entries(selectedBodyFeelings).filter(([part]) => headParts.includes(part))
-    ));
-    setUpperBodyFeelings(Object.fromEntries(
-      Object.entries(selectedBodyFeelings).filter(([part]) => upperBodyParts.includes(part))
-    ));
-    setLowerBodyFeelings(Object.fromEntries(
-      Object.entries(selectedBodyFeelings).filter(([part]) => lowerBodyParts.includes(part))
-    ));
-  }, [selectedBodyFeelings]);
+  // Separate feelings by body area for display
+  const headParts = ["forehead", "eyes", "jaw", "neck"];
+  const upperBodyParts = ["chest", "heart", "shoulders", "arms", "hands", "stomach"];
+  const lowerBodyParts = ["hips", "thighs", "knees", "calves", "feet"];
 
-  // Update parent state when feelings change
-  useEffect(() => {
-    const allFeelings = { ...headFeelings, ...upperBodyFeelings, ...lowerBodyFeelings };
-    localStorage.setItem('bodyJournal_bodyFeelings', JSON.stringify(allFeelings));
-    
-    // Only update parent if different to prevent infinite re-renders
-    const currentKeys = Object.keys(selectedBodyFeelings).sort();
-    const newKeys = Object.keys(allFeelings).sort();
-    const isDifferent = currentKeys.length !== newKeys.length || 
-      currentKeys.some((key, index) => key !== newKeys[index]) ||
-      Object.entries(allFeelings).some(([key, value]) => selectedBodyFeelings[key] !== value);
-    
-    if (isDifferent) {
-      onBodyFeelingsChange(allFeelings);
-    }
-  }, [headFeelings, upperBodyFeelings, lowerBodyFeelings]);
-
-  const handleHeadFeelingChange = (part: string, feeling: string) => {
-    setHeadFeelings(prev => ({ ...prev, [part]: feeling }));
-  };
-
-  const handleUpperBodyFeelingChange = (part: string, feeling: string) => {
-    setUpperBodyFeelings(prev => ({ ...prev, [part]: feeling }));
-  };
-
-  const handleLowerBodyFeelingChange = (part: string, feeling: string) => {
-    setLowerBodyFeelings(prev => ({ ...prev, [part]: feeling }));
-  };
+  const headFeelings = Object.fromEntries(
+    Object.entries(selectedBodyFeelings).filter(([part]) => headParts.includes(part))
+  );
+  const upperBodyFeelings = Object.fromEntries(
+    Object.entries(selectedBodyFeelings).filter(([part]) => upperBodyParts.includes(part))
+  );
+  const lowerBodyFeelings = Object.fromEntries(
+    Object.entries(selectedBodyFeelings).filter(([part]) => lowerBodyParts.includes(part))
+  );
 
   const totalSelectedFeelings = Object.keys(selectedBodyFeelings).length;
 
@@ -116,21 +88,21 @@ export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChang
               <TabsContent value="head" className="mt-0">
                 <HeadMap 
                   selectedFeelings={headFeelings}
-                  onFeelingChange={handleHeadFeelingChange}
+                  onFeelingChange={handleFeelingChange}
                 />
               </TabsContent>
               
               <TabsContent value="upper" className="mt-0">
                 <UpperBodyMap 
                   selectedFeelings={upperBodyFeelings}
-                  onFeelingChange={handleUpperBodyFeelingChange}
+                  onFeelingChange={handleFeelingChange}
                 />
               </TabsContent>
               
               <TabsContent value="lower" className="mt-0">
                 <LowerBodyMap 
                   selectedFeelings={lowerBodyFeelings}
-                  onFeelingChange={handleLowerBodyFeelingChange}
+                  onFeelingChange={handleFeelingChange}
                 />
               </TabsContent>
             </Tabs>
