@@ -1,4 +1,4 @@
-import { CheckCircle, Circle } from "lucide-react";
+// Progress bar component - shows current step number and greys out remaining steps
 
 interface ProgressBarProps {
   currentStep: number;
@@ -19,22 +19,21 @@ export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProp
           {/* Step Circle */}
           <div className="flex flex-col items-center">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
-              currentStep >= step.number 
+              currentStep === step.number 
                 ? "bg-coral-500 border-coral-500" 
-                : "bg-white border-stone-300"
+                : currentStep > step.number
+                ? "bg-stone-400 border-stone-400"
+                : "bg-stone-100 border-stone-200"
             }`}>
-              {currentStep > step.number ? (
-                <CheckCircle className="w-5 h-5 text-white" />
-              ) : (
-                <span className={`text-sm font-medium ${
-                  currentStep >= step.number ? "text-white" : "text-stone-400"
-                }`}>
-                  {step.number}
-                </span>
-              )}
+              <span className={`text-sm font-medium ${
+                currentStep >= step.number ? "text-white" : "text-stone-300"
+              }`}>
+                {step.number}
+              </span>
             </div>
             <span className={`text-xs mt-2 font-medium ${
-              currentStep >= step.number ? "text-stone-600" : "text-stone-400"
+              currentStep === step.number ? "text-stone-600" : 
+              currentStep > step.number ? "text-stone-500" : "text-stone-300"
             }`}>
               {step.label}
             </span>
@@ -43,7 +42,7 @@ export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProp
           {/* Connector Line */}
           {index < steps.length - 1 && (
             <div className={`flex-1 h-0.5 mx-4 transition-all duration-300 ${
-              currentStep > step.number ? "bg-coral-500" : "bg-stone-200"
+              currentStep > step.number ? "bg-stone-400" : "bg-stone-200"
             }`} />
           )}
         </div>
