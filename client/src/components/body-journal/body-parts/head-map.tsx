@@ -65,49 +65,88 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
       {/* Head SVG - Enhanced with realistic proportions */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Enhanced head outline based on reference */}
-          <path 
-            d="M50 15 
-               C65 15 75 25 75 40
-               C75 45 73 50 70 52
-               C68 54 68 56 70 58
-               C72 60 72 62 70 64
-               L68 66
-               C65 68 62 70 58 70
-               L42 70
-               C38 70 35 68 32 66
-               L30 64
-               C28 62 28 60 30 58
-               C32 56 32 54 30 52
-               C27 50 25 45 25 40
-               C25 25 35 15 50 15 Z" 
-            fill="hsl(270, 20%, 85%)" 
-            stroke="hsl(270, 30%, 60%)" 
-            strokeWidth="2"
-          />
-          
-          {/* Ears */}
-          <ellipse cx="25" cy="40" rx="4" ry="8" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
-          <ellipse cx="75" cy="40" rx="4" ry="8" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
-          
-          {/* Neck */}
-          <path 
-            d="M42 70 
-               C45 72 48 73 50 73
-               C52 73 55 72 58 70
-               L60 75
-               C58 78 55 80 50 80
-               C45 80 42 78 40 75
-               L42 70 Z" 
-            fill="hsl(270, 20%, 85%)" 
-            stroke="hsl(270, 30%, 60%)" 
-            strokeWidth="2"
-          />
-          
-          {/* Facial features for reference */}
-          <ellipse cx="42" cy="35" rx="2" ry="1" fill="hsl(270, 30%, 70%)" opacity="0.3"/>
-          <ellipse cx="58" cy="35" rx="2" ry="1" fill="hsl(270, 30%, 70%)" opacity="0.3"/>
-          <path d="M46 48 C48 50 52 50 54 48" fill="none" stroke="hsl(270, 30%, 70%)" strokeWidth="1" opacity="0.3"/>
+          {/* Professional head silhouette based on reference image */}
+          <g>
+            {/* Main head shape - clean rounded silhouette */}
+            <path 
+              d="M50 10
+                 C60 10 68 16 72 24
+                 C75 30 76 37 75 44
+                 C74 50 71 55 67 58
+                 C65 60 64 62 64 64
+                 C64 66 65 67 66 68
+                 L64 70
+                 C62 72 59 73 56 74
+                 L44 74
+                 C41 73 38 72 36 70
+                 L34 68
+                 C35 67 36 66 36 64
+                 C36 62 35 60 33 58
+                 C29 55 26 50 25 44
+                 C24 37 25 30 28 24
+                 C32 16 40 10 50 10 Z" 
+              fill="hsl(270, 18%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2.5"
+            />
+            
+            {/* Left ear */}
+            <ellipse 
+              cx="28" 
+              cy="42" 
+              rx="3.5" 
+              ry="7" 
+              fill="hsl(270, 18%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2"
+            />
+            
+            {/* Right ear */}
+            <ellipse 
+              cx="72" 
+              cy="42" 
+              rx="3.5" 
+              ry="7" 
+              fill="hsl(270, 18%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2"
+            />
+            
+            {/* Neck - clean cylindrical shape */}
+            <path 
+              d="M44 74
+                 C46 75 48 76 50 76
+                 C52 76 54 75 56 74
+                 L58 82
+                 C56 85 54 87 50 87
+                 C46 87 44 85 42 82
+                 L44 74 Z" 
+              fill="hsl(270, 18%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2.5"
+            />
+            
+            {/* Subtle facial features for anatomical reference - very light */}
+            <g opacity="0.25">
+              {/* Eyes indication */}
+              <ellipse cx="43" cy="38" rx="1.5" ry="0.8" fill="hsl(270, 30%, 70%)"/>
+              <ellipse cx="57" cy="38" rx="1.5" ry="0.8" fill="hsl(270, 30%, 70%)"/>
+              
+              {/* Nose indication */}
+              <path d="M48 47 L50 50 L52 47" 
+                    fill="none" 
+                    stroke="hsl(270, 30%, 70%)" 
+                    strokeWidth="1.2" 
+                    strokeLinecap="round"/>
+              
+              {/* Mouth indication */}
+              <path d="M46 54 Q50 56 54 54" 
+                    fill="none" 
+                    stroke="hsl(270, 30%, 70%)" 
+                    strokeWidth="1" 
+                    strokeLinecap="round"/>
+            </g>
+          </g>
           
           {/* Interactive areas with enhanced styling */}
           {headParts.map((part) => {

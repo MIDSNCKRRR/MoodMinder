@@ -131,11 +131,14 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                 <circle
                   cx={leftX}
                   cy={part.y}
-                  r="5"
-                  fill={isSelected ? "#f97316" : hasFeeling ? "#22c55e" : "#e7e5e4"}
-                  stroke={isSelected ? "#ea580c" : hasFeeling ? "#16a34a" : "#a8a29e"}
-                  strokeWidth="2"
-                  className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
+                  r="7"
+                  fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
+                  stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
+                  strokeWidth="2.5"
+                  className="cursor-pointer transition-all duration-300 hover:scale-110"
+                  style={{
+                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
+                  }}
                   onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
@@ -148,11 +151,14 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                 <circle
                   cx={rightX}
                   cy={part.y}
-                  r="5"
-                  fill={isSelected ? "#f97316" : hasFeeling ? "#22c55e" : "#e7e5e4"}
-                  stroke={isSelected ? "#ea580c" : hasFeeling ? "#16a34a" : "#a8a29e"}
-                  strokeWidth="2"
-                  className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
+                  r="7"
+                  fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
+                  stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
+                  strokeWidth="2.5"
+                  className="cursor-pointer transition-all duration-300 hover:scale-110"
+                  style={{
+                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
+                  }}
                   onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
