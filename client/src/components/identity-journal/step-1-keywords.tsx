@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowRight, Plus, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -32,22 +32,6 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
     "Embracing", "Expanding", "Deepening", "Awakening", "Integrating"
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredWords, setFilteredWords] = useState(candidateWords);
-
-  // Filter words based on search
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredWords(candidateWords);
-    } else {
-      setFilteredWords(
-        candidateWords.filter(word =>
-          word.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    }
-  }, [searchTerm]);
-
   // Auto-save keywords
   useEffect(() => {
     localStorage.setItem('identityJournal_keywords', JSON.stringify(selectedKeywords));
@@ -73,7 +57,7 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
       {/* Step Content */}
       <Card 
         className="rounded-organic stone-shadow border-0"
-        style={{ background: 'linear-gradient(135deg, hsl(140, 35%, 93%) 0%, hsl(140, 30%, 85%) 100%)' }}
+        style={{ background: 'linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)' }}
       >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-xl mb-2 text-center">
@@ -82,22 +66,10 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
           <p className="text-stone-500 text-sm text-center mb-6">
             Select keywords that resonate with your current sense of self
           </p>
-          
-          {/* Search Input */}
-          <div className="mb-6">
-            <input
-              type="text"
-              placeholder="Search for words..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 rounded-stone border border-sage-200 bg-white/80 text-stone-600 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-transparent"
-              data-testid="keyword-search"
-            />
-          </div>
 
           {/* Selected Keywords */}
           {selectedKeywords.length > 0 && (
-            <div className="mb-6 p-4 bg-white/60 rounded-stone border border-sage-200">
+            <div className="mb-6 p-4 bg-white/60 rounded-stone">
               <h4 className="text-sm font-medium text-stone-600 mb-3">
                 Selected ({selectedKeywords.length})
               </h4>
@@ -123,37 +95,29 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
           )}
 
           {/* Keywords Grid */}
-          <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-            {filteredWords.map((keyword) => (
-              <Button
+          <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
+            {candidateWords.map((keyword) => (
+              <div
                 key={keyword}
-                onClick={() => handleKeywordToggle(keyword)}
-                variant="outline"
-                size="sm"
                 className={`
-                  p-3 h-auto rounded-stone text-sm font-medium transition-all duration-200
+                  p-3 rounded-stone text-center cursor-pointer transition-all duration-300 text-sm font-medium
                   ${isSelected(keyword)
-                    ? "bg-sage-200 border-sage-300 text-sage-700 scale-95"
-                    : "bg-white/60 border-sage-200 text-stone-600 hover:bg-sage-50 hover:border-sage-300"
+                    ? "bg-white/90 scale-105 shadow-lg ring-2 ring-sage-300 text-sage-700"
+                    : "bg-white/50 hover:bg-white/70 text-stone-600"
                   }
                 `}
+                onClick={() => handleKeywordToggle(keyword)}
                 data-testid={`keyword-${keyword.toLowerCase()}`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-2">
                   {isSelected(keyword) && (
                     <div className="w-2 h-2 bg-sage-500 rounded-full" />
                   )}
                   <span>{keyword}</span>
                 </div>
-              </Button>
+              </div>
             ))}
           </div>
-
-          {filteredWords.length === 0 && (
-            <div className="text-center py-8 text-stone-500">
-              <p>No words found matching "{searchTerm}"</p>
-            </div>
-          )}
         </CardContent>
       </Card>
 

@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import ProgressBar from "@/components/identity-journal/progress-bar";
-import Step1Keywords from "@/components/identity-journal/step-1-keywords";
-import Step2Reflection from "@/components/identity-journal/step-2-reflection";
+import ProgressBar from "./progress-bar";
+import Step1Keywords from "./step-1-keywords";
+import Step2Reflection from "./step-2-reflection";
 
 interface IdentityJournalFlowProps {
   onBack: () => void;
@@ -94,7 +94,7 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
     }
   };
 
-  // Memoize the keywords change handler to prevent re-renders
+  // Memoize handlers to prevent re-renders
   const handleKeywordsChange = useCallback((keywords: string[]) => {
     setSelectedKeywords(keywords);
   }, []);

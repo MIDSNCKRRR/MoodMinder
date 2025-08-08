@@ -53,7 +53,7 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
       {/* Step Content */}
       <Card 
         className="rounded-organic stone-shadow border-0"
-        style={{ background: 'linear-gradient(135deg, hsl(140, 35%, 93%) 0%, hsl(140, 30%, 85%) 100%)' }}
+        style={{ background: 'linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)' }}
       >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-xl mb-2 text-center">
@@ -64,7 +64,7 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
           </p>
 
           {/* Selected Keywords Summary */}
-          <div className="mb-6 p-4 bg-white/60 rounded-stone border border-sage-200">
+          <div className="mb-6 p-4 bg-white/60 rounded-stone">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-sage-600" />
               <h4 className="text-sm font-medium text-stone-600">
@@ -84,7 +84,7 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
           </div>
 
           {/* Reflection Prompts */}
-          <div className="mb-6 p-4 bg-white/40 rounded-stone border border-sage-100">
+          <div className="mb-6 p-4 bg-white/40 rounded-stone">
             <h4 className="text-sm font-medium text-stone-600 mb-3">
               Reflection Prompts
             </h4>
@@ -104,7 +104,7 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
               value={content}
               onChange={handleContentChange}
               placeholder="Start writing about your identity and what these words mean to you..."
-              className="w-full h-64 p-4 rounded-stone border border-sage-200 bg-white/80 text-stone-600 placeholder-stone-400 resize-none focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-transparent"
+              className="w-full h-64 p-4 rounded-stone bg-white/80 text-stone-600 placeholder-stone-400 resize-none focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-transparent border-0"
               data-testid="reflection-textarea"
             />
             <div className="absolute bottom-3 right-3 text-xs text-stone-400">
