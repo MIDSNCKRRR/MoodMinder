@@ -62,7 +62,7 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
       <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4>
       
       {/* Your uploaded Head & Neck image */}
-      <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
+      <div className="relative mx-auto" style={{ width: '280px', height: '320px' }}>
         <div className="relative w-full h-full">
           <img 
             src={headNeckImage} 
