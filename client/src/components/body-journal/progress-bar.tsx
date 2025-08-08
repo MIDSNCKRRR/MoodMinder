@@ -6,47 +6,27 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
-  const steps = [
-    { number: 1, label: "Emotion" },
-    { number: 2, label: "Body Map" },
-    { number: 3, label: "Journal" },
-  ];
+  const stepLabels = ["Emotion", "Body Map", "Journal"];
+  const currentLabel = stepLabels[currentStep - 1];
 
   return (
-    <div className="flex items-center justify-between mb-8 px-4">
-      {steps.map((step, index) => (
-        <div key={step.number} className="flex items-center">
-          {/* Step Circle */}
-          <div className="flex flex-col items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
-              currentStep === step.number 
-                ? "bg-coral-500 border-coral-500" 
-                : currentStep > step.number
-                ? "bg-stone-400 border-stone-400"
-                : "bg-stone-100 border-stone-200"
-            }`}>
-              <span className={`text-sm font-medium ${
-                currentStep >= step.number ? "text-white" : "text-stone-300"
-              }`}>
-                {step.number}
-              </span>
-            </div>
-            <span className={`text-xs mt-2 font-medium ${
-              currentStep === step.number ? "text-stone-600" : 
-              currentStep > step.number ? "text-stone-500" : "text-stone-300"
-            }`}>
-              {step.label}
-            </span>
-          </div>
-
-          {/* Connector Line */}
-          {index < steps.length - 1 && (
-            <div className={`flex-1 h-0.5 mx-4 transition-all duration-300 ${
-              currentStep > step.number ? "bg-stone-400" : "bg-stone-200"
-            }`} />
-          )}
+    <div className="flex justify-center items-center mb-8">
+      <div className="flex flex-col items-center">
+        {/* Current Step Circle */}
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-coral-500 border-2 border-coral-500 shadow-lg">
+          <span className="text-lg font-bold text-white">
+            {currentStep}
+          </span>
         </div>
-      ))}
+        {/* Current Step Label */}
+        <span className="text-sm mt-2 font-semibold text-stone-600">
+          {currentLabel}
+        </span>
+        {/* Step Counter */}
+        <span className="text-xs mt-1 text-stone-400">
+          Step {currentStep} of {totalSteps}
+        </span>
+      </div>
     </div>
   );
 }
