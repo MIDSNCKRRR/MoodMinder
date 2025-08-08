@@ -11,18 +11,27 @@ interface Step2ReflectionProps {
   onBack: () => void;
 }
 
-export default function Step2Reflection({ content, onContentChange, selectedKeywords, onComplete, onBack }: Step2ReflectionProps) {
+export default function Step2Reflection({
+  content,
+  onContentChange,
+  selectedKeywords,
+  onComplete,
+  onBack,
+}: Step2ReflectionProps) {
   const [wordCount, setWordCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   // Auto-save content
   useEffect(() => {
-    localStorage.setItem('identityJournal_content', content);
+    localStorage.setItem("identityJournal_content", content);
   }, [content]);
 
   // Update word count
   useEffect(() => {
-    const words = content.trim().split(/\s+/).filter(word => word.length > 0);
+    const words = content
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
     setWordCount(words.length);
   }, [content]);
 
@@ -43,25 +52,29 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
 
   const reflectionPrompts = [
     "How do these words reflect who you are today?",
-    "What patterns do you notice in your selected keywords?",
-    "Which of these qualities feel most true to you right now?",
-    "How have these aspects of yourself evolved recently?",
-    "What would you add or change about this list?"
+    // "What patterns do you notice in your selected keywords?",
+    // "Which of these qualities feel most true to you right now?",
+    // "How have these aspects of yourself evolved recently?",
+    // "What would you add or change about this list?"
   ];
 
   return (
     <div className="space-y-6">
       {/* Step Content */}
-      <Card 
+      <Card
         className="rounded-organic stone-shadow border-0"
-        style={{ background: 'linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)' }}
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)",
+        }}
       >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-xl mb-2 text-center">
             Reflect on your identity
           </h3>
           <p className="text-stone-500 text-sm text-center mb-6">
-            Write about what these words mean to you and how they represent who you are
+            Write about what these words mean to you and how they represent who
+            you are
           </p>
 
           {/* Selected Keywords Summary */}
@@ -91,7 +104,10 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
             </h4>
             <ul className="space-y-2">
               {reflectionPrompts.map((prompt, index) => (
-                <li key={index} className="text-sm text-stone-500 flex items-start gap-2">
+                <li
+                  key={index}
+                  className="text-sm text-stone-500 flex items-start gap-2"
+                >
                   <span className="text-sage-400 mt-0.5">•</span>
                   <span>{prompt}</span>
                 </li>
@@ -132,7 +148,8 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
           disabled={!canSave || isLoading}
           className="px-6 py-3 rounded-stone font-medium transition-all"
           style={{
-            background: "linear-gradient(to right, hsl(120, 30%, 60%), hsl(120, 35%, 50%))",
+            background:
+              "linear-gradient(to right, hsl(120, 30%, 60%), hsl(120, 35%, 50%))",
             color: "white",
           }}
           data-testid="save-identity-journal"

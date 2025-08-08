@@ -10,24 +10,26 @@ interface IdentityJournalFlowProps {
   onBack: () => void;
 }
 
-export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps) {
+export default function IdentityJournalFlow({
+  onBack,
+}: IdentityJournalFlowProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [showInfo, setShowInfo] = useState(false);
-  
+
   // State for all steps
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [reflectionContent, setReflectionContent] = useState("");
 
   // Load saved data on component mount
   useEffect(() => {
-    const savedKeywords = localStorage.getItem('identityJournal_keywords');
-    const savedContent = localStorage.getItem('identityJournal_content');
+    const savedKeywords = localStorage.getItem("identityJournal_keywords");
+    const savedContent = localStorage.getItem("identityJournal_content");
 
     if (savedKeywords) {
       try {
         setSelectedKeywords(JSON.parse(savedKeywords));
       } catch (e) {
-        console.error('Error parsing saved keywords:', e);
+        console.error("Error parsing saved keywords:", e);
       }
     }
     if (savedContent) {
@@ -59,15 +61,15 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
         bodyMapping: {
           keywords: selectedKeywords,
           keywordCount: selectedKeywords.length,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
       };
 
       // Save to backend
-      const response = await fetch('/api/journal-entries', {
-        method: 'POST',
+      const response = await fetch("/api/journal-entries", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(journalData),
       });
@@ -77,11 +79,11 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
       }
 
       const savedEntry = await response.json();
-      console.log('Identity journal entry saved:', savedEntry);
+      console.log("Identity journal entry saved:", savedEntry);
 
       // Clear localStorage
-      localStorage.removeItem('identityJournal_keywords');
-      localStorage.removeItem('identityJournal_content');
+      localStorage.removeItem("identityJournal_keywords");
+      localStorage.removeItem("identityJournal_content");
 
       // Reset form and go back to journal types
       setCurrentStep(1);
@@ -89,7 +91,7 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
       setReflectionContent("");
       onBack();
     } catch (error) {
-      console.error('Error saving identity journal entry:', error);
+      console.error("Error saving identity journal entry:", error);
       // You could show a toast notification here
     }
   };
@@ -141,12 +143,16 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        
+
         <div className="text-center">
-          <h2 className="text-xl font-serif font-semibold text-stone-600">Identity Journal</h2>
-          <p className="text-stone-400 text-sm">Explore your values and sense of self</p>
+          <h2 className="text-xl font-serif font-semibold text-stone-600">
+            Identity Journal
+          </h2>
+          <p className="text-stone-400 text-sm">
+            Explore your values and sense of self
+          </p>
         </div>
-        
+
         <Button
           onClick={() => setShowInfo(!showInfo)}
           variant="ghost"
@@ -160,13 +166,18 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
 
       {/* Info Panel for Identity Journal */}
       {showInfo && (
-        <Card 
+        <Card
           className="rounded-organic stone-shadow border-0 relative"
-          style={{ background: 'linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)' }}
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)",
+          }}
         >
           <CardContent className="p-4">
             <div className="flex justify-between items-start mb-3">
-              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Identity Journal</h3>
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">
+                About Identity Journal
+              </h3>
               <Button
                 onClick={() => setShowInfo(false)}
                 variant="ghost"
@@ -178,12 +189,19 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
               </Button>
             </div>
             <div className="space-y-3 text-sm text-stone-600">
-              <p>The Identity Journal helps you explore your values, beliefs, and authentic sense of self.</p>
+              {/* <p>The Identity Journal helps you explore your values, beliefs, and authentic sense of self.</p> */}
+              <p>Choose words that reflect who you are today</p>
               <div className="space-y-2">
-                <p><strong>How to use:</strong></p>
+                <p>
+                  <strong>How to use:</strong>
+                </p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Select keywords that reflect your core values and identity</li>
-                  <li>Explore different aspects of your personality and beliefs</li>
+                  <li>
+                    Select keywords that reflect your core values and identity
+                  </li>
+                  <li>
+                    Explore different aspects of your personality and beliefs
+                  </li>
                   <li>Write about your goals, dreams, and aspirations</li>
                   <li>Regular practice builds self-awareness and confidence</li>
                 </ul>
@@ -194,11 +212,7 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
       )}
 
       {/* Progress Bar */}
-      <ProgressBar 
-        currentStep={currentStep} 
-        totalSteps={2}
-        className="mb-4"
-      />
+      <ProgressBar currentStep={currentStep} totalSteps={2} className="mb-4" />
 
       {/* Current Step Content */}
       {renderCurrentStep()}
