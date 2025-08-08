@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import headNeckImage from "@assets/ChatGPT Image Aug 8, 2025, 03_28_00 PM_1754634489490.png";
 
 interface HeadMapProps {
   selectedFeelings: Record<string, string>;
@@ -60,81 +61,46 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4>
       
-      {/* Head & Neck based on your reference image */}
+      {/* Your uploaded Head & Neck image */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Clean head silhouette matching your reference exactly */}
-          <g>
-            {/* Main head shape - perfect circle */}
-            <circle 
-              cx="50" 
-              cy="35" 
-              r="20" 
-              fill="hsl(270, 12%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="3"
-            />
-            
-            {/* Simple ears - small rounded bumps */}
-            <circle 
-              cx="32" 
-              cy="35" 
-              r="4.5" 
-              fill="hsl(270, 12%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="3"
-            />
-            <circle 
-              cx="68" 
-              cy="35" 
-              r="4.5" 
-              fill="hsl(270, 12%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="3"
-            />
-            
-            {/* Clean neck curves like in reference */}
-            <path 
-              d="M42 52
-                 Q45 54 50 54
-                 Q55 54 58 52
-                 L60 68
-                 Q58 70 50 70
-                 Q42 70 40 68
-                 L42 52 Z" 
-              fill="hsl(270, 12%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="3"
-            />
-          </g>
+        <div className="relative w-full h-full">
+          <img 
+            src={headNeckImage} 
+            alt="Head and Neck" 
+            className="w-full h-full object-contain"
+          />
           
-          {/* Interactive areas positioned over the body */}
-          {headParts.map((part) => {
-            const isSelected = selectedPart === part.id;
-            const hasFeeling = selectedFeelings[part.id];
-            return (
-              <circle
-                key={part.id}
-                cx={part.x}
-                cy={part.y}
-                r="8"
-                fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
-                stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
-                strokeWidth="2.5"
-                className="cursor-pointer transition-all duration-300 hover:scale-110"
-                style={{
-                  filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
-                }}
-                onClick={() => handlePartClick(part.id)}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, part.id)}
-                data-testid={`head-part-${part.id}`}
-              >
-                <title>{part.label}</title>
-              </circle>
-            );
-          })}
-        </svg>
+          {/* Invisible overlay for interactions */}
+          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
+            {/* Interactive areas positioned over your image */}
+            {headParts.map((part) => {
+              const isSelected = selectedPart === part.id;
+              const hasFeeling = selectedFeelings[part.id];
+              return (
+                <circle
+                  key={part.id}
+                  cx={part.x}
+                  cy={part.y}
+                  r="8"
+                  fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
+                  stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
+                  strokeWidth="2.5"
+                  className="cursor-pointer transition-all duration-300 hover:scale-110"
+                  style={{
+                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none",
+                    pointerEvents: "auto"
+                  }}
+                  onClick={() => handlePartClick(part.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, part.id)}
+                  data-testid={`head-part-${part.id}`}
+                >
+                  <title>{part.label}</title>
+                </circle>
+              );
+            })}
+          </svg>
+        </div>
         
         {/* Part labels */}
         {headParts.map((part) => (
