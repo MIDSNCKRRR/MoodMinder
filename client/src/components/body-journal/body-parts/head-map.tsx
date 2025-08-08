@@ -88,7 +88,8 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
                   className="cursor-pointer transition-all duration-300 hover:scale-110"
                   style={{
                     filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none",
-                    pointerEvents: "auto"
+                    pointerEvents: "auto",
+                    transformOrigin: "center"
                   }}
                   onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
