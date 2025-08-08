@@ -9,10 +9,10 @@ interface HeadMapProps {
 
 export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapProps) {
   const headParts = [
-    { id: "forehead", label: "Forehead", x: 50, y: 22 },
-    { id: "eyes", label: "Eyes", x: 50, y: 35 },
-    { id: "jaw", label: "Jaw", x: 50, y: 48 },
-    { id: "neck", label: "Neck", x: 50, y: 61 },
+    { id: "forehead", label: "Forehead", x: 50, y: 20 },
+    { id: "eyes", label: "Eyes", x: 50, y: 30 },
+    { id: "jaw", label: "Jaw", x: 50, y: 40 },
+    { id: "neck", label: "Neck", x: 50, y: 52 },
   ];
 
   const feelingEmojis = [
@@ -65,71 +65,60 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
       {/* Head SVG - Enhanced with realistic proportions */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Head and shoulders silhouette based on reference image */}
+          {/* Simple flat head silhouette */}
           <g>
-            {/* Main head shape - perfect circle top */}
+            {/* Main head - perfect circle */}
             <circle 
               cx="50" 
-              cy="35" 
-              r="20" 
-              fill="hsl(270, 15%, 80%)" 
-              stroke="hsl(270, 30%, 60%)" 
-              strokeWidth="3"
-            />
-            
-            {/* Left ear - small rounded rectangle */}
-            <ellipse 
-              cx="32" 
-              cy="35" 
-              rx="2.5" 
-              ry="6" 
-              fill="hsl(270, 15%, 80%)" 
-              stroke="hsl(270, 30%, 60%)" 
+              cy="30" 
+              r="18" 
+              fill="hsl(270, 12%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
               strokeWidth="2.5"
             />
             
-            {/* Right ear - small rounded rectangle */}
-            <ellipse 
-              cx="68" 
-              cy="35" 
-              rx="2.5" 
-              ry="6" 
-              fill="hsl(270, 15%, 80%)" 
-              stroke="hsl(270, 30%, 60%)" 
+            {/* Simple ears - small circles */}
+            <circle 
+              cx="34" 
+              cy="30" 
+              r="4" 
+              fill="hsl(270, 12%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2.5"
+            />
+            <circle 
+              cx="66" 
+              cy="30" 
+              r="4" 
+              fill="hsl(270, 12%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
               strokeWidth="2.5"
             />
             
-            {/* Neck - straight cylindrical */}
+            {/* Simple neck */}
             <rect 
-              x="45" 
-              y="55" 
-              width="10" 
-              height="12" 
-              fill="hsl(270, 15%, 80%)" 
-              stroke="hsl(270, 30%, 60%)" 
-              strokeWidth="3"
+              x="46" 
+              y="48" 
+              width="8" 
+              height="8" 
+              fill="hsl(270, 12%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2.5"
             />
             
-            {/* Shoulders - wide curved base */}
+            {/* Simple shoulders outline */}
             <path 
-              d="M20 67
-                 C20 67 25 65 35 65
-                 C40 65 45 66 50 67
-                 C55 66 60 65 65 65
-                 C75 65 80 67 80 67
-                 L80 85
-                 C80 87 78 88 76 88
-                 L24 88
-                 C22 88 20 87 20 85
-                 L20 67 Z" 
-              fill="hsl(270, 15%, 80%)" 
-              stroke="hsl(270, 30%, 60%)" 
-              strokeWidth="3"
+              d="M35 56
+                 C40 55 45 55 50 56
+                 C55 55 60 55 65 56
+                 L68 70
+                 C65 72 60 73 50 73
+                 C40 73 35 72 32 70
+                 L35 56 Z" 
+              fill="hsl(270, 12%, 82%)" 
+              stroke="hsl(270, 25%, 65%)" 
+              strokeWidth="2.5"
             />
-            
-            {/* Small shoulder line breaks for realistic look */}
-            <line x1="20" y1="75" x2="20" y2="85" stroke="hsl(270, 30%, 60%)" strokeWidth="2"/>
-            <line x1="80" y1="75" x2="80" y2="85" stroke="hsl(270, 30%, 60%)" strokeWidth="2"/>
           </g>
           
           {/* Interactive areas with enhanced styling */}
