@@ -130,10 +130,10 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
           {/* Selected Keywords */}
           {selectedKeywords.length > 0 && (
             <div className="mb-6 p-4 bg-white/60 rounded-stone">
-              <h4 className="text-sm font-medium text-stone-600 mb-3">
+              <h4 className="text-sm font-medium text-stone-600 mb-3 text-center">
                 Selected ({selectedKeywords.length}/2)
               </h4>
-              <div className="flex flex-wrap gap-2 justify-center">
+              <div className="flex flex-wrap gap-2 justify-center items-center">
                 {selectedKeywords
                   .sort((a, b) => {
                     const aIsAdjective = adjectiveWords.includes(a);
@@ -173,7 +173,7 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
           )}
 
           {/* Keywords Grid */}
-          <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto justify-items-center">
             {candidateWords.map((keyword) => (
               <div
                 key={keyword}
