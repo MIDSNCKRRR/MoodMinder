@@ -69,7 +69,7 @@ export default function Home() {
     <div className="px-6 space-y-6">
       {/* Status Bar */}
       <div className="flex justify-between items-center pt-8 text-stone-400 text-sm">
-        <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        {/* <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> */}
         <div className="flex space-x-1">
           <div className="w-4 h-2 bg-stone-300 rounded-sm"></div>
           <div className="w-4 h-2 bg-stone-300 rounded-sm"></div>
@@ -82,8 +82,12 @@ export default function Home() {
         <div className="w-16 h-16 mx-auto mb-4 rounded-stone bg-gradient-to-br from-stone-100 to-stone-200 stone-shadow flex items-center justify-center relative">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-200 to-stone-300 opacity-80"></div>
         </div>
-        <h1 className="text-2xl font-serif font-semibold text-stone-600">Soft Moves</h1>
-        <p className="text-stone-400 text-sm mt-1">Your emotional wellness companion</p>
+        <h1 className="text-2xl font-serif font-semibold text-stone-600">
+          Soft Moves
+        </h1>
+        <p className="text-stone-400 text-sm mt-1">
+          Your emotional wellness companion
+        </p>
       </div>
 
       {/* Crisis Support Button */}
@@ -92,30 +96,36 @@ export default function Home() {
           onClick={() => crisisMutation.mutate()}
           disabled={crisisMutation.isPending}
           className="crisis-button w-full py-4 px-6 rounded-organic stone-shadow transition-all duration-300 font-medium border-2"
-          style={{ 
-            backgroundColor: 'hsl(260, 45%, 65%)',
-            borderColor: 'hsl(260, 45%, 65%)',
-            color: 'white'
+          style={{
+            backgroundColor: "hsl(260, 45%, 65%)",
+            borderColor: "hsl(260, 45%, 65%)",
+            color: "white",
           }}
           data-testid="crisis-button"
         >
           <AlertTriangle className="mr-2 h-4 w-4" />
-          {crisisMutation.isPending ? "CONNECTING..." : "NEED IMMEDIATE SUPPORT"}
+          {crisisMutation.isPending
+            ? "CONNECTING..."
+            : "NEED IMMEDIATE SUPPORT"}
         </Button>
       </div>
 
       {/* Today's Question Card */}
-      <Card 
+      <Card
         className="rounded-organic stone-shadow border-0 relative"
         style={{
-          background: 'linear-gradient(135deg, hsl(25, 35%, 85%) 0%, hsl(25, 30%, 78%) 100%)'
+          background:
+            "linear-gradient(135deg, hsl(25, 35%, 85%) 0%, hsl(25, 30%, 78%) 100%)",
         }}
       >
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">Today's Reflection</h3>
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">
+            Today's Reflection
+          </h3>
           <p className="text-stone-500 mb-4">
-            {todayReflection?.question || "What three things brought you peace today?"}
+            {todayReflection?.question ||
+              "What three things brought you peace today?"}
           </p>
           <Link href="/journal">
             <Button
@@ -130,15 +140,18 @@ export default function Home() {
       </Card>
 
       {/* Quick Emotion Check */}
-      <Card 
+      <Card
         className="rounded-organic stone-shadow border-0 relative"
         style={{
-          background: 'linear-gradient(135deg, hsl(260, 40%, 91%) 0%, hsl(260, 35%, 84%) 100%)'
+          background:
+            "linear-gradient(135deg, hsl(260, 40%, 91%) 0%, hsl(260, 35%, 84%) 100%)",
         }}
       >
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">How are you feeling?</h3>
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">
+            How are you feeling?
+          </h3>
           <div className="flex justify-between items-center">
             {[1, 2, 3, 4, 5].map((emotion) => (
               <EmotionFace
@@ -157,10 +170,11 @@ export default function Home() {
       </Card>
 
       {/* Mindfulness Moment */}
-      <Card 
+      <Card
         className="rounded-organic stone-shadow border-0 relative"
         style={{
-          background: 'linear-gradient(135deg, hsl(120, 10%, 83%) 0%, hsl(120, 8%, 72%) 100%)'
+          background:
+            "linear-gradient(135deg, hsl(120, 10%, 83%) 0%, hsl(120, 8%, 72%) 100%)",
         }}
       >
         <CardContent className="p-6">
@@ -170,7 +184,9 @@ export default function Home() {
               <Flower2 className="text-sage-500 w-6 h-6" />
             </div>
             <div className="flex-1">
-              <h3 className="font-serif font-semibold text-stone-600">Mindful Breathing</h3>
+              <h3 className="font-serif font-semibold text-stone-600">
+                Mindful Breathing
+              </h3>
               <p className="text-stone-500 text-sm">5-minute guided session</p>
             </div>
             <Button
@@ -186,7 +202,9 @@ export default function Home() {
 
       {/* Recent Journal Entries Preview */}
       <div className="space-y-3">
-        <h3 className="font-serif font-semibold text-stone-600 text-lg">Recent Entries</h3>
+        <h3 className="font-serif font-semibold text-stone-600 text-lg">
+          Recent Entries
+        </h3>
         {recentEntries.length === 0 ? (
           <Card className="bg-white rounded-stone stone-shadow border border-stone-100">
             <CardContent className="p-4 text-center">
@@ -200,7 +218,10 @@ export default function Home() {
           </Card>
         ) : (
           recentEntries.map((entry) => (
-            <Card key={entry.id} className="bg-white rounded-stone stone-shadow border border-stone-100 relative">
+            <Card
+              key={entry.id}
+              className="bg-white rounded-stone stone-shadow border border-stone-100 relative"
+            >
               <CardContent className="p-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">

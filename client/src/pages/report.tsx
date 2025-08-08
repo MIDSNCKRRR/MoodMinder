@@ -25,16 +25,16 @@ export default function Report() {
   const getWeeklyData = () => {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    
-    const weeklyEntries = journalEntries.filter(entry => 
-      new Date(entry.createdAt) >= weekAgo
+
+    const weeklyEntries = journalEntries.filter(
+      (entry) => new Date(entry.createdAt) >= weekAgo,
     );
 
-    const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const dailyData = new Array(7).fill(0);
     const dailyCounts = new Array(7).fill(0);
 
-    weeklyEntries.forEach(entry => {
+    weeklyEntries.forEach((entry) => {
       const dayIndex = new Date(entry.createdAt).getDay();
       const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1; // Adjust Sunday to be index 6
       dailyData[adjustedIndex] += entry.emotionLevel;
@@ -42,8 +42,8 @@ export default function Report() {
     });
 
     // Calculate averages, default to 3 if no data
-    const averages = dailyData.map((sum, index) => 
-      dailyCounts[index] > 0 ? sum / dailyCounts[index] : 3
+    const averages = dailyData.map((sum, index) =>
+      dailyCounts[index] > 0 ? sum / dailyCounts[index] : 3,
     );
 
     return { data: averages, labels: dayLabels };
@@ -52,10 +52,10 @@ export default function Report() {
   // Get body mapping insights
   const getBodyMappingInsights = () => {
     const areaCounts: Record<string, number> = {};
-    
-    journalEntries.forEach(entry => {
-      if (entry.bodyMapping && typeof entry.bodyMapping === 'object') {
-        Object.keys(entry.bodyMapping).forEach(area => {
+
+    journalEntries.forEach((entry) => {
+      if (entry.bodyMapping && typeof entry.bodyMapping === "object") {
+        Object.keys(entry.bodyMapping).forEach((area) => {
           areaCounts[area] = (areaCounts[area] || 0) + 1;
         });
       }
@@ -68,43 +68,49 @@ export default function Report() {
   const getEmotionPatterns = () => {
     if (journalEntries.length === 0) return [];
 
-    const morningEntries = journalEntries.filter(entry => {
+    const morningEntries = journalEntries.filter((entry) => {
       const hour = new Date(entry.createdAt).getHours();
       return hour >= 6 && hour < 12;
     });
 
-    const morningAvg = morningEntries.length > 0 
-      ? morningEntries.reduce((sum, entry) => sum + entry.emotionLevel, 0) / morningEntries.length
-      : 0;
+    const morningAvg =
+      morningEntries.length > 0
+        ? morningEntries.reduce((sum, entry) => sum + entry.emotionLevel, 0) /
+          morningEntries.length
+        : 0;
 
     const overallAvg = emotionStats?.averageEmotion || 0;
     const morningBoost = morningAvg > overallAvg;
 
-    const emotionCounts = journalEntries.reduce((acc, entry) => {
-      acc[entry.emotionType] = (acc[entry.emotionType] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const emotionCounts = journalEntries.reduce(
+      (acc, entry) => {
+        acc[entry.emotionType] = (acc[entry.emotionType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const mostFrequentEmotion = Object.entries(emotionCounts)
-      .sort(([,a], [,b]) => b - a)[0];
+    const mostFrequentEmotion = Object.entries(emotionCounts).sort(
+      ([, a], [, b]) => b - a,
+    )[0];
 
     return [
       {
-        text: morningBoost 
-          ? `Mornings show ${Math.round((morningAvg - overallAvg) * 100 / overallAvg)}% higher emotional balance`
+        text: morningBoost
+          ? `Mornings show ${Math.round(((morningAvg - overallAvg) * 100) / overallAvg)}% higher emotional balance`
           : "Evening reflections tend to be more balanced",
-        color: "bg-sage-400"
+        color: "bg-sage-400",
       },
       {
         text: `Average journaling session: ${Math.round(Math.random() * 2 + 3)} minutes`,
-        color: "bg-lavender-400"
+        color: "bg-lavender-400",
       },
       {
-        text: mostFrequentEmotion 
-          ? `Most frequent emotion: ${mostFrequentEmotion[0]} (${Math.round(mostFrequentEmotion[1] / journalEntries.length * 100)}%)`
+        text: mostFrequentEmotion
+          ? `Most frequent emotion: ${mostFrequentEmotion[0]} (${Math.round((mostFrequentEmotion[1] / journalEntries.length) * 100)}%)`
           : "Building emotional awareness through journaling",
-        color: "bg-coral-400"
-      }
+        color: "bg-coral-400",
+      },
     ];
   };
 
@@ -114,10 +120,16 @@ export default function Report() {
 
   const getTrendDirection = () => {
     if (journalEntries.length < 2) return "📊 Building data";
-    
-    const recent = journalEntries.slice(0, 3).reduce((sum, entry) => sum + entry.emotionLevel, 0) / 3;
-    const older = journalEntries.slice(-3).reduce((sum, entry) => sum + entry.emotionLevel, 0) / 3;
-    
+
+    const recent =
+      journalEntries
+        .slice(0, 3)
+        .reduce((sum, entry) => sum + entry.emotionLevel, 0) / 3;
+    const older =
+      journalEntries
+        .slice(-3)
+        .reduce((sum, entry) => sum + entry.emotionLevel, 0) / 3;
+
     if (recent > older) return "↗️ Rising";
     if (recent < older) return "↘️ Declining";
     return "→ Stable";
@@ -133,7 +145,7 @@ export default function Report() {
     <div className="px-6 space-y-6">
       {/* Status Bar */}
       <div className="flex justify-between items-center pt-8 text-stone-400 text-sm">
-        <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        {/* <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> */}
         <div className="flex space-x-1">
           <div className="w-4 h-2 bg-stone-300 rounded-sm"></div>
           <div className="w-4 h-2 bg-stone-300 rounded-sm"></div>
@@ -143,18 +155,24 @@ export default function Report() {
 
       {/* Report Header */}
       <div className="text-center pt-4">
-        <h1 className="text-2xl font-serif font-semibold text-stone-600">Insights</h1>
-        <p className="text-stone-400 text-sm mt-1">Understanding your emotional patterns</p>
+        <h1 className="text-2xl font-serif font-semibold text-stone-600">
+          Insights
+        </h1>
+        <p className="text-stone-400 text-sm mt-1">
+          Understanding your emotional patterns
+        </p>
       </div>
 
       {/* Emotion Wave Analysis */}
       <Card className="bg-white rounded-organic stone-shadow border border-stone-100 relative">
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">Emotion Wave Analysis</h3>
-          
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
+            Emotion Wave Analysis
+          </h3>
+
           <WaveChart data={weeklyData.data} labels={weeklyData.labels} />
-          
+
           <div className="flex justify-between text-sm">
             <div className="text-center">
               <p className="text-stone-400">Average</p>
@@ -168,7 +186,9 @@ export default function Report() {
             </div>
             <div className="text-center">
               <p className="text-stone-400">Trend</p>
-              <p className="font-semibold text-peach-500">{getTrendDirection()}</p>
+              <p className="font-semibold text-peach-500">
+                {getTrendDirection()}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -178,13 +198,17 @@ export default function Report() {
       <Card className="bg-gradient-to-br from-peach-100 to-peach-200 rounded-organic stone-shadow border-0 relative">
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">Wellness Patterns</h3>
-          
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
+            Wellness Patterns
+          </h3>
+
           <div className="space-y-3">
             {emotionPatterns.map((pattern, index) => (
               <div key={index} className="bg-white/80 p-3 rounded-stone">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 ${pattern.color} rounded-full`}></div>
+                  <div
+                    className={`w-3 h-3 ${pattern.color} rounded-full`}
+                  ></div>
                   <p className="text-sm text-stone-600">{pattern.text}</p>
                 </div>
               </div>
@@ -197,13 +221,18 @@ export default function Report() {
       <Card className="bg-gradient-to-br from-sage-100 to-sage-200 rounded-organic stone-shadow border-0 relative">
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">Physical Emotion Map</h3>
-          
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
+            Physical Emotion Map
+          </h3>
+
           <div className="flex justify-center mb-4">
-            <div className="relative w-20 h-32 bg-white/80 rounded-full" style={{ borderRadius: "50% 50% 50% 50% / 60% 60% 40% 40%" }}>
+            <div
+              className="relative w-20 h-32 bg-white/80 rounded-full"
+              style={{ borderRadius: "50% 50% 50% 50% / 60% 60% 40% 40%" }}
+            >
               {/* Head */}
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-white/90 rounded-full"></div>
-              
+
               {/* Show body areas based on data */}
               {Object.entries(bodyMappingData).map(([area, count]) => {
                 const positions: Record<string, { x: string; y: string }> = {
@@ -213,13 +242,21 @@ export default function Report() {
                   arms: { x: "30%", y: "25%" },
                   legs: { x: "50%", y: "65%" },
                 };
-                
+
                 const pos = positions[area];
                 if (!pos) return null;
-                
-                const intensity = Math.min(count / Math.max(journalEntries.length * 0.2, 1), 1);
-                const bgColor = intensity > 0.6 ? "bg-coral-300" : intensity > 0.3 ? "bg-sage-300" : "bg-stone-200";
-                
+
+                const intensity = Math.min(
+                  count / Math.max(journalEntries.length * 0.2, 1),
+                  1,
+                );
+                const bgColor =
+                  intensity > 0.6
+                    ? "bg-coral-300"
+                    : intensity > 0.3
+                      ? "bg-sage-300"
+                      : "bg-stone-200";
+
                 return (
                   <div
                     key={area}
@@ -228,7 +265,7 @@ export default function Report() {
                       left: pos.x,
                       top: pos.y,
                       transform: "translate(-50%, -50%)",
-                      opacity: 0.7
+                      opacity: 0.7,
                     }}
                     title={`${area} - ${count} times`}
                   />
@@ -236,9 +273,11 @@ export default function Report() {
               })}
             </div>
           </div>
-          
+
           <div className="text-center">
-            <p className="text-sm text-stone-500">Most common areas of emotional sensation</p>
+            <p className="text-sm text-stone-500">
+              Most common areas of emotional sensation
+            </p>
             <div className="flex justify-center space-x-4 mt-2 text-xs">
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-coral-300 rounded-full"></div>
@@ -260,8 +299,10 @@ export default function Report() {
       {/* Monthly Summary */}
       <Card className="bg-white rounded-organic stone-shadow border border-stone-100">
         <CardContent className="p-6 space-y-4">
-          <h3 className="font-serif font-semibold text-stone-600 text-lg">Monthly Summary</h3>
-          
+          <h3 className="font-serif font-semibold text-stone-600 text-lg">
+            Monthly Summary
+          </h3>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-lavender-50 rounded-stone">
               <p className="text-2xl font-bold text-lavender-500">
