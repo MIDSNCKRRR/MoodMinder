@@ -128,21 +128,14 @@ export default function Journal() {
                     <ChevronRight className="w-5 h-5 text-stone-400" />
                   </div>
                   
-                  {/* Recent entries preview */}
-                  <div className="bg-white/60 p-3 rounded-stone">
-                    <p className="text-xs font-medium text-stone-500 mb-2">
-                      Recent entries: {recentEntries.length}
-                    </p>
-                    {recentEntries.length > 0 ? (
-                      <p className="text-stone-600 text-sm line-clamp-2">
-                        {recentEntries[0].content.substring(0, 100)}...
-                      </p>
-                    ) : (
+                  {/* Entry status */}
+                  {recentEntries.length === 0 && (
+                    <div className="bg-white/60 p-3 rounded-stone">
                       <p className="text-stone-400 text-sm italic">
                         No entries yet - tap to start writing
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
