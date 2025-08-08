@@ -12,7 +12,7 @@ interface Step3JournalProps {
   onJournalChange: (content: string) => void;
   onBack: () => void;
   selectedEmotion: number;
-  selectedBodyAreas: string[];
+  selectedBodyFeelings: Record<string, string>;
   onComplete: () => void;
 }
 
@@ -21,7 +21,7 @@ export default function Step3Journal({
   onJournalChange, 
   onBack, 
   selectedEmotion, 
-  selectedBodyAreas,
+  selectedBodyFeelings,
   onComplete 
 }: Step3JournalProps) {
   const { toast } = useToast();
@@ -57,7 +57,7 @@ export default function Step3Journal({
         emotion: selectedEmotion,
         emotionType: getEmotionType(selectedEmotion),
         content: journalContent,
-        bodyAreas: selectedBodyAreas,
+        bodyFeelings: selectedBodyFeelings,
       });
     },
     onSuccess: () => {
@@ -68,7 +68,7 @@ export default function Step3Journal({
       });
       // Clear temporary saved data
       localStorage.removeItem('bodyJournal_emotion');
-      localStorage.removeItem('bodyJournal_bodyAreas');
+      localStorage.removeItem('bodyJournal_bodyFeelings');
       localStorage.removeItem('bodyJournal_content');
       onComplete();
     },
@@ -94,9 +94,9 @@ export default function Step3Journal({
               <span className="text-lg">{selectedEmotionData?.emoji}</span>
               <span>{selectedEmotionData?.label}</span>
             </div>
-            {selectedBodyAreas.length > 0 && (
+            {Object.keys(selectedBodyFeelings).length > 0 && (
               <div>
-                • {selectedBodyAreas.length} body area{selectedBodyAreas.length > 1 ? 's' : ''}
+                • {Object.keys(selectedBodyFeelings).length} body feeling{Object.keys(selectedBodyFeelings).length > 1 ? 's' : ''}
               </div>
             )}
           </div>

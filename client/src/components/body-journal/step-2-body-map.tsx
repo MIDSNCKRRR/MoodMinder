@@ -2,27 +2,60 @@ import { useState, useEffect } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import BodyMap from "@/components/body-map";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HeadMap from "./body-parts/head-map";
+import UpperBodyMap from "./body-parts/upper-body-map";
+import LowerBodyMap from "./body-parts/lower-body-map";
 
 interface Step2BodyMapProps {
-  selectedBodyAreas: string[];
-  onBodyAreasChange: (areas: string[]) => void;
+  selectedBodyFeelings: Record<string, string>;
+  onBodyFeelingsChange: (feelings: Record<string, string>) => void;
   onNext: () => void;
   onBack: () => void;
 }
 
-export default function Step2BodyMap({ selectedBodyAreas, onBodyAreasChange, onNext, onBack }: Step2BodyMapProps) {
-  const handleBodyAreaSelect = (area: string) => {
-    const newAreas = selectedBodyAreas.includes(area) 
-      ? selectedBodyAreas.filter(a => a !== area)
-      : [...selectedBodyAreas, area];
-    onBodyAreasChange(newAreas);
+export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChange, onNext, onBack }: Step2BodyMapProps) {
+  const [headFeelings, setHeadFeelings] = useState<Record<string, string>>({});
+  const [upperBodyFeelings, setUpperBodyFeelings] = useState<Record<string, string>>({});
+  const [lowerBodyFeelings, setLowerBodyFeelings] = useState<Record<string, string>>({});
+
+  // Initialize feelings from props
+  useEffect(() => {
+    const headParts = ["forehead", "eyes", "jaw", "neck"];
+    const upperBodyParts = ["chest", "heart", "shoulders", "arms", "hands", "stomach"];
+    const lowerBodyParts = ["hips", "thighs", "knees", "calves", "feet"];
+
+    setHeadFeelings(Object.fromEntries(
+      Object.entries(selectedBodyFeelings).filter(([part]) => headParts.includes(part))
+    ));
+    setUpperBodyFeelings(Object.fromEntries(
+      Object.entries(selectedBodyFeelings).filter(([part]) => upperBodyParts.includes(part))
+    ));
+    setLowerBodyFeelings(Object.fromEntries(
+      Object.entries(selectedBodyFeelings).filter(([part]) => lowerBodyParts.includes(part))
+    ));
+  }, [selectedBodyFeelings]);
+
+  // Update parent state when feelings change
+  useEffect(() => {
+    const allFeelings = { ...headFeelings, ...upperBodyFeelings, ...lowerBodyFeelings };
+    onBodyFeelingsChange(allFeelings);
+    localStorage.setItem('bodyJournal_bodyFeelings', JSON.stringify(allFeelings));
+  }, [headFeelings, upperBodyFeelings, lowerBodyFeelings, onBodyFeelingsChange]);
+
+  const handleHeadFeelingChange = (part: string, feeling: string) => {
+    setHeadFeelings(prev => ({ ...prev, [part]: feeling }));
   };
 
-  // Auto-save body areas selection
-  useEffect(() => {
-    localStorage.setItem('bodyJournal_bodyAreas', JSON.stringify(selectedBodyAreas));
-  }, [selectedBodyAreas]);
+  const handleUpperBodyFeelingChange = (part: string, feeling: string) => {
+    setUpperBodyFeelings(prev => ({ ...prev, [part]: feeling }));
+  };
+
+  const handleLowerBodyFeelingChange = (part: string, feeling: string) => {
+    setLowerBodyFeelings(prev => ({ ...prev, [part]: feeling }));
+  };
+
+  const totalSelectedFeelings = Object.keys(selectedBodyFeelings).length;
 
   return (
     <div className="space-y-6">
@@ -33,26 +66,51 @@ export default function Step2BodyMap({ selectedBodyAreas, onBodyAreasChange, onN
       >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-xl mb-2 text-center">
-            Where do you feel it in your body?
+            Map your body feelings
           </h3>
           <p className="text-stone-500 text-sm text-center mb-6">
-            Tap areas where you feel emotional sensations
+            Select body parts and describe how they feel with emoji tags
           </p>
           
-          {/* Body Mapping Feature */}
-          <div className="bg-white/80 p-4 rounded-stone relative">
-            <BodyMap 
-              selectedAreas={selectedBodyAreas}
-              onAreaSelect={handleBodyAreaSelect}
-            />
-            {selectedBodyAreas.length > 0 && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-stone-600 font-medium">
-                  Selected areas: {selectedBodyAreas.join(', ')}
-                </p>
-              </div>
-            )}
+          {/* Body Mapping Tabs */}
+          <div className="bg-white/80 p-4 rounded-stone">
+            <Tabs defaultValue="head" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="head" className="text-xs">Head</TabsTrigger>
+                <TabsTrigger value="upper" className="text-xs">Upper</TabsTrigger>
+                <TabsTrigger value="lower" className="text-xs">Lower</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="head" className="mt-0">
+                <HeadMap 
+                  selectedFeelings={headFeelings}
+                  onFeelingChange={handleHeadFeelingChange}
+                />
+              </TabsContent>
+              
+              <TabsContent value="upper" className="mt-0">
+                <UpperBodyMap 
+                  selectedFeelings={upperBodyFeelings}
+                  onFeelingChange={handleUpperBodyFeelingChange}
+                />
+              </TabsContent>
+              
+              <TabsContent value="lower" className="mt-0">
+                <LowerBodyMap 
+                  selectedFeelings={lowerBodyFeelings}
+                  onFeelingChange={handleLowerBodyFeelingChange}
+                />
+              </TabsContent>
+            </Tabs>
           </div>
+
+          {totalSelectedFeelings > 0 && (
+            <div className="mt-4 text-center">
+              <p className="text-sm text-stone-600 font-medium">
+                {totalSelectedFeelings} body feeling{totalSelectedFeelings > 1 ? 's' : ''} selected
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

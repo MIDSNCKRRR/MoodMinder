@@ -17,23 +17,23 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   
   // State for all steps
   const [selectedEmotion, setSelectedEmotion] = useState<number>(4);
-  const [selectedBodyAreas, setSelectedBodyAreas] = useState<string[]>([]);
+  const [selectedBodyFeelings, setSelectedBodyFeelings] = useState<Record<string, string>>({});
   const [journalContent, setJournalContent] = useState("");
 
   // Load saved data on component mount
   useEffect(() => {
     const savedEmotion = localStorage.getItem('bodyJournal_emotion');
-    const savedBodyAreas = localStorage.getItem('bodyJournal_bodyAreas');
+    const savedBodyFeelings = localStorage.getItem('bodyJournal_bodyFeelings');
     const savedContent = localStorage.getItem('bodyJournal_content');
 
     if (savedEmotion) {
       setSelectedEmotion(parseInt(savedEmotion));
     }
-    if (savedBodyAreas) {
+    if (savedBodyFeelings) {
       try {
-        setSelectedBodyAreas(JSON.parse(savedBodyAreas));
+        setSelectedBodyFeelings(JSON.parse(savedBodyFeelings));
       } catch (e) {
-        console.error('Error parsing saved body areas:', e);
+        console.error('Error parsing saved body feelings:', e);
       }
     }
     if (savedContent) {
@@ -57,7 +57,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     // Reset form and go back to journal types
     setCurrentStep(1);
     setSelectedEmotion(4);
-    setSelectedBodyAreas([]);
+    setSelectedBodyFeelings({});
     setJournalContent("");
     onBack();
   };
@@ -75,8 +75,8 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       case 2:
         return (
           <Step2BodyMap
-            selectedBodyAreas={selectedBodyAreas}
-            onBodyAreasChange={setSelectedBodyAreas}
+            selectedBodyFeelings={selectedBodyFeelings}
+            onBodyFeelingsChange={setSelectedBodyFeelings}
             onNext={handleNext}
             onBack={handleBack}
           />
@@ -88,7 +88,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
             onJournalChange={setJournalContent}
             onBack={handleBack}
             selectedEmotion={selectedEmotion}
-            selectedBodyAreas={selectedBodyAreas}
+            selectedBodyFeelings={selectedBodyFeelings}
             onComplete={handleComplete}
           />
         );
