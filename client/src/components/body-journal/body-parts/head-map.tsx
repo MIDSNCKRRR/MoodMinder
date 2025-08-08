@@ -13,10 +13,10 @@ export default function HeadMap({
   onFeelingChange,
 }: HeadMapProps) {
   const headParts = [
-    { id: "forehead", label: "Forehead", x: 50, y: 25 },
-    { id: "eyes", label: "Eyes", x: 50, y: 35 },
-    { id: "jaw", label: "Jaw", x: 50, y: 45 },
-    { id: "neck", label: "Neck", x: 50, y: 65 },
+    { id: "forehead", label: "Forehead", x: 50, y: 30 },
+    { id: "eyes", label: "Eyes", x: 50, y: 40 },
+    { id: "jaw", label: "Jaw", x: 50, y: 50 },
+    { id: "neck", label: "Neck", x: 50, y: 70 },
   ];
 
   const feelingEmojis = [
