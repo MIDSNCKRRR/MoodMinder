@@ -180,7 +180,7 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
                 className={`
                   p-3 rounded-stone text-center cursor-pointer transition-all duration-300 text-sm font-medium min-w-0
                   ${isSelected(keyword)
-                    ? "bg-white/90 shadow-lg text-sage-700"
+                    ? "bg-white text-sage-700"
                     : "bg-white/50 hover:bg-white/70 text-stone-600"
                   }
                 `}
