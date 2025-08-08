@@ -68,7 +68,10 @@ export default function Journal() {
       <div className="flex justify-between items-center pt-8">
         {selectedJournalType ? (
           <Button
-            onClick={() => setSelectedJournalType(null)}
+            onClick={() => {
+              setSelectedJournalType(null);
+              setShowInfo(false); // Reset info panel when going back
+            }}
             variant="ghost"
             size="sm"
             className="p-2"
@@ -80,19 +83,22 @@ export default function Journal() {
           <div></div>
         )}
         
-        <Button
-          onClick={() => setShowInfo(!showInfo)}
-          variant="ghost"
-          size="sm"
-          className="p-2"
-          data-testid="info-button"
-        >
-          <Info className="w-4 h-4" />
-        </Button>
+        {/* Only show info button on main journal selection page */}
+        {!selectedJournalType && (
+          <Button
+            onClick={() => setShowInfo(!showInfo)}
+            variant="ghost"
+            size="sm"
+            className="p-2"
+            data-testid="info-button"
+          >
+            <Info className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
-      {/* Info Panel */}
-      {showInfo && (
+      {/* Info Panel - only show on main page */}
+      {showInfo && !selectedJournalType && (
         <Card 
           className="rounded-organic stone-shadow border-0 relative"
           style={{ background: 'linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)' }}
@@ -131,7 +137,10 @@ export default function Journal() {
                 key={journalType.id}
                 className="rounded-organic stone-shadow border-0 relative cursor-pointer hover:scale-[1.02] transition-all duration-300"
                 style={{ background: journalType.bgColor }}
-                onClick={() => setSelectedJournalType(journalType.id)}
+                onClick={() => {
+                  setSelectedJournalType(journalType.id);
+                  setShowInfo(false); // Hide info panel when selecting a journal
+                }}
                 data-testid={`journal-type-${journalType.id}`}
               >
                 <CardContent className="p-6">
