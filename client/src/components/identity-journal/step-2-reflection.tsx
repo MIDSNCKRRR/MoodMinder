@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -8,9 +8,10 @@ interface Step2ReflectionProps {
   onContentChange: (content: string) => void;
   selectedKeywords: string[];
   onComplete: () => void;
+  onBack: () => void;
 }
 
-export default function Step2Reflection({ content, onContentChange, selectedKeywords, onComplete }: Step2ReflectionProps) {
+export default function Step2Reflection({ content, onContentChange, selectedKeywords, onComplete, onBack }: Step2ReflectionProps) {
   const [wordCount, setWordCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -114,14 +115,27 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
         </CardContent>
       </Card>
 
-      {/* Save Button */}
-      <div className="flex justify-center">
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <Button
+          onClick={onBack}
+          variant="outline"
+          className="px-6 py-3 rounded-stone font-medium"
+          data-testid="back-to-keywords"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+
         <Button
           onClick={handleComplete}
           disabled={!canSave || isLoading}
-          size="lg"
-          className="rounded-stone px-8 bg-sage-500 hover:bg-sage-600 text-white disabled:bg-stone-300 disabled:text-stone-500"
-          data-testid="save-entry-button"
+          className="px-6 py-3 rounded-stone font-medium transition-all"
+          style={{
+            background: "linear-gradient(to right, hsl(120, 30%, 60%), hsl(120, 35%, 50%))",
+            color: "white",
+          }}
+          data-testid="save-identity-journal"
         >
           {isLoading ? (
             <>
@@ -130,8 +144,8 @@ export default function Step2Reflection({ content, onContentChange, selectedKeyw
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-2" />
-              Save Identity Entry
+              <Save className="mr-2 h-4 w-4" />
+              Save Entry
             </>
           )}
         </Button>

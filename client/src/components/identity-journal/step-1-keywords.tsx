@@ -121,17 +121,20 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
         </CardContent>
       </Card>
 
-      {/* Next Button */}
-      <div className="flex justify-center">
+      {/* Navigation */}
+      <div className="flex justify-end">
         <Button
           onClick={onNext}
           disabled={!canProceed}
-          size="lg"
-          className="rounded-stone px-8 bg-sage-500 hover:bg-sage-600 text-white disabled:bg-stone-300 disabled:text-stone-500"
-          data-testid="next-button"
+          className="px-6 py-3 rounded-stone font-medium transition-all"
+          style={{
+            background: "linear-gradient(to right, hsl(120, 30%, 60%), hsl(120, 35%, 50%))",
+            color: "white",
+          }}
+          data-testid="next-to-reflection"
         >
-          Continue to Reflection
-          <ArrowRight className="w-4 h-4 ml-2" />
+          Next Step
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </div>

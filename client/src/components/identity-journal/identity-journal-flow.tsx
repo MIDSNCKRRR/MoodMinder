@@ -120,6 +120,7 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
             onContentChange={handleContentChange}
             selectedKeywords={selectedKeywords}
             onComplete={handleComplete}
+            onBack={handleBack}
           />
         );
       default:
