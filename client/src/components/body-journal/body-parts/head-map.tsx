@@ -87,7 +87,9 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, part.id)}
                 data-testid={`head-part-${part.id}`}
-              />
+              >
+                <title>{part.label}</title>
+              </circle>
             );
           })}
         </svg>

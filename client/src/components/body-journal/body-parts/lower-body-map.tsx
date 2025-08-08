@@ -94,7 +94,9 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
                   data-testid={`lower-body-part-${part.id}-left`}
-                />
+                >
+                  <title>{part.label}</title>
+                </circle>
                 
                 {/* Right side */}
                 <circle
@@ -109,7 +111,9 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
                   data-testid={`lower-body-part-${part.id}-right`}
-                />
+                >
+                  <title>{part.label}</title>
+                </circle>
               </g>
             );
           })}

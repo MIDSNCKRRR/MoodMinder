@@ -90,7 +90,9 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, part.id)}
                 data-testid={`upper-body-part-${part.id}`}
-              />
+              >
+                <title>{part.label}</title>
+              </circle>
             );
           })}
           
@@ -107,7 +109,9 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, "arms")}
             data-testid="upper-body-part-arms-right"
-          />
+          >
+            <title>Arms</title>
+          </circle>
           <circle
             cx="85"
             cy="65"
@@ -120,7 +124,9 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, "hands")}
             data-testid="upper-body-part-hands-right"
-          />
+          >
+            <title>Hands</title>
+          </circle>
         </svg>
         
         {/* Feeling emojis */}
