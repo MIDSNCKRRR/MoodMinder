@@ -117,9 +117,20 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
               }}
             >
               {selectedFeelings[part.id] && (
-                <span className="text-lg">
-                  {feelingEmojis.find(f => f.id === selectedFeelings[part.id])?.emoji}
-                </span>
+                <div className="relative group">
+                  <span className="text-lg cursor-pointer">
+                    {feelingEmojis.find(f => f.id === selectedFeelings[part.id])?.emoji}
+                  </span>
+                  {/* Delete button - appears on hover */}
+                  <button
+                    onClick={() => onFeelingChange(part.id, "")}
+                    className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
+                    title="Remove feeling"
+                    data-testid={`remove-feeling-${part.id}`}
+                  >
+                    ×
+                  </button>
+                </div>
               )}
             </div>
           ))}
@@ -149,6 +160,17 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   <span className="text-xs">{feeling.label}</span>
                 </Button>
               ))}
+              {/* Clear button */}
+              <Button
+                onClick={() => handleFeelingSelect("")}
+                variant="outline"
+                size="sm"
+                className="flex flex-col items-center p-2 h-auto rounded-stone border-dashed border-red-300 text-red-500 hover:bg-red-50"
+                data-testid="clear-feeling"
+              >
+                <span className="text-lg mb-1">🚫</span>
+                <span className="text-xs">Clear</span>
+              </Button>
             </div>
             <Button
               onClick={() => setSelectedPart(null)}
