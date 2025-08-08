@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Heart, Sparkles, BookOpen, ChevronRight } from "lucide-react";
+import { ArrowLeft, Heart, Sparkles, BookOpen, ChevronRight, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
@@ -22,6 +22,7 @@ interface JournalTypeOption {
 
 export default function Journal() {
   const [selectedJournalType, setSelectedJournalType] = useState<JournalType | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   // Fetch journal entries
   const { data: journalEntries = [] } = useQuery<JournalEntry[]>({
@@ -63,9 +64,9 @@ export default function Journal() {
 
   return (
     <div className="px-6 space-y-6">
-      {/* Navigation */}
-      {selectedJournalType && (
-        <div className="pt-8">
+      {/* Navigation and Info */}
+      <div className="flex justify-between items-center pt-8">
+        {selectedJournalType ? (
           <Button
             onClick={() => setSelectedJournalType(null)}
             variant="ghost"
@@ -75,7 +76,47 @@ export default function Journal() {
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-        </div>
+        ) : (
+          <div></div>
+        )}
+        
+        <Button
+          onClick={() => setShowInfo(!showInfo)}
+          variant="ghost"
+          size="sm"
+          className="p-2"
+          data-testid="info-button"
+        >
+          <Info className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Info Panel */}
+      {showInfo && (
+        <Card 
+          className="rounded-organic stone-shadow border-0 relative"
+          style={{ background: 'linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)' }}
+        >
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Your Journaling</h3>
+              <Button
+                onClick={() => setShowInfo(false)}
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto"
+                data-testid="close-info"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-2 text-sm text-stone-600">
+              <p><strong>Body Journal:</strong> Start your day by checking in with your emotional and physical state. Choose from 12 different feelings and map where you feel them in your body.</p>
+              <p><strong>Gratitude Journal:</strong> Focus on positive moments and things you're thankful for to cultivate appreciation and contentment.</p>
+              <p><strong>Daily Reflection:</strong> Process your thoughts and experiences through guided questions for deeper self-understanding.</p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Journal Type Selection */}
