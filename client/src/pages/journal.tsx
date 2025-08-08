@@ -129,41 +129,39 @@ export default function Journal() {
 
   return (
     <div className="px-6 space-y-6">
-      {/* Header - only show on main journal selection page */}
+      {/* Header with Info Button - only show on main journal selection page */}
       {!selectedJournalType && (
         <div className="pt-6 pb-1">
           <Card 
             className="rounded-organic stone-shadow border-0"
             style={{ background: 'linear-gradient(135deg, hsl(140, 35%, 93%) 0%, hsl(140, 30%, 85%) 100%)' }}
           >
-            <CardContent className="p-4 text-center">
-              <h1 className="font-serif font-semibold text-lg text-stone-600 mb-1">
-                Soft Moves
-              </h1>
-              <p className="text-stone-500 text-xs">
-                {new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'short', 
-                  day: 'numeric' 
-                })}
-              </p>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-center">
+                <div className="flex-1 text-center">
+                  <h1 className="font-serif font-semibold text-lg text-stone-600 mb-1">
+                    Soft Moves
+                  </h1>
+                  <p className="text-stone-500 text-xs">
+                    {new Date().toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setShowInfo(!showInfo)}
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 text-stone-500 hover:text-stone-600 hover:bg-white/50"
+                  data-testid="info-button"
+                >
+                  <Info className="w-4 h-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
-        </div>
-      )}
-
-      {/* Navigation and Info - only show on main journal selection page */}
-      {!selectedJournalType && (
-        <div className="flex justify-end items-center pt-8">
-          <Button
-            onClick={() => setShowInfo(!showInfo)}
-            variant="ghost"
-            size="sm"
-            className="p-2"
-            data-testid="info-button"
-          >
-            <Info className="w-4 h-4" />
-          </Button>
         </div>
       )}
 
