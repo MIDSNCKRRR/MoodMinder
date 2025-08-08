@@ -28,6 +28,7 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
+  const [draggedFeeling, setDraggedFeeling] = useState<string | null>(null);
 
   const handlePartClick = (partId: string) => {
     setSelectedPart(partId);
@@ -37,6 +38,22 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
     if (selectedPart) {
       onFeelingChange(selectedPart, feeling);
       setSelectedPart(null);
+    }
+  };
+
+  const handleDragStart = (feeling: string) => {
+    setDraggedFeeling(feeling);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, partId: string) => {
+    e.preventDefault();
+    if (draggedFeeling) {
+      onFeelingChange(partId, draggedFeeling);
+      setDraggedFeeling(null);
     }
   };
 
@@ -74,6 +91,8 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   strokeWidth="2"
                   className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
                   onClick={() => handlePartClick(part.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, part.id)}
                   data-testid={`lower-body-part-${part.id}-left`}
                 />
                 
@@ -87,6 +106,8 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   strokeWidth="2"
                   className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
                   onClick={() => handlePartClick(part.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, part.id)}
                   data-testid={`lower-body-part-${part.id}-right`}
                 />
               </g>
@@ -128,7 +149,9 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   onClick={() => handleFeelingSelect(feeling.id)}
                   variant="outline"
                   size="sm"
-                  className="flex flex-col items-center p-2 h-auto rounded-stone"
+                  className="flex flex-col items-center p-2 h-auto rounded-stone cursor-move"
+                  draggable
+                  onDragStart={() => handleDragStart(feeling.id)}
                   data-testid={`feeling-${feeling.id}`}
                 >
                   <span className="text-lg mb-1">{feeling.emoji}</span>

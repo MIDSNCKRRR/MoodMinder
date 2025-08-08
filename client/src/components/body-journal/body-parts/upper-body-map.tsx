@@ -29,6 +29,7 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
+  const [draggedFeeling, setDraggedFeeling] = useState<string | null>(null);
 
   const handlePartClick = (partId: string) => {
     setSelectedPart(partId);
@@ -38,6 +39,22 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
     if (selectedPart) {
       onFeelingChange(selectedPart, feeling);
       setSelectedPart(null);
+    }
+  };
+
+  const handleDragStart = (feeling: string) => {
+    setDraggedFeeling(feeling);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, partId: string) => {
+    e.preventDefault();
+    if (draggedFeeling) {
+      onFeelingChange(partId, draggedFeeling);
+      setDraggedFeeling(null);
     }
   };
 
@@ -70,6 +87,8 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                 strokeWidth="2"
                 className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
                 onClick={() => handlePartClick(part.id)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, part.id)}
                 data-testid={`upper-body-part-${part.id}`}
               />
             );
@@ -85,6 +104,8 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
             strokeWidth="2"
             className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
             onClick={() => handlePartClick("arms")}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, "arms")}
             data-testid="upper-body-part-arms-right"
           />
           <circle
@@ -96,6 +117,8 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
             strokeWidth="2"
             className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
             onClick={() => handlePartClick("hands")}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, "hands")}
             data-testid="upper-body-part-hands-right"
           />
         </svg>
@@ -134,7 +157,9 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                   onClick={() => handleFeelingSelect(feeling.id)}
                   variant="outline"
                   size="sm"
-                  className="flex flex-col items-center p-2 h-auto rounded-stone"
+                  className="flex flex-col items-center p-2 h-auto rounded-stone cursor-move"
+                  draggable
+                  onDragStart={() => handleDragStart(feeling.id)}
                   data-testid={`feeling-${feeling.id}`}
                 >
                   <span className="text-lg mb-1">{feeling.emoji}</span>

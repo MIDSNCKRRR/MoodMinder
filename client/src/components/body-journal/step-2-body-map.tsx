@@ -18,6 +18,7 @@ export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChang
   const [headFeelings, setHeadFeelings] = useState<Record<string, string>>({});
   const [upperBodyFeelings, setUpperBodyFeelings] = useState<Record<string, string>>({});
   const [lowerBodyFeelings, setLowerBodyFeelings] = useState<Record<string, string>>({});
+  const [draggedFeeling, setDraggedFeeling] = useState<string | null>(null);
 
   // Initialize feelings from props
   useEffect(() => {
@@ -39,9 +40,19 @@ export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChang
   // Update parent state when feelings change
   useEffect(() => {
     const allFeelings = { ...headFeelings, ...upperBodyFeelings, ...lowerBodyFeelings };
-    onBodyFeelingsChange(allFeelings);
     localStorage.setItem('bodyJournal_bodyFeelings', JSON.stringify(allFeelings));
-  }, [headFeelings, upperBodyFeelings, lowerBodyFeelings, onBodyFeelingsChange]);
+    
+    // Only update parent if different to prevent infinite re-renders
+    const currentKeys = Object.keys(selectedBodyFeelings).sort();
+    const newKeys = Object.keys(allFeelings).sort();
+    const isDifferent = currentKeys.length !== newKeys.length || 
+      currentKeys.some((key, index) => key !== newKeys[index]) ||
+      Object.entries(allFeelings).some(([key, value]) => selectedBodyFeelings[key] !== value);
+    
+    if (isDifferent) {
+      onBodyFeelingsChange(allFeelings);
+    }
+  }, [headFeelings, upperBodyFeelings, lowerBodyFeelings]);
 
   const handleHeadFeelingChange = (part: string, feeling: string) => {
     setHeadFeelings(prev => ({ ...prev, [part]: feeling }));
@@ -73,7 +84,29 @@ export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChang
           </p>
           
           {/* Body Mapping Tabs */}
-          <div className="bg-white/80 p-4 rounded-stone">
+          <div className="bg-white/80 p-4 rounded-stone relative">
+            {/* Floating Emoji Palette */}
+            <div className="mb-4 p-3 bg-stone-50 rounded-stone border border-stone-200">
+              <p className="text-xs text-stone-600 mb-2 font-medium">Drag feelings onto body parts:</p>
+              <div className="flex flex-wrap gap-1 justify-center">
+                {[
+                  { id: "tense", emoji: "😬" }, { id: "relaxed", emoji: "😌" }, { id: "warm", emoji: "🔥" }, { id: "cool", emoji: "❄️" },
+                  { id: "fluttery", emoji: "🦋" }, { id: "racing", emoji: "💓" }, { id: "calm", emoji: "🌊" }, { id: "buzzing", emoji: "⚡" },
+                  { id: "restless", emoji: "🦵" }, { id: "grounded", emoji: "🌳" }, { id: "strong", emoji: "💪" }, { id: "light", emoji: "🪶" }
+                ].map((feeling) => (
+                  <div
+                    key={feeling.id}
+                    draggable
+                    onDragStart={() => setDraggedFeeling(feeling.id)}
+                    className="w-8 h-8 flex items-center justify-center text-lg bg-white rounded-full border border-stone-200 cursor-move hover:bg-orange-50 hover:border-orange-200 transition-all"
+                    data-testid={`floating-feeling-${feeling.id}`}
+                  >
+                    {feeling.emoji}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <Tabs defaultValue="head" className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="head" className="text-xs">Head</TabsTrigger>
