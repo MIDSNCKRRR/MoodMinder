@@ -57,10 +57,23 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
   }, [selectedKeywords]);
 
   const handleKeywordToggle = (keyword: string) => {
+    const isCurrentCategoryWord = candidateWords.includes(keyword);
+    
     if (selectedKeywords.includes(keyword)) {
+      // Remove if already selected
       onKeywordsChange(selectedKeywords.filter(k => k !== keyword));
     } else {
-      onKeywordsChange([...selectedKeywords, keyword]);
+      // Remove any existing word from the same category before adding new one
+      const wordsFromOtherCategory = selectedKeywords.filter(k => {
+        if (selectedCategory === 'adjectives') {
+          return characterWords.includes(k);
+        } else {
+          return adjectiveWords.includes(k);
+        }
+      });
+      
+      // Keep words from other category and add the new word
+      onKeywordsChange([...wordsFromOtherCategory, keyword]);
     }
   };
 
@@ -83,7 +96,7 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
             Choose words that reflect who you are today
           </h3>
           <p className="text-stone-500 text-sm text-center mb-6">
-            Select keywords that resonate with your current sense of self
+            Select one word from each category that resonates with your current sense of self
           </p>
 
           {/* Category Selector */}
@@ -118,25 +131,34 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
           {selectedKeywords.length > 0 && (
             <div className="mb-6 p-4 bg-white/60 rounded-stone">
               <h4 className="text-sm font-medium text-stone-600 mb-3">
-                Selected ({selectedKeywords.length})
+                Selected ({selectedKeywords.length}/2)
               </h4>
               <div className="flex flex-wrap gap-2">
-                {selectedKeywords.map((keyword) => (
-                  <div
-                    key={keyword}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
-                    data-testid={`selected-keyword-${keyword.toLowerCase()}`}
-                  >
-                    <span>{keyword}</span>
-                    <button
-                      onClick={() => handleRemoveKeyword(keyword)}
-                      className="ml-1 text-sage-500 hover:text-sage-700 transition-colors"
-                      data-testid={`remove-keyword-${keyword.toLowerCase()}`}
+                {selectedKeywords.map((keyword) => {
+                  const isFromAdjectives = adjectiveWords.includes(keyword);
+                  const categoryLabel = isFromAdjectives ? 'Adjective' : 'Character';
+                  const categoryColor = isFromAdjectives ? 'bg-blue-200 text-blue-700' : 'bg-purple-200 text-purple-700';
+                  
+                  return (
+                    <div
+                      key={keyword}
+                      className="inline-flex items-center gap-2 px-3 py-1 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
+                      data-testid={`selected-keyword-${keyword.toLowerCase()}`}
                     >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${categoryColor}`}>
+                        {categoryLabel}
+                      </span>
+                      <span>{keyword}</span>
+                      <button
+                        onClick={() => handleRemoveKeyword(keyword)}
+                        className="ml-1 text-sage-500 hover:text-sage-700 transition-colors"
+                        data-testid={`remove-keyword-${keyword.toLowerCase()}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
