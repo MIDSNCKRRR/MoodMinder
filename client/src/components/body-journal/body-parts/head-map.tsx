@@ -165,8 +165,8 @@ export default function HeadMap({
       </div>
       </div>
 
-      {/* Feeling selection */}
-      {selectedPart && (
+      {/* Feeling selection - Hidden for now */}
+      {/* {selectedPart && (
         <Card className="rounded-stone border border-orange-200">
           <CardContent className="p-4">
             <p className="text-sm font-medium text-stone-600 mb-3">
@@ -192,7 +192,6 @@ export default function HeadMap({
                   <span className="text-xs">{feeling.label}</span>
                 </Button>
               ))}
-              {/* Clear button */}
               <Button
                 onClick={() => handleFeelingSelect("")}
                 variant="outline"
@@ -215,7 +214,7 @@ export default function HeadMap({
             </Button>
           </CardContent>
         </Card>
-      )}
+      )} */}
     </div>
   );
 }

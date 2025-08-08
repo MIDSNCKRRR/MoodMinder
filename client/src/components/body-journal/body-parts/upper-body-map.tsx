@@ -140,8 +140,8 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
         </div>
       </div>
 
-      {/* Feeling selection */}
-      {selectedPart && (
+      {/* Feeling selection - Hidden for now */}
+      {/* {selectedPart && (
         <Card className="rounded-stone border border-orange-200">
           <CardContent className="p-4">
             <p className="text-sm font-medium text-stone-600 mb-3">
@@ -163,7 +163,6 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                   <span className="text-xs">{feeling.label}</span>
                 </Button>
               ))}
-              {/* Clear button */}
               <Button
                 onClick={() => handleFeelingSelect("")}
                 variant="outline"
@@ -186,7 +185,7 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
             </Button>
           </CardContent>
         </Card>
-      )}
+      )} */}
     </div>
   );
 }
