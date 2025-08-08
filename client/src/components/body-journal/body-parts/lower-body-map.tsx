@@ -42,7 +42,8 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
     }
   };
 
-  const handleDragStart = (feelingId: string) => {
+  const handleDragStart = (e: React.DragEvent, feelingId: string) => {
+    e.dataTransfer.setData("text/plain", feelingId);
     setDraggedFeeling(feelingId);
   };
 
@@ -52,8 +53,10 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
 
   const handleDrop = (e: React.DragEvent, partId: string) => {
     e.preventDefault();
-    if (draggedFeeling) {
-      onFeelingChange(partId, draggedFeeling);
+    const draggedData = e.dataTransfer.getData("text/plain");
+    const feeling = draggedData || draggedFeeling;
+    if (feeling) {
+      onFeelingChange(partId, feeling);
       setDraggedFeeling(null);
     }
   };
@@ -139,7 +142,7 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
                   size="sm"
                   className="flex flex-col items-center p-2 h-auto rounded-stone cursor-move"
                   draggable
-                  onDragStart={() => handleDragStart(feeling.id)}
+                  onDragStart={(e) => handleDragStart(e, feeling.id)}
                   data-testid={`feeling-${feeling.id}`}
                 >
                   <span className="text-lg mb-1">{feeling.emoji}</span>
