@@ -140,7 +140,8 @@ export default function HeadMap({
                 top: `${part.y}%`,
               }}
             >
-              {selectedFeelings[part.id] && (
+              {/* Selected feeling emoji display - Hidden for now */}
+              {/* {selectedFeelings[part.id] && (
                 <div className="relative group">
                   <span className="text-lg cursor-pointer">
                     {
@@ -148,7 +149,6 @@ export default function HeadMap({
                         ?.emoji
                     }
                   </span>
-                  {/* Delete button - appears on hover */}
                   <button
                     onClick={() => onFeelingChange(part.id, "")}
                     className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
@@ -158,15 +158,15 @@ export default function HeadMap({
                     ×
                   </button>
                 </div>
-              )}
+              )} */}
             </div>
           ))}
         </div>
       </div>
       </div>
 
-      {/* Feeling selection - Hidden for now */}
-      {/* {selectedPart && (
+      {/* Feeling selection */}
+      {selectedPart && (
         <Card className="rounded-stone border border-orange-200">
           <CardContent className="p-4">
             <p className="text-sm font-medium text-stone-600 mb-3">
@@ -214,7 +214,7 @@ export default function HeadMap({
             </Button>
           </CardContent>
         </Card>
-      )} */}
+      )}
     </div>
   );
 }
