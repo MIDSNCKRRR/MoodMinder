@@ -68,7 +68,10 @@ export default function Step2BodyMap({ selectedBodyFeelings, onBodyFeelingsChang
                   <div
                     key={feeling.id}
                     draggable
-                    onDragStart={() => setDraggedFeeling(feeling.id)}
+                    onDragStart={(e) => {
+                      setDraggedFeeling(feeling.id);
+                      e.dataTransfer.setData("text/plain", feeling.id);
+                    }}
                     className="w-8 h-8 flex items-center justify-center text-lg bg-white rounded-full border border-stone-200 cursor-move hover:bg-orange-50 hover:border-orange-200 transition-all"
                     data-testid={`floating-feeling-${feeling.id}`}
                   >

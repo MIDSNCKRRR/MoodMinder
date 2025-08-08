@@ -52,8 +52,10 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
 
   const handleDrop = (e: React.DragEvent, partId: string) => {
     e.preventDefault();
-    if (draggedFeeling) {
-      onFeelingChange(partId, draggedFeeling);
+    const draggedData = e.dataTransfer.getData("text/plain");
+    const feeling = draggedData || draggedFeeling;
+    if (feeling) {
+      onFeelingChange(partId, feeling);
       setDraggedFeeling(null);
     }
   };
