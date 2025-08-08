@@ -129,36 +129,20 @@ export default function Journal() {
 
   return (
     <div className="px-6 space-y-6">
-      {/* Navigation and Info */}
-      <div className="flex justify-between items-center pt-8">
-        {selectedJournalType ? (
+      {/* Navigation and Info - only show on main journal selection page */}
+      {!selectedJournalType && (
+        <div className="flex justify-end items-center pt-8">
           <Button
-            onClick={() => {
-              setSelectedJournalType(null);
-              setShowInfo(false); // Reset info panel when going back
-            }}
+            onClick={() => setShowInfo(!showInfo)}
             variant="ghost"
             size="sm"
             className="p-2"
-            data-testid="back-to-journal-types"
+            data-testid="info-button"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <Info className="w-4 h-4" />
           </Button>
-        ) : (
-          <div></div>
-        )}
-        
-        {/* Info button appears on both main page and individual journal pages */}
-        <Button
-          onClick={() => setShowInfo(!showInfo)}
-          variant="ghost"
-          size="sm"
-          className="p-2"
-          data-testid="info-button"
-        >
-          <Info className="w-4 h-4" />
-        </Button>
-      </div>
+        </div>
+      )}
 
       {/* Info Panel - different content based on context */}
       {showInfo && (
