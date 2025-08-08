@@ -2,14 +2,17 @@ import { useState, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 
 interface Step1EmotionProps {
   selectedEmotion: number;
+  emotionIntensity: number;
   onEmotionChange: (emotion: number) => void;
+  onIntensityChange: (intensity: number) => void;
   onNext: () => void;
 }
 
-export default function Step1Emotion({ selectedEmotion, onEmotionChange, onNext }: Step1EmotionProps) {
+export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmotionChange, onIntensityChange, onNext }: Step1EmotionProps) {
   const emotionCategories = [
     { id: 1, emoji: "😭", label: "Overwhelmed", type: "overwhelmed" },
     { id: 2, emoji: "😰", label: "Anxious", type: "anxious" },
@@ -25,10 +28,11 @@ export default function Step1Emotion({ selectedEmotion, onEmotionChange, onNext 
     { id: 12, emoji: "🧘", label: "Mindful", type: "mindful" },
   ];
 
-  // Auto-save emotion selection
+  // Auto-save emotion selection and intensity
   useEffect(() => {
     localStorage.setItem('bodyJournal_emotion', selectedEmotion.toString());
-  }, [selectedEmotion]);
+    localStorage.setItem('bodyJournal_intensity', emotionIntensity.toString());
+  }, [selectedEmotion, emotionIntensity]);
 
   return (
     <div className="space-y-6">
@@ -46,7 +50,7 @@ export default function Step1Emotion({ selectedEmotion, onEmotionChange, onNext 
           </p>
           
           {/* Emotion Categories Grid */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 mb-8">
             {emotionCategories.map((category) => (
               <div 
                 key={category.id} 
@@ -64,6 +68,36 @@ export default function Step1Emotion({ selectedEmotion, onEmotionChange, onNext 
                 </span>
               </div>
             ))}
+          </div>
+
+          {/* Intensity Slider */}
+          <div className="bg-white/60 p-6 rounded-stone border border-stone-200">
+            <div className="text-center mb-4">
+              <h4 className="font-medium text-stone-600 mb-2">
+                How strong is this feeling?
+              </h4>
+              <div className="text-2xl font-bold" style={{ color: "hsl(15, 65%, 60%)" }}>
+                {emotionIntensity}%
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <Slider
+                value={[emotionIntensity]}
+                onValueChange={([value]) => onIntensityChange(value)}
+                max={100}
+                min={0}
+                step={5}
+                className="w-full"
+                data-testid="emotion-intensity-slider"
+              />
+              
+              <div className="flex justify-between text-xs text-stone-500">
+                <span>Very Mild (0%)</span>
+                <span>Moderate (50%)</span>
+                <span>Very Strong (100%)</span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

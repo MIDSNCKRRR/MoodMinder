@@ -17,17 +17,22 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   
   // State for all steps
   const [selectedEmotion, setSelectedEmotion] = useState<number>(4);
+  const [emotionIntensity, setEmotionIntensity] = useState<number>(50);
   const [selectedBodyFeelings, setSelectedBodyFeelings] = useState<Record<string, string>>({});
   const [journalContent, setJournalContent] = useState("");
 
   // Load saved data on component mount
   useEffect(() => {
     const savedEmotion = localStorage.getItem('bodyJournal_emotion');
+    const savedIntensity = localStorage.getItem('bodyJournal_intensity');
     const savedBodyFeelings = localStorage.getItem('bodyJournal_bodyFeelings');
     const savedContent = localStorage.getItem('bodyJournal_content');
 
     if (savedEmotion) {
       setSelectedEmotion(parseInt(savedEmotion));
+    }
+    if (savedIntensity) {
+      setEmotionIntensity(parseInt(savedIntensity));
     }
     if (savedBodyFeelings) {
       try {
@@ -57,6 +62,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     // Reset form and go back to journal types
     setCurrentStep(1);
     setSelectedEmotion(4);
+    setEmotionIntensity(50);
     setSelectedBodyFeelings({});
     setJournalContent("");
     onBack();
@@ -73,7 +79,9 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
         return (
           <Step1Emotion
             selectedEmotion={selectedEmotion}
+            emotionIntensity={emotionIntensity}
             onEmotionChange={setSelectedEmotion}
+            onIntensityChange={setEmotionIntensity}
             onNext={handleNext}
           />
         );
