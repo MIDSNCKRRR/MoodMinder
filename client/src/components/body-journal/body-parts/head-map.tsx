@@ -9,10 +9,10 @@ interface HeadMapProps {
 
 export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapProps) {
   const headParts = [
-    { id: "forehead", label: "Forehead", x: 50, y: 25 },
-    { id: "eyes", label: "Eyes", x: 50, y: 40 },
-    { id: "jaw", label: "Jaw", x: 50, y: 65 },
-    { id: "neck", label: "Neck", x: 50, y: 85 },
+    { id: "forehead", label: "Forehead", x: 50, y: 22 },
+    { id: "eyes", label: "Eyes", x: 50, y: 35 },
+    { id: "jaw", label: "Jaw", x: 50, y: 48 },
+    { id: "neck", label: "Neck", x: 50, y: 61 },
   ];
 
   const feelingEmojis = [
@@ -65,87 +65,71 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
       {/* Head SVG - Enhanced with realistic proportions */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Professional head silhouette based on reference image */}
+          {/* Head and shoulders silhouette based on reference image */}
           <g>
-            {/* Main head shape - clean rounded silhouette */}
-            <path 
-              d="M50 10
-                 C60 10 68 16 72 24
-                 C75 30 76 37 75 44
-                 C74 50 71 55 67 58
-                 C65 60 64 62 64 64
-                 C64 66 65 67 66 68
-                 L64 70
-                 C62 72 59 73 56 74
-                 L44 74
-                 C41 73 38 72 36 70
-                 L34 68
-                 C35 67 36 66 36 64
-                 C36 62 35 60 33 58
-                 C29 55 26 50 25 44
-                 C24 37 25 30 28 24
-                 C32 16 40 10 50 10 Z" 
-              fill="hsl(270, 18%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
+            {/* Main head shape - perfect circle top */}
+            <circle 
+              cx="50" 
+              cy="35" 
+              r="20" 
+              fill="hsl(270, 15%, 80%)" 
+              stroke="hsl(270, 30%, 60%)" 
+              strokeWidth="3"
+            />
+            
+            {/* Left ear - small rounded rectangle */}
+            <ellipse 
+              cx="32" 
+              cy="35" 
+              rx="2.5" 
+              ry="6" 
+              fill="hsl(270, 15%, 80%)" 
+              stroke="hsl(270, 30%, 60%)" 
               strokeWidth="2.5"
             />
             
-            {/* Left ear */}
+            {/* Right ear - small rounded rectangle */}
             <ellipse 
-              cx="28" 
-              cy="42" 
-              rx="3.5" 
-              ry="7" 
-              fill="hsl(270, 18%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2"
-            />
-            
-            {/* Right ear */}
-            <ellipse 
-              cx="72" 
-              cy="42" 
-              rx="3.5" 
-              ry="7" 
-              fill="hsl(270, 18%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2"
-            />
-            
-            {/* Neck - clean cylindrical shape */}
-            <path 
-              d="M44 74
-                 C46 75 48 76 50 76
-                 C52 76 54 75 56 74
-                 L58 82
-                 C56 85 54 87 50 87
-                 C46 87 44 85 42 82
-                 L44 74 Z" 
-              fill="hsl(270, 18%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
+              cx="68" 
+              cy="35" 
+              rx="2.5" 
+              ry="6" 
+              fill="hsl(270, 15%, 80%)" 
+              stroke="hsl(270, 30%, 60%)" 
               strokeWidth="2.5"
             />
             
-            {/* Subtle facial features for anatomical reference - very light */}
-            <g opacity="0.25">
-              {/* Eyes indication */}
-              <ellipse cx="43" cy="38" rx="1.5" ry="0.8" fill="hsl(270, 30%, 70%)"/>
-              <ellipse cx="57" cy="38" rx="1.5" ry="0.8" fill="hsl(270, 30%, 70%)"/>
-              
-              {/* Nose indication */}
-              <path d="M48 47 L50 50 L52 47" 
-                    fill="none" 
-                    stroke="hsl(270, 30%, 70%)" 
-                    strokeWidth="1.2" 
-                    strokeLinecap="round"/>
-              
-              {/* Mouth indication */}
-              <path d="M46 54 Q50 56 54 54" 
-                    fill="none" 
-                    stroke="hsl(270, 30%, 70%)" 
-                    strokeWidth="1" 
-                    strokeLinecap="round"/>
-            </g>
+            {/* Neck - straight cylindrical */}
+            <rect 
+              x="45" 
+              y="55" 
+              width="10" 
+              height="12" 
+              fill="hsl(270, 15%, 80%)" 
+              stroke="hsl(270, 30%, 60%)" 
+              strokeWidth="3"
+            />
+            
+            {/* Shoulders - wide curved base */}
+            <path 
+              d="M20 67
+                 C20 67 25 65 35 65
+                 C40 65 45 66 50 67
+                 C55 66 60 65 65 65
+                 C75 65 80 67 80 67
+                 L80 85
+                 C80 87 78 88 76 88
+                 L24 88
+                 C22 88 20 87 20 85
+                 L20 67 Z" 
+              fill="hsl(270, 15%, 80%)" 
+              stroke="hsl(270, 30%, 60%)" 
+              strokeWidth="3"
+            />
+            
+            {/* Small shoulder line breaks for realistic look */}
+            <line x1="20" y1="75" x2="20" y2="85" stroke="hsl(270, 30%, 60%)" strokeWidth="2"/>
+            <line x1="80" y1="75" x2="80" y2="85" stroke="hsl(270, 30%, 60%)" strokeWidth="2"/>
           </g>
           
           {/* Interactive areas with enhanced styling */}
