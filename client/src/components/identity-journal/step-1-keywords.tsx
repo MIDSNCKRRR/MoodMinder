@@ -106,8 +106,8 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
                 onClick={() => setSelectedCategory('adjectives')}
                 className={`px-4 py-2 rounded-stone text-sm font-medium transition-all duration-300 ${
                   selectedCategory === 'adjectives'
-                    ? 'bg-sage-600 text-sage-50 shadow-md'
-                    : 'text-stone-600 hover:text-sage-600'
+                    ? 'bg-sage-700 text-white shadow-lg'
+                    : 'bg-white/50 text-stone-600 hover:bg-white/70 hover:text-sage-600'
                 }`}
                 data-testid="category-adjectives"
               >
@@ -117,8 +117,8 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
                 onClick={() => setSelectedCategory('characters')}
                 className={`px-4 py-2 rounded-stone text-sm font-medium transition-all duration-300 ${
                   selectedCategory === 'characters'
-                    ? 'bg-sage-600 text-sage-50 shadow-md'
-                    : 'text-stone-600 hover:text-sage-600'
+                    ? 'bg-sage-700 text-white shadow-lg'
+                    : 'bg-white/50 text-stone-600 hover:bg-white/70 hover:text-sage-600'
                 }`}
                 data-testid="category-characters"
               >
