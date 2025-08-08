@@ -62,6 +62,71 @@ export default function Journal() {
       .slice(0, 3);
   };
 
+  const getJournalInfoTitle = (journalType: JournalType) => {
+    switch (journalType) {
+      case 'emotion':
+        return "About Body Journal";
+      case 'gratitude':
+        return "About Gratitude Journal";
+      case 'reflection':
+        return "About Daily Reflection";
+      default:
+        return "About This Journal";
+    }
+  };
+
+  const getJournalInfoContent = (journalType: JournalType) => {
+    switch (journalType) {
+      case 'emotion':
+        return (
+          <div className="space-y-3">
+            <p>The Body Journal helps you start your day with emotional awareness and physical check-ins.</p>
+            <div className="space-y-2">
+              <p><strong>How to use:</strong></p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>Choose from 12 different emotions that best describe your current state</li>
+                <li>Map where you feel these emotions in your body</li>
+                <li>Write about your physical sensations and emotional state</li>
+                <li>This practice helps build mind-body awareness</li>
+              </ul>
+            </div>
+          </div>
+        );
+      case 'gratitude':
+        return (
+          <div className="space-y-3">
+            <p>The Gratitude Journal focuses on positive moments and appreciation to cultivate contentment.</p>
+            <div className="space-y-2">
+              <p><strong>How to use:</strong></p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>Reflect on things you're thankful for today</li>
+                <li>Notice small moments of joy or beauty</li>
+                <li>Write about people who made a positive impact</li>
+                <li>Regular practice shifts focus toward positivity</li>
+              </ul>
+            </div>
+          </div>
+        );
+      case 'reflection':
+        return (
+          <div className="space-y-3">
+            <p>Daily Reflection helps you process thoughts and experiences through guided self-inquiry.</p>
+            <div className="space-y-2">
+              <p><strong>How to use:</strong></p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>Answer thoughtful questions about your day</li>
+                <li>Explore your reactions and responses to events</li>
+                <li>Identify patterns in your thoughts and behaviors</li>
+                <li>Gain deeper self-understanding and clarity</li>
+              </ul>
+            </div>
+          </div>
+        );
+      default:
+        return <p>Learn more about this journaling practice.</p>;
+    }
+  };
+
   return (
     <div className="px-6 space-y-6">
       {/* Navigation and Info */}
@@ -83,29 +148,29 @@ export default function Journal() {
           <div></div>
         )}
         
-        {/* Only show info button on main journal selection page */}
-        {!selectedJournalType && (
-          <Button
-            onClick={() => setShowInfo(!showInfo)}
-            variant="ghost"
-            size="sm"
-            className="p-2"
-            data-testid="info-button"
-          >
-            <Info className="w-4 h-4" />
-          </Button>
-        )}
+        {/* Info button appears on both main page and individual journal pages */}
+        <Button
+          onClick={() => setShowInfo(!showInfo)}
+          variant="ghost"
+          size="sm"
+          className="p-2"
+          data-testid="info-button"
+        >
+          <Info className="w-4 h-4" />
+        </Button>
       </div>
 
-      {/* Info Panel - only show on main page */}
-      {showInfo && !selectedJournalType && (
+      {/* Info Panel - different content based on context */}
+      {showInfo && (
         <Card 
           className="rounded-organic stone-shadow border-0 relative"
           style={{ background: 'linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)' }}
         >
           <CardContent className="p-4">
             <div className="flex justify-between items-start mb-3">
-              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Your Journaling</h3>
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">
+                {selectedJournalType ? getJournalInfoTitle(selectedJournalType) : "About Your Journaling"}
+              </h3>
               <Button
                 onClick={() => setShowInfo(false)}
                 variant="ghost"
@@ -117,9 +182,13 @@ export default function Journal() {
               </Button>
             </div>
             <div className="space-y-2 text-sm text-stone-600">
-              <p><strong>Body Journal:</strong> Start your day by checking in with your emotional and physical state. Choose from 12 different feelings and map where you feel them in your body.</p>
-              <p><strong>Gratitude Journal:</strong> Focus on positive moments and things you're thankful for to cultivate appreciation and contentment.</p>
-              <p><strong>Daily Reflection:</strong> Process your thoughts and experiences through guided questions for deeper self-understanding.</p>
+              {selectedJournalType ? getJournalInfoContent(selectedJournalType) : (
+                <>
+                  <p><strong>Body Journal:</strong> Start your day by checking in with your emotional and physical state. Choose from 12 different feelings and map where you feel them in your body.</p>
+                  <p><strong>Gratitude Journal:</strong> Focus on positive moments and things you're thankful for to cultivate appreciation and contentment.</p>
+                  <p><strong>Daily Reflection:</strong> Process your thoughts and experiences through guided questions for deeper self-understanding.</p>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
