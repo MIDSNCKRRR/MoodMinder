@@ -8,7 +8,10 @@ interface HeadMapProps {
   onFeelingChange: (bodyPart: string, feeling: string) => void;
 }
 
-export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapProps) {
+export default function HeadMap({
+  selectedFeelings,
+  onFeelingChange,
+}: HeadMapProps) {
   const headParts = [
     { id: "forehead", label: "Forehead", x: 50, y: 25 },
     { id: "eyes", label: "Eyes", x: 50, y: 35 },
@@ -59,19 +62,27 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4>
-      
+      {/* <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4> */}
+
       {/* Your uploaded Head & Neck image */}
-      <div className="relative mx-auto" style={{ width: '280px', height: '320px' }}>
+      <div className="flex justify-center items-center w-full">
+        <div
+          className="relative"
+          style={{ width: "280px", height: "320px" }}
+        >
         <div className="relative w-full h-full">
-          <img 
-            src={headNeckImage} 
-            alt="Head and Neck" 
+          <img
+            src={headNeckImage}
+            alt="Head and Neck"
             className="w-full h-full object-contain mx-auto block"
           />
-          
+
           {/* Invisible overlay for interactions */}
-          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
+          <svg
+            viewBox="0 0 100 100"
+            className="absolute inset-0 w-full h-full"
+            style={{ pointerEvents: "none" }}
+          >
             {/* Interactive areas positioned over your image */}
             {headParts.map((part) => {
               const isSelected = selectedPart === part.id;
@@ -82,14 +93,28 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
                   cx={part.x}
                   cy={part.y}
                   r="8"
-                  fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
-                  stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
+                  fill={
+                    isSelected
+                      ? "hsl(15, 65%, 60%)"
+                      : hasFeeling
+                        ? "hsl(140, 50%, 50%)"
+                        : "hsl(270, 15%, 90%)"
+                  }
+                  stroke={
+                    isSelected
+                      ? "hsl(15, 70%, 50%)"
+                      : hasFeeling
+                        ? "hsl(140, 60%, 40%)"
+                        : "hsl(270, 25%, 70%)"
+                  }
                   strokeWidth="2.5"
                   className="cursor-pointer transition-all duration-300 hover:scale-110"
                   style={{
-                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none",
+                    filter: isSelected
+                      ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))"
+                      : "none",
                     pointerEvents: "auto",
-                    transformOrigin: "center"
+                    transformOrigin: "center",
                   }}
                   onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
@@ -102,7 +127,8 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
             })}
           </svg>
         </div>
-        
+      </div>
+
         {/* Part labels */}
         {headParts.map((part) => (
           <div
@@ -111,12 +137,15 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
             style={{
               left: `${part.x + 8}%`,
               top: `${part.y - 2}%`,
-              transform: 'translateY(-50%)'
+              transform: "translateY(-50%)",
             }}
           >
             {selectedFeelings[part.id] && (
               <span className="text-lg">
-                {feelingEmojis.find(f => f.id === selectedFeelings[part.id])?.emoji}
+                {
+                  feelingEmojis.find((f) => f.id === selectedFeelings[part.id])
+                    ?.emoji
+                }
               </span>
             )}
           </div>
@@ -128,7 +157,11 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
         <Card className="rounded-stone border border-orange-200">
           <CardContent className="p-4">
             <p className="text-sm font-medium text-stone-600 mb-3">
-              How does your {headParts.find(p => p.id === selectedPart)?.label.toLowerCase()} feel?
+              How does your{" "}
+              {headParts
+                .find((p) => p.id === selectedPart)
+                ?.label.toLowerCase()}{" "}
+              feel?
             </p>
             <div className="grid grid-cols-4 gap-2">
               {feelingEmojis.map((feeling) => (
