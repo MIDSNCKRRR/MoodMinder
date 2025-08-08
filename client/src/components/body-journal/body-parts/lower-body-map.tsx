@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import lowerBodyImage from "@assets/image_1754642975195.png";
 
 interface LowerBodyMapProps {
   selectedFeelings: Record<string, string>;
@@ -9,9 +10,9 @@ interface LowerBodyMapProps {
 
 export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: LowerBodyMapProps) {
   const lowerBodyParts = [
-    { id: "hips", label: "Hips", x: 50, y: 25 },
-    { id: "thighs", label: "Thighs", x: 50, y: 45 },
-    { id: "knees", label: "Knees", x: 50, y: 65 },
+    { id: "hips", label: "Hips", x: 50, y: 20 },
+    { id: "thighs", label: "Thighs", x: 50, y: 40 },
+    { id: "knees", label: "Knees", x: 50, y: 60 },
     { id: "calves", label: "Calves", x: 50, y: 80 },
     { id: "feet", label: "Feet", x: 50, y: 95 },
   ];
@@ -34,15 +35,15 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
     setSelectedPart(partId);
   };
 
-  const handleFeelingSelect = (feeling: string) => {
+  const handleFeelingSelect = (feelingId: string) => {
     if (selectedPart) {
-      onFeelingChange(selectedPart, feeling);
+      onFeelingChange(selectedPart, feelingId);
       setSelectedPart(null);
     }
   };
 
-  const handleDragStart = (feeling: string) => {
-    setDraggedFeeling(feeling);
+  const handleDragStart = (feelingId: string) => {
+    setDraggedFeeling(feelingId);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -51,10 +52,8 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
 
   const handleDrop = (e: React.DragEvent, partId: string) => {
     e.preventDefault();
-    const draggedData = e.dataTransfer.getData("text/plain");
-    const feeling = draggedData || draggedFeeling;
-    if (feeling) {
-      onFeelingChange(partId, feeling);
+    if (draggedFeeling) {
+      onFeelingChange(partId, draggedFeeling);
       setDraggedFeeling(null);
     }
   };
@@ -63,132 +62,65 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Lower Body</h4>
       
-      {/* Lower Body SVG - Enhanced with realistic proportions */}
-      <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '280px' }}>
-        <svg viewBox="0 0 100 120" className="w-full h-full">
-          {/* Enhanced hip area */}
-          <path 
-            d="M35 10
-               C32 12 30 15 32 20
-               C35 25 40 28 45 30
-               C48 32 52 32 55 30
-               C60 28 65 25 68 20
-               C70 15 68 12 65 10
-               C60 8 55 8 50 8
-               C45 8 40 8 35 10 Z" 
-            fill="hsl(270, 20%, 85%)" 
-            stroke="hsl(270, 30%, 60%)" 
-            strokeWidth="2"
+      {/* Your uploaded Lower Body image */}
+      <div className="flex justify-center items-center w-full">
+        <div className="relative" style={{ width: '280px', height: '360px' }}>
+          <img 
+            src={lowerBodyImage} 
+            alt="Lower Body" 
+            className="w-full h-full object-contain"
           />
           
-          {/* Left leg */}
-          <path 
-            d="M45 30
-               C42 35 40 45 38 55
-               C36 65 35 75 36 85
-               C37 90 38 95 40 98
-               C42 100 44 100 46 98
-               L48 95
-               C48 85 47 75 46 65
-               C45 55 45 45 45 35
-               L45 30 Z" 
-            fill="hsl(270, 20%, 85%)" 
-            stroke="hsl(270, 30%, 60%)" 
-            strokeWidth="2"
-          />
-          
-          {/* Right leg */}
-          <path 
-            d="M55 30
-               C58 35 60 45 62 55
-               C64 65 65 75 64 85
-               C63 90 62 95 60 98
-               C58 100 56 100 54 98
-               L52 95
-               C52 85 53 75 54 65
-               C55 55 55 45 55 35
-               L55 30 Z" 
-            fill="hsl(270, 20%, 85%)" 
-            stroke="hsl(270, 30%, 60%)" 
-            strokeWidth="2"
-          />
-          
-          {/* Left foot */}
-          <ellipse cx="40" cy="102" rx="8" ry="4" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
-          {/* Right foot */}
-          <ellipse cx="60" cy="102" rx="8" ry="4" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
-          
-          {/* Interactive areas */}
-          {lowerBodyParts.map((part) => {
-            const isSelected = selectedPart === part.id;
-            const hasFeeling = selectedFeelings[part.id];
-            const leftX = part.id === "feet" ? 40 : part.x - 10;
-            const rightX = part.id === "feet" ? 60 : part.x + 10;
-            
-            return (
-              <g key={part.id}>
-                {/* Left side */}
+          {/* Invisible overlay for interactions */}
+          <svg viewBox="0 0 100 120" className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
+            {/* Interactive areas positioned over your image */}
+            {lowerBodyParts.map((part) => {
+              const isSelected = selectedPart === part.id;
+              const hasFeeling = selectedFeelings[part.id];
+              return (
                 <circle
-                  cx={leftX}
+                  key={part.id}
+                  cx={part.x}
                   cy={part.y}
-                  r="7"
+                  r="8"
                   fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
                   stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
                   strokeWidth="2.5"
                   className="cursor-pointer transition-all duration-300 hover:scale-110"
                   style={{
-                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
+                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none",
+                    pointerEvents: "auto",
+                    transformOrigin: "center"
                   }}
                   onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
-                  data-testid={`lower-body-part-${part.id}-left`}
+                  data-testid={`lower-body-part-${part.id}`}
                 >
                   <title>{part.label}</title>
                 </circle>
-                
-                {/* Right side */}
-                <circle
-                  cx={rightX}
-                  cy={part.y}
-                  r="7"
-                  fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
-                  stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
-                  strokeWidth="2.5"
-                  className="cursor-pointer transition-all duration-300 hover:scale-110"
-                  style={{
-                    filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
-                  }}
-                  onClick={() => handlePartClick(part.id)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, part.id)}
-                  data-testid={`lower-body-part-${part.id}-right`}
-                >
-                  <title>{part.label}</title>
-                </circle>
-              </g>
-            );
-          })}
-        </svg>
-        
-        {/* Feeling emojis */}
-        {lowerBodyParts.map((part) => (
-          <div
-            key={part.id}
-            className="absolute text-xs text-stone-500 pointer-events-none"
-            style={{
-              left: `${part.x + 12}%`,
-              top: `${(part.y / 120) * 100 - 2}%`,
-              transform: 'translateY(-50%)'
-            }}
-          >
-            {selectedFeelings[part.id] && (
-              <span className="text-lg">
-                {feelingEmojis.find(f => f.id === selectedFeelings[part.id])?.emoji}
-              </span>
-            )}
-          </div>
-        ))}
+              );
+            })}
+          </svg>
+          
+          {/* Part labels using shared CSS class */}
+          {lowerBodyParts.map((part) => (
+            <div
+              key={part.id}
+              className="body-part-emoji"
+              style={{
+                left: `${part.x}%`,
+                top: `${part.y}%`,
+              }}
+            >
+              {selectedFeelings[part.id] && (
+                <span className="text-lg">
+                  {feelingEmojis.find(f => f.id === selectedFeelings[part.id])?.emoji}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Feeling selection */}
@@ -226,24 +158,6 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
             </Button>
           </CardContent>
         </Card>
-      )}
-
-      {/* Selected feelings summary */}
-      {Object.keys(selectedFeelings).length > 0 && (
-        <div className="text-center">
-          <p className="text-xs text-stone-500 mb-2">Selected feelings:</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {Object.entries(selectedFeelings).map(([part, feeling]) => {
-              const partLabel = lowerBodyParts.find(p => p.id === part)?.label;
-              const feelingEmoji = feelingEmojis.find(f => f.id === feeling)?.emoji;
-              return (
-                <span key={part} className="text-sm bg-stone-100 px-2 py-1 rounded-stone">
-                  {partLabel}: {feelingEmoji}
-                </span>
-              );
-            })}
-          </div>
-        </div>
       )}
     </div>
   );
