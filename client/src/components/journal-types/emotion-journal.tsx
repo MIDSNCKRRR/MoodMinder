@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,6 +89,32 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
 
   return (
     <div className="space-y-6">
+      {/* Header with navigation, title and info */}
+      <div className="flex justify-between items-center pt-8">
+        <Button
+          onClick={onBack}
+          variant="ghost"
+          size="sm"
+          className="p-2"
+          data-testid="back-to-journal-types"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        
+        <div className="text-center">
+          <h2 className="text-xl font-serif font-semibold text-stone-600">Body Journal</h2>
+          <p className="text-stone-400 text-sm">Track your physical and emotional state</p>
+        </div>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          className="p-2"
+          data-testid="info-button"
+        >
+          <Info className="w-4 h-4" />
+        </Button>
+      </div>
 
       {/* Emotion Tracking Section */}
       <Card 
