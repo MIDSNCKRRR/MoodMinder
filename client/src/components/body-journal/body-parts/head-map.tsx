@@ -126,30 +126,30 @@ export default function HeadMap({
               );
             })}
           </svg>
+          
+          {/* Part labels - moved inside image container */}
+          {headParts.map((part) => (
+            <div
+              key={part.id}
+              className="absolute text-xs text-stone-500 pointer-events-none"
+              style={{
+                left: `${part.x + 8}%`,
+                top: `${part.y - 2}%`,
+                transform: "translateY(-50%)",
+              }}
+            >
+              {selectedFeelings[part.id] && (
+                <span className="text-lg">
+                  {
+                    feelingEmojis.find((f) => f.id === selectedFeelings[part.id])
+                      ?.emoji
+                  }
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-
-        {/* Part labels */}
-        {headParts.map((part) => (
-          <div
-            key={part.id}
-            className="absolute text-xs text-stone-500 pointer-events-none"
-            style={{
-              left: `${part.x + 8}%`,
-              top: `${part.y - 2}%`,
-              transform: "translateY(-50%)",
-            }}
-          >
-            {selectedFeelings[part.id] && (
-              <span className="text-lg">
-                {
-                  feelingEmojis.find((f) => f.id === selectedFeelings[part.id])
-                    ?.emoji
-                }
-              </span>
-            )}
-          </div>
-        ))}
       </div>
 
       {/* Feeling selection */}
