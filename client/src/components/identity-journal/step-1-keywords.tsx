@@ -151,20 +151,20 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
                     return (
                       <div
                         key={keyword}
-                        className="flex items-center justify-center gap-2 p-3 bg-sage-200 text-sage-700 rounded-full text-sm font-medium"
+                        className="p-3 rounded-stone text-center cursor-pointer transition-all duration-300 text-sm font-medium min-w-0 bg-white text-sage-700"
                         data-testid={`selected-keyword-${keyword.toLowerCase()}`}
                       >
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${categoryColor}`}>
-                          {categoryLabel}
-                        </span>
-                        <span>{keyword}</span>
-                        <button
-                          onClick={() => handleRemoveKeyword(keyword)}
-                          className="ml-1 text-sage-500 hover:text-sage-700 transition-colors"
-                          data-testid={`remove-keyword-${keyword.toLowerCase()}`}
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-sage-500 rounded-full" />
+                          <span>{keyword}</span>
+                          <button
+                            onClick={() => handleRemoveKeyword(keyword)}
+                            className="ml-1 text-sage-500 hover:text-sage-700 transition-colors"
+                            data-testid={`remove-keyword-${keyword.toLowerCase()}`}
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
