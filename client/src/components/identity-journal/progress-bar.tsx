@@ -5,20 +5,51 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ currentStep, totalSteps, className = "" }: ProgressBarProps) {
-  const progress = (currentStep / totalSteps) * 100;
+  const steps = [
+    { number: 1, label: "Keywords" },
+    { number: 2, label: "Reflection" }
+  ];
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      <div className="flex justify-between items-center text-sm">
-        <span className="text-sage-600">Step {currentStep} of {totalSteps}</span>
-        <span className="text-sage-500">{Math.round(progress)}%</span>
-      </div>
-      <div className="w-full bg-sage-200 rounded-full h-2 overflow-hidden">
-        <div 
-          className="h-full bg-gradient-to-r from-sage-400 to-sage-500 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+    <div className={`flex justify-center items-center space-x-8 ${className}`}>
+      {steps.map((step, index) => {
+        const isActive = currentStep === step.number;
+        const isCompleted = currentStep > step.number;
+        
+        return (
+          <div key={step.number} className="flex flex-col items-center">
+            {/* Circle with number */}
+            <div
+              className={`
+                w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
+                ${isActive 
+                  ? "bg-sage-600 text-white ring-4 ring-sage-200" 
+                  : isCompleted 
+                    ? "bg-sage-500 text-white" 
+                    : "bg-sage-200 text-sage-400"
+                }
+              `}
+            >
+              {step.number}
+            </div>
+            
+            {/* Step label */}
+            <span 
+              className={`
+                mt-2 text-xs font-medium transition-colors duration-300
+                ${isActive 
+                  ? "text-sage-700" 
+                  : isCompleted 
+                    ? "text-sage-600" 
+                    : "text-sage-400"
+                }
+              `}
+            >
+              {step.label}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
