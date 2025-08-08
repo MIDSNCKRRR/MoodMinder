@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { BookOpen, ArrowLeft, Info } from "lucide-react";
+import { BookOpen, ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ interface ReframingJournalProps {
 export default function ReframingJournal({ onBack }: ReframingJournalProps) {
   const { toast } = useToast();
   const [reframingAnswers, setReframingAnswers] = useState<string[]>(["", "", ""]);
+  const [showInfo, setShowInfo] = useState(false);
 
   // Create journal entry mutation
   const createEntryMutation = useMutation({
@@ -88,6 +89,7 @@ export default function ReframingJournal({ onBack }: ReframingJournalProps) {
         </div>
         
         <Button
+          onClick={() => setShowInfo(!showInfo)}
           variant="ghost"
           size="sm"
           className="p-2"
@@ -96,6 +98,41 @@ export default function ReframingJournal({ onBack }: ReframingJournalProps) {
           <Info className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Info Panel for Re-Framing Journal */}
+      {showInfo && (
+        <Card 
+          className="rounded-organic stone-shadow border-0 relative"
+          style={{ background: 'linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)' }}
+        >
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Re-Framing Journal</h3>
+              <Button
+                onClick={() => setShowInfo(false)}
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto"
+                data-testid="close-info"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-3 text-sm text-stone-600">
+              <p>The Re-Framing Journal helps transform negative thought patterns into positive, balanced perspectives.</p>
+              <div className="space-y-2">
+                <p><strong>How to use:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Identify negative or unhelpful thoughts</li>
+                  <li>Challenge these thoughts with evidence and alternative views</li>
+                  <li>Rewrite situations from a more balanced perspective</li>
+                  <li>Practice builds resilience and emotional regulation</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Re-framing Questions */}
       <Card className="rounded-organic stone-shadow border-0"

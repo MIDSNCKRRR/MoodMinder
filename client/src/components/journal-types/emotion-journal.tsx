@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Heart, ArrowLeft, Info } from "lucide-react";
+import { Heart, ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +18,7 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
   const [selectedEmotion, setSelectedEmotion] = useState<number>(4);
   const [journalContent, setJournalContent] = useState("");
   const [selectedBodyAreas, setSelectedBodyAreas] = useState<string[]>([]);
+  const [showInfo, setShowInfo] = useState(false);
 
   // Create journal entry mutation
   const createEntryMutation = useMutation({
@@ -107,6 +108,7 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
         </div>
         
         <Button
+          onClick={() => setShowInfo(!showInfo)}
           variant="ghost"
           size="sm"
           className="p-2"
@@ -115,6 +117,41 @@ export default function EmotionJournal({ onBack }: EmotionJournalProps) {
           <Info className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Info Panel for Body Journal */}
+      {showInfo && (
+        <Card 
+          className="rounded-organic stone-shadow border-0 relative"
+          style={{ background: 'linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)' }}
+        >
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Body Journal</h3>
+              <Button
+                onClick={() => setShowInfo(false)}
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto"
+                data-testid="close-info"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-3 text-sm text-stone-600">
+              <p>The Body Journal helps you start your day with emotional awareness and physical check-ins.</p>
+              <div className="space-y-2">
+                <p><strong>How to use:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Choose from 12 different emotions that best describe your current state</li>
+                  <li>Map where you feel these emotions in your body</li>
+                  <li>Write about your physical sensations and emotional state</li>
+                  <li>This practice helps build mind-body awareness</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Emotion Tracking Section */}
       <Card 

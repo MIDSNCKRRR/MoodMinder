@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Sparkles, ArrowLeft, Info } from "lucide-react";
+import { Sparkles, ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ interface IdentityJournalProps {
 export default function IdentityJournal({ onBack }: IdentityJournalProps) {
   const { toast } = useToast();
   const [identityReflections, setIdentityReflections] = useState<string[]>(["", "", ""]);
+  const [showInfo, setShowInfo] = useState(false);
 
   // Create journal entry mutation
   const createEntryMutation = useMutation({
@@ -88,6 +89,7 @@ export default function IdentityJournal({ onBack }: IdentityJournalProps) {
         </div>
         
         <Button
+          onClick={() => setShowInfo(!showInfo)}
           variant="ghost"
           size="sm"
           className="p-2"
@@ -96,6 +98,41 @@ export default function IdentityJournal({ onBack }: IdentityJournalProps) {
           <Info className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Info Panel for Identity Journal */}
+      {showInfo && (
+        <Card 
+          className="rounded-organic stone-shadow border-0 relative"
+          style={{ background: 'linear-gradient(135deg, hsl(260, 45%, 96%) 0%, hsl(260, 40%, 91%) 100%)' }}
+        >
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Identity Journal</h3>
+              <Button
+                onClick={() => setShowInfo(false)}
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto"
+                data-testid="close-info"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-3 text-sm text-stone-600">
+              <p>The Identity Journal helps you explore your values, beliefs, and authentic sense of self.</p>
+              <div className="space-y-2">
+                <p><strong>How to use:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Reflect on your core values and what matters most to you</li>
+                  <li>Explore different aspects of your identity and personality</li>
+                  <li>Write about your goals, dreams, and aspirations</li>
+                  <li>Regular practice builds self-awareness and confidence</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Identity Reflection Prompts */}
       <Card className="rounded-organic stone-shadow border-0"
