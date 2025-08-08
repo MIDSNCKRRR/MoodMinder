@@ -131,11 +131,10 @@ export default function HeadMap({
           {headParts.map((part) => (
             <div
               key={part.id}
-              className="absolute text-xs text-stone-500 pointer-events-none"
+              className="body-part-emoji"
               style={{
                 left: `${part.x}%`,
                 top: `${part.y}%`,
-                transform: "translate(-50%, -50%)",
               }}
             >
               {selectedFeelings[part.id] && (

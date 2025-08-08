@@ -63,6 +63,20 @@
   --crisis: hsl(260, 45%, 65%);
 }
 
+/* Body Part Emoji Positioning */
+.body-part-emoji {
+  position: absolute;
+  font-size: 0.75rem;
+  color: hsl(25, 10%, 45%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.body-part-emoji span {
+  font-size: 1.125rem;
+}
+
 .dark {
   --background: hsl(25, 15%, 8%);
   --foreground: hsl(45, 20%, 90%);
