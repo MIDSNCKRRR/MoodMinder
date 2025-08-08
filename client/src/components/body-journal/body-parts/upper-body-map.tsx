@@ -119,12 +119,12 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                 top: `${part.y}%`,
               }}
             >
-              {/* Selected feeling emoji display - Hidden for now */}
-              {/* {selectedFeelings[part.id] && (
+              {selectedFeelings[part.id] && (
                 <div className="relative group">
                   <span className="text-lg cursor-pointer">
                     {feelingEmojis.find(f => f.id === selectedFeelings[part.id])?.emoji}
                   </span>
+                  {/* Delete button - appears on hover */}
                   <button
                     onClick={() => onFeelingChange(part.id, "")}
                     className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
@@ -134,7 +134,7 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                     ×
                   </button>
                 </div>
-              )} */}
+              )}
             </div>
           ))}
         </div>
