@@ -61,15 +61,17 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   const handleComplete = async () => {
     try {
       // Prepare journal entry data
+      const emotionData = getEmotionData(selectedEmotion);
       const journalData = {
         userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
         journalType: "body" as const,
-        emotionLevel: selectedEmotion,
-        emotionType: getEmotionTypeFromLevel(selectedEmotion),
+        emotionLevel: emotionData.level, // Convert to 1-5 scale
+        emotionType: emotionData.type,
         content: journalContent,
         bodyMapping: {
           feelings: selectedBodyFeelings,
           intensity: emotionIntensity,
+          emotionCategory: selectedEmotion, // Keep original emotion ID for reference
           timestamp: new Date().toISOString()
         },
       };
@@ -109,16 +111,25 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     }
   };
 
-  // Helper function to convert emotion level to type
-  const getEmotionTypeFromLevel = (level: number): string => {
-    switch (level) {
-      case 1: return "very-sad";
-      case 2: return "sad";
-      case 3: return "neutral";
-      case 4: return "happy";
-      case 5: return "very-happy";
-      default: return "neutral";
-    }
+  // Helper function to convert emotion ID to type and level
+  const getEmotionData = (emotionId: number) => {
+    const emotionCategories = [
+      { id: 1, label: "Overwhelmed", type: "overwhelmed", level: 1 },
+      { id: 2, label: "Anxious", type: "anxious", level: 2 },
+      { id: 3, label: "Sad", type: "sad", level: 2 },
+      { id: 4, label: "Neutral", type: "neutral", level: 3 },
+      { id: 5, label: "Content", type: "content", level: 4 },
+      { id: 6, label: "Happy", type: "happy", level: 4 },
+      { id: 7, label: "Loving", type: "loving", level: 5 },
+      { id: 8, label: "Peaceful", type: "peaceful", level: 5 },
+      { id: 9, label: "Energized", type: "energized", level: 5 },
+      { id: 10, label: "Excited", type: "excited", level: 5 },
+      { id: 11, label: "Tired", type: "tired", level: 2 },
+      { id: 12, label: "Mindful", type: "mindful", level: 4 },
+    ];
+    
+    const emotion = emotionCategories.find(e => e.id === emotionId);
+    return emotion || { type: "neutral", level: 3 };
   };
 
   // Memoize the body feelings change handler to prevent re-renders
