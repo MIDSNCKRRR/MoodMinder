@@ -67,7 +67,7 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
           <img 
             src={headNeckImage} 
             alt="Head and Neck" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain mx-auto block"
           />
           
           {/* Invisible overlay for interactions */}
