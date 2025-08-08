@@ -131,25 +131,21 @@ export default function Journal() {
     <div className="px-6 space-y-6">
       {/* Header - only show on main journal selection page */}
       {!selectedJournalType && (
-        <div className="pt-8 pb-2">
+        <div className="pt-6 pb-1">
           <Card 
             className="rounded-organic stone-shadow border-0"
             style={{ background: 'linear-gradient(135deg, hsl(140, 35%, 93%) 0%, hsl(140, 30%, 85%) 100%)' }}
           >
-            <CardContent className="p-6 text-center">
-              <h1 className="font-serif font-bold text-2xl text-stone-600 mb-2">
+            <CardContent className="p-4 text-center">
+              <h1 className="font-serif font-semibold text-lg text-stone-600 mb-1">
                 Soft Moves
               </h1>
-              <p className="text-stone-500 text-sm mb-1">
+              <p className="text-stone-500 text-xs">
                 {new Date().toLocaleDateString('en-US', { 
                   weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
+                  month: 'short', 
                   day: 'numeric' 
                 })}
-              </p>
-              <p className="text-stone-500 text-sm">
-                Choose a journal to begin your mindful practice
               </p>
             </CardContent>
           </Card>
