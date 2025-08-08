@@ -63,16 +63,60 @@ export default function LowerBodyMap({ selectedFeelings, onFeelingChange }: Lowe
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Lower Body</h4>
       
-      {/* Lower Body SVG */}
+      {/* Lower Body SVG - Enhanced with realistic proportions */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '280px' }}>
         <svg viewBox="0 0 100 120" className="w-full h-full">
-          {/* Legs outline */}
-          <ellipse cx="40" cy="60" rx="8" ry="40" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
-          <ellipse cx="60" cy="60" rx="8" ry="40" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
+          {/* Enhanced hip area */}
+          <path 
+            d="M35 10
+               C32 12 30 15 32 20
+               C35 25 40 28 45 30
+               C48 32 52 32 55 30
+               C60 28 65 25 68 20
+               C70 15 68 12 65 10
+               C60 8 55 8 50 8
+               C45 8 40 8 35 10 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
           
-          {/* Feet */}
-          <ellipse cx="40" cy="105" rx="12" ry="6" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
-          <ellipse cx="60" cy="105" rx="12" ry="6" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
+          {/* Left leg */}
+          <path 
+            d="M45 30
+               C42 35 40 45 38 55
+               C36 65 35 75 36 85
+               C37 90 38 95 40 98
+               C42 100 44 100 46 98
+               L48 95
+               C48 85 47 75 46 65
+               C45 55 45 45 45 35
+               L45 30 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
+          
+          {/* Right leg */}
+          <path 
+            d="M55 30
+               C58 35 60 45 62 55
+               C64 65 65 75 64 85
+               C63 90 62 95 60 98
+               C58 100 56 100 54 98
+               L52 95
+               C52 85 53 75 54 65
+               C55 55 55 45 55 35
+               L55 30 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
+          
+          {/* Left foot */}
+          <ellipse cx="40" cy="102" rx="8" ry="4" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
+          {/* Right foot */}
+          <ellipse cx="60" cy="102" rx="8" ry="4" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
           
           {/* Interactive areas */}
           {lowerBodyParts.map((part) => {

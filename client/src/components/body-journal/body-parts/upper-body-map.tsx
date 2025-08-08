@@ -64,17 +64,59 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Upper Body</h4>
       
-      {/* Upper Body SVG */}
+      {/* Upper Body SVG - Enhanced with realistic proportions */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Torso outline */}
-          <ellipse cx="50" cy="50" rx="20" ry="35" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
+          {/* Enhanced torso outline based on reference */}
+          <path 
+            d="M35 20
+               C30 22 25 28 25 35
+               C25 45 30 55 35 65
+               C38 70 42 75 50 75
+               C58 75 62 70 65 65
+               C70 55 75 45 75 35
+               C75 28 70 22 65 20
+               C60 18 55 18 50 18
+               C45 18 40 18 35 20 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
           
-          {/* Arms */}
-          <ellipse cx="25" cy="45" rx="8" ry="25" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
-          <ellipse cx="75" cy="45" rx="8" ry="25" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
+          {/* Left arm */}
+          <path 
+            d="M25 35
+               C20 40 18 50 20 60
+               C22 65 25 68 28 70
+               C30 72 32 72 35 70
+               L32 65
+               C28 60 25 50 25 40
+               L25 35 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
           
-          {/* Interactive areas */}
+          {/* Right arm */}
+          <path 
+            d="M75 35
+               C80 40 82 50 80 60
+               C78 65 75 68 72 70
+               C70 72 68 72 65 70
+               L68 65
+               C72 60 75 50 75 40
+               L75 35 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
+          
+          {/* Left hand */}
+          <ellipse cx="28" cy="72" rx="4" ry="6" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
+          {/* Right hand */}
+          <ellipse cx="72" cy="72" rx="4" ry="6" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
+          
+          {/* Interactive areas with enhanced styling */}
           {upperBodyParts.map((part) => {
             const isSelected = selectedPart === part.id;
             const hasFeeling = selectedFeelings[part.id];
@@ -83,11 +125,14 @@ export default function UpperBodyMap({ selectedFeelings, onFeelingChange }: Uppe
                 key={part.id}
                 cx={part.x}
                 cy={part.y}
-                r="6"
-                fill={isSelected ? "#f97316" : hasFeeling ? "#22c55e" : "#e7e5e4"}
-                stroke={isSelected ? "#ea580c" : hasFeeling ? "#16a34a" : "#a8a29e"}
-                strokeWidth="2"
-                className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
+                r="7"
+                fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
+                stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
+                strokeWidth="2.5"
+                className="cursor-pointer transition-all duration-300 hover:scale-110"
+                style={{
+                  filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
+                }}
                 onClick={() => handlePartClick(part.id)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, part.id)}

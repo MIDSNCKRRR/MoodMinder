@@ -62,16 +62,54 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4>
       
-      {/* Head SVG */}
+      {/* Head SVG - Enhanced with realistic proportions */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Head outline */}
-          <ellipse cx="50" cy="45" rx="25" ry="30" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
+          {/* Enhanced head outline based on reference */}
+          <path 
+            d="M50 15 
+               C65 15 75 25 75 40
+               C75 45 73 50 70 52
+               C68 54 68 56 70 58
+               C72 60 72 62 70 64
+               L68 66
+               C65 68 62 70 58 70
+               L42 70
+               C38 70 35 68 32 66
+               L30 64
+               C28 62 28 60 30 58
+               C32 56 32 54 30 52
+               C27 50 25 45 25 40
+               C25 25 35 15 50 15 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
+          
+          {/* Ears */}
+          <ellipse cx="25" cy="40" rx="4" ry="8" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
+          <ellipse cx="75" cy="40" rx="4" ry="8" fill="hsl(270, 20%, 85%)" stroke="hsl(270, 30%, 60%)" strokeWidth="1.5"/>
           
           {/* Neck */}
-          <rect x="45" y="70" width="10" height="15" fill="none" stroke="#d6d3d1" strokeWidth="2"/>
+          <path 
+            d="M42 70 
+               C45 72 48 73 50 73
+               C52 73 55 72 58 70
+               L60 75
+               C58 78 55 80 50 80
+               C45 80 42 78 40 75
+               L42 70 Z" 
+            fill="hsl(270, 20%, 85%)" 
+            stroke="hsl(270, 30%, 60%)" 
+            strokeWidth="2"
+          />
           
-          {/* Interactive areas */}
+          {/* Facial features for reference */}
+          <ellipse cx="42" cy="35" rx="2" ry="1" fill="hsl(270, 30%, 70%)" opacity="0.3"/>
+          <ellipse cx="58" cy="35" rx="2" ry="1" fill="hsl(270, 30%, 70%)" opacity="0.3"/>
+          <path d="M46 48 C48 50 52 50 54 48" fill="none" stroke="hsl(270, 30%, 70%)" strokeWidth="1" opacity="0.3"/>
+          
+          {/* Interactive areas with enhanced styling */}
           {headParts.map((part) => {
             const isSelected = selectedPart === part.id;
             const hasFeeling = selectedFeelings[part.id];
@@ -80,11 +118,14 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
                 key={part.id}
                 cx={part.x}
                 cy={part.y}
-                r="6"
-                fill={isSelected ? "#f97316" : hasFeeling ? "#22c55e" : "#e7e5e4"}
-                stroke={isSelected ? "#ea580c" : hasFeeling ? "#16a34a" : "#a8a29e"}
-                strokeWidth="2"
-                className="cursor-pointer transition-all duration-200 hover:fill-orange-300"
+                r="7"
+                fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
+                stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
+                strokeWidth="2.5"
+                className="cursor-pointer transition-all duration-300 hover:scale-110"
+                style={{
+                  filter: isSelected ? "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none"
+                }}
                 onClick={() => handlePartClick(part.id)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, part.id)}
