@@ -12,7 +12,13 @@ interface Step1EmotionProps {
   onNext: () => void;
 }
 
-export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmotionChange, onIntensityChange, onNext }: Step1EmotionProps) {
+export default function Step1Emotion({
+  selectedEmotion,
+  emotionIntensity,
+  onEmotionChange,
+  onIntensityChange,
+  onNext,
+}: Step1EmotionProps) {
   const emotionCategories = [
     { id: 1, emoji: "😭", label: "Overwhelmed", type: "overwhelmed" },
     { id: 2, emoji: "😰", label: "Anxious", type: "anxious" },
@@ -30,16 +36,19 @@ export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmot
 
   // Auto-save emotion selection and intensity
   useEffect(() => {
-    localStorage.setItem('bodyJournal_emotion', selectedEmotion.toString());
-    localStorage.setItem('bodyJournal_intensity', emotionIntensity.toString());
+    localStorage.setItem("bodyJournal_emotion", selectedEmotion.toString());
+    localStorage.setItem("bodyJournal_intensity", emotionIntensity.toString());
   }, [selectedEmotion, emotionIntensity]);
 
   return (
     <div className="space-y-6">
       {/* Step Content */}
-      <Card 
+      <Card
         className="rounded-organic stone-shadow border-0"
-        style={{ background: 'linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)' }}
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(15, 55%, 93%) 0%, hsl(15, 50%, 78%) 100%)",
+        }}
       >
         <CardContent className="p-6">
           <h3 className="font-serif font-semibold text-stone-600 text-xl mb-2 text-center">
@@ -48,15 +57,15 @@ export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmot
           <p className="text-stone-500 text-sm text-center mb-6">
             Take a moment to check in with yourself
           </p>
-          
+
           {/* Emotion Categories Grid */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             {emotionCategories.map((category) => (
-              <div 
-                key={category.id} 
+              <div
+                key={category.id}
                 className={`text-center p-4 rounded-stone cursor-pointer transition-all duration-300 ${
-                  selectedEmotion === category.id 
-                    ? "bg-white/90 scale-105 shadow-lg ring-2 ring-coral-300" 
+                  selectedEmotion === category.id
+                    ? "bg-white/90 scale-105 shadow-lg ring-2 ring-coral-300"
                     : "bg-white/50 hover:bg-white/70"
                 }`}
                 onClick={() => onEmotionChange(category.id)}
@@ -76,11 +85,14 @@ export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmot
               <h4 className="font-medium text-stone-600 mb-2">
                 How strong is this feeling?
               </h4>
-              <div className="text-2xl font-bold" style={{ color: "hsl(15, 65%, 60%)" }}>
+              <div
+                className="text-2xl font-bold"
+                style={{ color: "hsl(15, 65%, 60%)" }}
+              >
                 {emotionIntensity}%
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <Slider
                 value={[emotionIntensity]}
@@ -91,7 +103,7 @@ export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmot
                 className="w-full"
                 data-testid="emotion-intensity-slider"
               />
-              
+
               <div className="flex justify-between text-xs text-stone-500">
                 <span>Very Mild (0%)</span>
                 <span>Moderate (50%)</span>
@@ -107,9 +119,10 @@ export default function Step1Emotion({ selectedEmotion, emotionIntensity, onEmot
         <Button
           onClick={onNext}
           className="px-6 py-3 rounded-stone font-medium transition-all"
-          style={{ 
-            background: "linear-gradient(to right, hsl(15, 60%, 70%), hsl(15, 65%, 60%))",
-            color: "white"
+          style={{
+            background:
+              "linear-gradient(to right, hsl(15, 60%, 70%), hsl(15, 65%, 60%))",
+            color: "white",
           }}
           data-testid="next-to-body-mapping"
         >
