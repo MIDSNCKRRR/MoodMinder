@@ -133,7 +133,7 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
               <h4 className="text-sm font-medium text-stone-600 mb-3 text-center">
                 Selected ({selectedKeywords.length}/2)
               </h4>
-              <div className="flex flex-wrap gap-2 justify-center items-center">
+              <div className="flex flex-wrap gap-2 justify-center">
                 {selectedKeywords
                   .sort((a, b) => {
                     const aIsAdjective = adjectiveWords.includes(a);
