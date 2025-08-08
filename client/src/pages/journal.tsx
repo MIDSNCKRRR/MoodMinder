@@ -63,36 +63,20 @@ export default function Journal() {
 
   return (
     <div className="px-6 space-y-6">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center pt-8 text-stone-400 text-sm">
-        <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-        <div className="flex space-x-1">
-          <div className="w-4 h-2 bg-stone-300 rounded-sm"></div>
-          <div className="w-4 h-2 bg-stone-300 rounded-sm"></div>
-          <div className="w-6 h-2 bg-stone-300 rounded-sm"></div>
+      {/* Navigation */}
+      {selectedJournalType && (
+        <div className="pt-8">
+          <Button
+            onClick={() => setSelectedJournalType(null)}
+            variant="ghost"
+            size="sm"
+            className="p-2"
+            data-testid="back-to-journal-types"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
         </div>
-      </div>
-
-      {/* Journal Header */}
-      <div className="text-center pt-4">
-        <div className="flex items-center justify-center space-x-3">
-          {selectedJournalType && (
-            <Button
-              onClick={() => setSelectedJournalType(null)}
-              variant="ghost"
-              size="sm"
-              className="p-2"
-              data-testid="back-to-journal-types"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          )}
-          <div className="text-center">
-            <h1 className="text-2xl font-serif font-semibold text-stone-600">Journal</h1>
-            <p className="text-stone-400 text-sm mt-1">Choose your journaling style</p>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Journal Type Selection */}
       {!selectedJournalType && (
