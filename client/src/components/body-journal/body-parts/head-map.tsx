@@ -9,21 +9,21 @@ interface HeadMapProps {
 
 export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapProps) {
   const headParts = [
-    { id: "forehead", label: "Forehead", x: 50, y: 20 },
-    { id: "eyes", label: "Eyes", x: 50, y: 30 },
-    { id: "jaw", label: "Jaw", x: 50, y: 40 },
-    { id: "neck", label: "Neck", x: 50, y: 52 },
+    { id: "forehead", label: "Forehead", x: 50, y: 25 },
+    { id: "eyes", label: "Eyes", x: 50, y: 35 },
+    { id: "jaw", label: "Jaw", x: 50, y: 45 },
+    { id: "neck", label: "Neck", x: 50, y: 65 },
   ];
 
   const feelingEmojis = [
-    { id: "tense", emoji: "😬", label: "Tense" },
-    { id: "relaxed", emoji: "😌", label: "Relaxed" },
-    { id: "warm", emoji: "🔥", label: "Warm" },
-    { id: "cool", emoji: "❄️", label: "Cool" },
-    { id: "fluttery", emoji: "🦋", label: "Fluttery" },
-    { id: "racing", emoji: "💓", label: "Racing" },
-    { id: "calm", emoji: "🌊", label: "Calm" },
-    { id: "buzzing", emoji: "⚡", label: "Buzzing" },
+    { id: "tense", label: "Tense", emoji: "😬" },
+    { id: "relaxed", label: "Relaxed", emoji: "😌" },
+    { id: "painful", label: "Painful", emoji: "😣" },
+    { id: "warm", label: "Warm", emoji: "🌞" },
+    { id: "cold", label: "Cold", emoji: "❄️" },
+    { id: "heavy", label: "Heavy", emoji: "⚡" },
+    { id: "light", label: "Light", emoji: "🪶" },
+    { id: "numb", label: "Numb", emoji: "😶" },
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
@@ -33,15 +33,15 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
     setSelectedPart(partId);
   };
 
-  const handleFeelingSelect = (feeling: string) => {
+  const handleFeelingSelect = (feelingId: string) => {
     if (selectedPart) {
-      onFeelingChange(selectedPart, feeling);
+      onFeelingChange(selectedPart, feelingId);
       setSelectedPart(null);
     }
   };
 
-  const handleDragStart = (feeling: string) => {
-    setDraggedFeeling(feeling);
+  const handleDragStart = (feelingId: string) => {
+    setDraggedFeeling(feelingId);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -50,10 +50,8 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
 
   const handleDrop = (e: React.DragEvent, partId: string) => {
     e.preventDefault();
-    const draggedData = e.dataTransfer.getData("text/plain");
-    const feeling = draggedData || draggedFeeling;
-    if (feeling) {
-      onFeelingChange(partId, feeling);
+    if (draggedFeeling) {
+      onFeelingChange(partId, draggedFeeling);
       setDraggedFeeling(null);
     }
   };
@@ -62,66 +60,55 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
     <div className="space-y-4">
       <h4 className="font-medium text-stone-600 text-center">Head & Neck</h4>
       
-      {/* Head SVG - Enhanced with realistic proportions */}
+      {/* Head & Neck based on your reference image */}
       <div className="relative bg-white/80 p-6 rounded-stone mx-auto" style={{ width: '200px', height: '240px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          {/* Simple flat head silhouette */}
+          {/* Clean head silhouette matching your reference exactly */}
           <g>
-            {/* Main head - perfect circle */}
+            {/* Main head shape - perfect circle */}
             <circle 
               cx="50" 
-              cy="30" 
-              r="18" 
+              cy="35" 
+              r="20" 
               fill="hsl(270, 12%, 82%)" 
               stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2.5"
+              strokeWidth="3"
             />
             
-            {/* Simple ears - small circles */}
+            {/* Simple ears - small rounded bumps */}
             <circle 
-              cx="34" 
-              cy="30" 
-              r="4" 
+              cx="32" 
+              cy="35" 
+              r="4.5" 
               fill="hsl(270, 12%, 82%)" 
               stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2.5"
+              strokeWidth="3"
             />
             <circle 
-              cx="66" 
-              cy="30" 
-              r="4" 
+              cx="68" 
+              cy="35" 
+              r="4.5" 
               fill="hsl(270, 12%, 82%)" 
               stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2.5"
+              strokeWidth="3"
             />
             
-            {/* Simple neck */}
-            <rect 
-              x="46" 
-              y="48" 
-              width="8" 
-              height="8" 
-              fill="hsl(270, 12%, 82%)" 
-              stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2.5"
-            />
-            
-            {/* Simple shoulders outline */}
+            {/* Clean neck curves like in reference */}
             <path 
-              d="M35 56
-                 C40 55 45 55 50 56
-                 C55 55 60 55 65 56
-                 L68 70
-                 C65 72 60 73 50 73
-                 C40 73 35 72 32 70
-                 L35 56 Z" 
+              d="M42 52
+                 Q45 54 50 54
+                 Q55 54 58 52
+                 L60 68
+                 Q58 70 50 70
+                 Q42 70 40 68
+                 L42 52 Z" 
               fill="hsl(270, 12%, 82%)" 
               stroke="hsl(270, 25%, 65%)" 
-              strokeWidth="2.5"
+              strokeWidth="3"
             />
           </g>
           
-          {/* Interactive areas with enhanced styling */}
+          {/* Interactive areas positioned over the body */}
           {headParts.map((part) => {
             const isSelected = selectedPart === part.id;
             const hasFeeling = selectedFeelings[part.id];
@@ -130,7 +117,7 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
                 key={part.id}
                 cx={part.x}
                 cy={part.y}
-                r="7"
+                r="8"
                 fill={isSelected ? "hsl(15, 65%, 60%)" : hasFeeling ? "hsl(140, 50%, 50%)" : "hsl(270, 15%, 90%)"}
                 stroke={isSelected ? "hsl(15, 70%, 50%)" : hasFeeling ? "hsl(140, 60%, 40%)" : "hsl(270, 25%, 70%)"}
                 strokeWidth="2.5"
@@ -204,24 +191,6 @@ export default function HeadMap({ selectedFeelings, onFeelingChange }: HeadMapPr
             </Button>
           </CardContent>
         </Card>
-      )}
-
-      {/* Selected feelings summary */}
-      {Object.keys(selectedFeelings).length > 0 && (
-        <div className="text-center">
-          <p className="text-xs text-stone-500 mb-2">Selected feelings:</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {Object.entries(selectedFeelings).map(([part, feeling]) => {
-              const partLabel = headParts.find(p => p.id === part)?.label;
-              const feelingEmoji = feelingEmojis.find(f => f.id === feeling)?.emoji;
-              return (
-                <span key={part} className="text-sm bg-stone-100 px-2 py-1 rounded-stone">
-                  {partLabel}: {feelingEmoji}
-                </span>
-              );
-            })}
-          </div>
-        </div>
       )}
     </div>
   );
