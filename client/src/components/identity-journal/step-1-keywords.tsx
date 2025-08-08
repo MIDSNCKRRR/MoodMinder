@@ -173,12 +173,12 @@ export default function Step1Keywords({ selectedKeywords, onKeywordsChange, onNe
           )}
 
           {/* Keywords Grid */}
-          <div className="flex flex-wrap gap-3 max-h-80 overflow-y-auto justify-center">
+          <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
             {candidateWords.map((keyword) => (
               <div
                 key={keyword}
                 className={`
-                  px-4 py-2 rounded-stone text-center cursor-pointer transition-all duration-300 text-sm font-medium
+                  p-3 rounded-stone text-center cursor-pointer transition-all duration-300 text-sm font-medium min-w-0
                   ${isSelected(keyword)
                     ? "bg-white/90 scale-105 shadow-lg ring-2 ring-sage-300 text-sage-700"
                     : "bg-white/50 hover:bg-white/70 text-stone-600"
