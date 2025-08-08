@@ -103,84 +103,104 @@ export default function IdentityJournalFlow({ onBack }: IdentityJournalFlowProps
     setReflectionContent(content);
   }, []);
 
-  const totalSteps = 2;
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100 p-4">
-      <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={currentStep === 1 ? onBack : handleBack}
-            className="text-sage-600 hover:text-sage-700"
-            data-testid="back-button"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </Button>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowInfo(!showInfo)}
-              className="text-sage-600 hover:text-sage-700"
-              data-testid="info-button"
-            >
-              <Info className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Info Panel */}
-        {showInfo && (
-          <Card className="mb-6 border-sage-200">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-medium text-sage-700">Identity Journal</h4>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowInfo(false)}
-                  className="text-sage-500 hover:text-sage-600"
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              </div>
-              <p className="text-sm text-sage-600">
-                Explore your sense of self through keywords and reflection. Select words that resonate with who you are today, then reflect on your identity journey.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Progress Bar */}
-        <ProgressBar 
-          currentStep={currentStep} 
-          totalSteps={totalSteps}
-          className="mb-8"
-        />
-
-        {/* Step Content */}
-        {currentStep === 1 && (
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
           <Step1Keywords
             selectedKeywords={selectedKeywords}
             onKeywordsChange={handleKeywordsChange}
             onNext={handleNext}
           />
-        )}
-        
-        {currentStep === 2 && (
+        );
+      case 2:
+        return (
           <Step2Reflection
             content={reflectionContent}
             onContentChange={handleContentChange}
             selectedKeywords={selectedKeywords}
             onComplete={handleComplete}
           />
-        )}
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header with navigation, title and info */}
+      <div className="flex justify-between items-center pt-8">
+        <Button
+          onClick={currentStep === 1 ? onBack : handleBack}
+          variant="ghost"
+          size="sm"
+          className="p-2"
+          data-testid="back-to-journal-types"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        
+        <div className="text-center">
+          <h2 className="text-xl font-serif font-semibold text-stone-600">Identity Journal</h2>
+          <p className="text-stone-400 text-sm">Explore your values and sense of self</p>
+        </div>
+        
+        <Button
+          onClick={() => setShowInfo(!showInfo)}
+          variant="ghost"
+          size="sm"
+          className="p-2"
+          data-testid="info-button"
+        >
+          <Info className="w-4 h-4" />
+        </Button>
       </div>
+
+      {/* Info Panel for Identity Journal */}
+      {showInfo && (
+        <Card 
+          className="rounded-organic stone-shadow border-0 relative"
+          style={{ background: 'linear-gradient(135deg, hsl(120, 12%, 91%) 0%, hsl(120, 10%, 83%) 100%)' }}
+        >
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="font-serif font-semibold text-stone-600 text-lg">About Identity Journal</h3>
+              <Button
+                onClick={() => setShowInfo(false)}
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto"
+                data-testid="close-info"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-3 text-sm text-stone-600">
+              <p>The Identity Journal helps you explore your values, beliefs, and authentic sense of self.</p>
+              <div className="space-y-2">
+                <p><strong>How to use:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Select keywords that reflect your core values and identity</li>
+                  <li>Explore different aspects of your personality and beliefs</li>
+                  <li>Write about your goals, dreams, and aspirations</li>
+                  <li>Regular practice builds self-awareness and confidence</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Progress Bar */}
+      <ProgressBar 
+        currentStep={currentStep} 
+        totalSteps={2}
+        className="mb-4"
+      />
+
+      {/* Current Step Content */}
+      {renderCurrentStep()}
     </div>
   );
 }
