@@ -379,34 +379,6 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
         {/* Content */}
         <div className="flex-1 p-4">{renderCurrentStep()}</div>
-
-        {/* Footer - hide on step 2 and 3 since they have their own buttons */}
-        {currentStep === 1 && (
-          <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
-            <div className="flex gap-3">
-              <Button
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className={`flex-1 h-12 text-base font-medium shadow-md rounded-stone transition-all ${
-                  canProceed()
-                    ? "text-white"
-                    : "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300"
-                }`}
-                style={
-                  canProceed()
-                    ? {
-                        background:
-                          "linear-gradient(to right, hsl(261, 60%, 60%), hsl(261, 65%, 50%))",
-                      }
-                    : {}
-                }
-                data-testid="button-continue"
-              >
-                계속하기
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
