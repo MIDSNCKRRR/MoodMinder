@@ -275,9 +275,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{
-      background: "linear-gradient(135deg, hsl(261, 15%, 96%) 0%, hsl(261, 10%, 92%) 100%)"
-    }}>
+    <div className="min-h-screen bg-stone-50 flex flex-col">
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="p-4">
