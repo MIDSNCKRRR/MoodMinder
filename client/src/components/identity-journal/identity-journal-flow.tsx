@@ -19,11 +19,13 @@ export default function IdentityJournalFlow({
   // State for all steps
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [reflectionContent, setReflectionContent] = useState("");
+  const [matchingScore, setMatchingScore] = useState<number>(3);
 
   // Load saved data on component mount
   useEffect(() => {
     const savedKeywords = localStorage.getItem("identityJournal_keywords");
     const savedContent = localStorage.getItem("identityJournal_content");
+    const savedScore = localStorage.getItem("identityJournal_matchingScore");
 
     if (savedKeywords) {
       try {
@@ -34,6 +36,9 @@ export default function IdentityJournalFlow({
     }
     if (savedContent) {
       setReflectionContent(savedContent);
+    }
+    if (savedScore) {
+      setMatchingScore(parseInt(savedScore));
     }
   }, []);
 
@@ -61,6 +66,7 @@ export default function IdentityJournalFlow({
         bodyMapping: {
           keywords: selectedKeywords,
           keywordCount: selectedKeywords.length,
+          matchingScore: matchingScore,
           timestamp: new Date().toISOString(),
         },
       };
@@ -84,11 +90,13 @@ export default function IdentityJournalFlow({
       // Clear localStorage
       localStorage.removeItem("identityJournal_keywords");
       localStorage.removeItem("identityJournal_content");
+      localStorage.removeItem("identityJournal_matchingScore");
 
       // Reset form and go back to journal types
       setCurrentStep(1);
       setSelectedKeywords([]);
       setReflectionContent("");
+      setMatchingScore(3);
       onBack();
     } catch (error) {
       console.error("Error saving identity journal entry:", error);
@@ -99,10 +107,17 @@ export default function IdentityJournalFlow({
   // Memoize handlers to prevent re-renders
   const handleKeywordsChange = useCallback((keywords: string[]) => {
     setSelectedKeywords(keywords);
+    localStorage.setItem("identityJournal_keywords", JSON.stringify(keywords));
+  }, []);
+
+  const handleMatchingScoreChange = useCallback((score: number) => {
+    setMatchingScore(score);
+    localStorage.setItem("identityJournal_matchingScore", score.toString());
   }, []);
 
   const handleContentChange = useCallback((content: string) => {
     setReflectionContent(content);
+    localStorage.setItem("identityJournal_content", content);
   }, []);
 
   const renderCurrentStep = () => {
@@ -113,6 +128,8 @@ export default function IdentityJournalFlow({
             selectedKeywords={selectedKeywords}
             onKeywordsChange={handleKeywordsChange}
             onNext={handleNext}
+            matchingScore={matchingScore}
+            onMatchingScoreChange={handleMatchingScoreChange}
           />
         );
       case 2:

@@ -2,17 +2,22 @@ import { useState, useEffect } from "react";
 import { ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 
 interface Step1KeywordsProps {
   selectedKeywords: string[];
   onKeywordsChange: (keywords: string[]) => void;
   onNext: () => void;
+  matchingScore?: number;
+  onMatchingScoreChange?: (score: number) => void;
 }
 
 export default function Step1Keywords({
   selectedKeywords,
   onKeywordsChange,
   onNext,
+  matchingScore = 3,
+  onMatchingScoreChange,
 }: Step1KeywordsProps) {
   const [selectedCategory, setSelectedCategory] = useState<
     "adjectives" | "characters"
@@ -333,6 +338,57 @@ export default function Step1Keywords({
           </div>
         </CardContent>
       </Card>
+
+      {/* Matching Score Slider - Only show when both keywords are selected */}
+      {selectedKeywords.length === 2 && (
+        <Card
+          className="rounded-organic stone-shadow border-0"
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(120, 15%, 95%) 0%, hsl(120, 12%, 90%) 100%)",
+          }}
+        >
+          <CardContent className="p-6">
+            <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4 text-center">
+              How much do these words match who you are today?
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-center gap-2 text-sm text-stone-600 mb-2">
+                <span className="bg-white/60 px-3 py-1 rounded-stone font-medium">
+                  {selectedKeywords[0]}
+                </span>
+                <span className="text-stone-400">+</span>
+                <span className="bg-white/60 px-3 py-1 rounded-stone font-medium">
+                  {selectedKeywords[1]}
+                </span>
+              </div>
+              
+              <div className="px-4">
+                <Slider
+                  value={[matchingScore]}
+                  onValueChange={(value) => onMatchingScoreChange?.(value[0])}
+                  max={5}
+                  min={1}
+                  step={1}
+                  className="w-full"
+                  data-testid="matching-score-slider"
+                />
+                <div className="flex justify-between text-xs text-stone-500 mt-2">
+                  <span>1 - Not like me</span>
+                  <span className="font-medium text-sage-600">
+                    {matchingScore}/5
+                  </span>
+                  <span>5 - Very much like me</span>
+                </div>
+              </div>
+              
+              <p className="text-center text-xs text-stone-500 bg-white/40 p-2 rounded-stone">
+                Rate how well this combination represents you today
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Navigation */}
       <div className="flex justify-end">
