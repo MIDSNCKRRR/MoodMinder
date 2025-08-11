@@ -80,7 +80,7 @@ export function Step2Questions({
           
           {/* Question Progress Dots inside card */}
           <div className="flex justify-center gap-3">
-            {questions.map((_, index) => (
+            {[0, 1, 2, 3].map((index) => (
               <div
                 key={index}
                 className={`

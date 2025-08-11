@@ -319,7 +319,8 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
             </Button>
           </div>
 
-          <ProgressBar currentStep={currentStep} totalSteps={3} />
+          {/* Only show main progress bar on steps 1 and 3, not on step 2 (questions) */}
+          {currentStep !== 2 && <ProgressBar currentStep={currentStep} totalSteps={3} />}
         </div>
 
         {/* Info Panel for Reframing Journal */}
