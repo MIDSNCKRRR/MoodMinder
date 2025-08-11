@@ -10,6 +10,7 @@ export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProp
     { number: 1, label: "Emotion" },
     { number: 2, label: "Body Map" },
     { number: 3, label: "Journal" },
+    { number: 4, label: "Keywords" },
   ];
 
   return (

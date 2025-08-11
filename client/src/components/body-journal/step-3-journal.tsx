@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -147,18 +147,18 @@ export default function Step3Journal({
         </Button>
 
         <Button
-          onClick={() => createEntryMutation.mutate()}
-          disabled={createEntryMutation.isPending || !journalContent.trim()}
+          onClick={onComplete}
+          disabled={!journalContent.trim()}
           className="px-6 py-3 rounded-stone font-medium transition-all"
           style={{
             background:
               "linear-gradient(to right, hsl(15, 60%, 70%), hsl(15, 65%, 60%))",
             color: "white",
           }}
-          data-testid="save-body-journal"
+          data-testid="next-to-keywords"
         >
-          <Heart className="mr-2 h-4 w-4" />
-          {createEntryMutation.isPending ? "Saving..." : "Save Entry"}
+          <ArrowRight className="mr-2 h-4 w-4" />
+          Next
         </Button>
       </div>
     </div>
