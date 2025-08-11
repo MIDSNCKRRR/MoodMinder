@@ -114,7 +114,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/journal-entries", "POST", data);
+      return apiRequest("POST", "/api/journal-entries", data);
     },
     onSuccess: () => {
       toast({

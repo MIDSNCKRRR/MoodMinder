@@ -53,7 +53,7 @@ export default function Step3Journal({
 
   const createEntryMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("/api/journal-entries", "POST", {
+      await apiRequest("POST", "/api/journal-entries", {
         emotion: selectedEmotion,
         emotionType: getEmotionType(selectedEmotion),
         content: journalContent,
