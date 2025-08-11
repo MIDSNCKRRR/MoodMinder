@@ -198,7 +198,7 @@ export function Step3ReframingResult({
           <Button
             onClick={() => onSave(getSelectedSentences())}
             disabled={!canSave || getSelectedSentences().length === 0}
-            className={`flex-1 h-12 text-base font-medium rounded-stone transition-all shadow-md ${
+            className={`flex-1 h-12 text-sm font-medium rounded-stone transition-all shadow-md ${
               canSave && getSelectedSentences().length > 0
                 ? 'text-white'
                 : 'bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300'
@@ -208,7 +208,9 @@ export function Step3ReframingResult({
             } : {}}
             data-testid="button-save-reframing"
           >
-            선택한 문장 저장하기 ({getSelectedSentences().length}개)
+            <span className="truncate">
+              저장하기 ({getSelectedSentences().length}개)
+            </span>
           </Button>
         )}
       </div>
