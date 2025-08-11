@@ -65,7 +65,7 @@ export function Step2Questions({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header Card */}
       <Card 
         className="rounded-organic stone-shadow border-0"
@@ -73,18 +73,18 @@ export function Step2Questions({
           background: "linear-gradient(135deg, hsl(261, 35%, 93%) 0%, hsl(261, 30%, 78%) 100%)",
         }}
       >
-        <CardContent className="p-6 text-center">
-          <h2 className="text-xl font-semibold text-stone-900 mb-4 font-serif">
+        <CardContent className="p-4 text-center">
+          <h2 className="text-lg font-medium text-stone-900 mb-3">
             {emotion.name} 탐구하기
           </h2>
           
           {/* Question Progress Dots inside card */}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-2">
             {[0, 1, 2, 3].map((index) => (
               <div
                 key={index}
                 className={`
-                  w-4 h-4 rounded-full transition-all duration-300 shadow-sm
+                  w-3 h-3 rounded-full transition-all duration-300 shadow-sm
                   ${index === currentQuestion 
                     ? 'bg-gradient-to-br from-purple-500 to-purple-600 scale-110' 
                     : 'bg-transparent border-2 border-purple-300'
@@ -105,7 +105,7 @@ export function Step2Questions({
         }}
       >
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-stone-900 mb-4 font-serif">
+          <h3 className="text-lg font-medium text-stone-900 mb-4">
             {questions[currentQuestion]}
           </h3>
           

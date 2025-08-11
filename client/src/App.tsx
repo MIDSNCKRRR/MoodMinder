@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { useRef } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,18 +8,22 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Journal from "@/pages/journal";
 import Report from "@/pages/report";
+import CrisisSupport from "@/pages/crisis-support";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
+  const journalResetRef = useRef<(() => void) | null>(null);
+
   return (
     <div className="max-w-sm mx-auto bg-white min-h-screen relative pb-20">
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/journal" component={Journal} />
+        <Route path="/journal" component={() => <Journal onResetRef={journalResetRef} />} />
         <Route path="/report" component={Report} />
+        <Route path="/crisis-support" component={CrisisSupport} />
         <Route component={NotFound} />
       </Switch>
-      <BottomNavigation />
+      <BottomNavigation onJournalClick={() => journalResetRef.current?.()} />
     </div>
   );
 }

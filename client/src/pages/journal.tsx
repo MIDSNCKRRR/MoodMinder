@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import {
   ArrowLeft,
   Heart,
@@ -28,10 +29,39 @@ interface JournalTypeOption {
   bgColor: string;
 }
 
-export default function Journal() {
+interface JournalProps {
+  onResetRef?: React.MutableRefObject<(() => void) | null>;
+}
+
+export default function Journal({ onResetRef }: JournalProps) {
+  const [location] = useLocation();
   const [selectedJournalType, setSelectedJournalType] =
     useState<JournalType | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+
+  // Set up the reset function for the footer navigation
+  useEffect(() => {
+    if (onResetRef) {
+      onResetRef.current = () => {
+        setSelectedJournalType(null);
+        setShowInfo(false);
+        // Clear URL parameters
+        window.history.replaceState({}, '', '/journal');
+      };
+    }
+  }, [onResetRef]);
+
+  // Check URL parameters and auto-select journal type
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type') as JournalType;
+    
+    if (type && ['emotion', 'gratitude', 'reframing'].includes(type)) {
+      setSelectedJournalType(type);
+    } else {
+      setSelectedJournalType(null);
+    }
+  }, [location]);
 
   // Fetch journal entries
   const { data: journalEntries = [] } = useQuery<JournalEntry[]>({

@@ -23,19 +23,6 @@ export default function Home() {
     queryKey: ["/api/daily-reflections/today"],
   });
 
-  // Crisis event mutation
-  const crisisMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/crisis-events", {});
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Support Requested",
-        description: "Help is on the way. You're not alone.",
-      });
-    },
-  });
 
   // Quick emotion logging
   const emotionMutation = useMutation({
@@ -92,22 +79,20 @@ export default function Home() {
 
       {/* Crisis Support Button */}
       <div className="relative">
-        <Button
-          onClick={() => crisisMutation.mutate()}
-          disabled={crisisMutation.isPending}
-          className="crisis-button w-full py-4 px-6 rounded-organic stone-shadow transition-all duration-300 font-medium border-2"
-          style={{
-            backgroundColor: "hsl(260, 45%, 65%)",
-            borderColor: "hsl(260, 45%, 65%)",
-            color: "white",
-          }}
-          data-testid="crisis-button"
-        >
-          <AlertTriangle className="mr-2 h-4 w-4" />
-          {crisisMutation.isPending
-            ? "CONNECTING..."
-            : "NEED IMMEDIATE SUPPORT"}
-        </Button>
+        <Link href="/crisis-support">
+          <Button
+            className="crisis-button w-full py-4 px-6 rounded-organic stone-shadow transition-all duration-300 font-medium border-2"
+            style={{
+              backgroundColor: "hsl(260, 45%, 65%)",
+              borderColor: "hsl(260, 45%, 65%)",
+              color: "white",
+            }}
+            data-testid="crisis-button"
+          >
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            NEED IMMEDIATE SUPPORT
+          </Button>
+        </Link>
       </div>
 
       {/* Today's Question Card */}
@@ -127,7 +112,7 @@ export default function Home() {
             {todayReflection?.question ||
               "What three things brought you peace today?"}
           </p>
-          <Link href="/journal">
+          <Link href="/journal?type=reframing">
             <Button
               variant="secondary"
               className="bg-white/80 text-stone-600 hover:bg-white transition-colors rounded-full"
@@ -139,7 +124,7 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      {/* Quick Emotion Check */}
+      {/* Quick Emotion Check
       <Card
         className="rounded-organic stone-shadow border-0 relative"
         style={{
@@ -167,9 +152,9 @@ export default function Home() {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
-      {/* Mindfulness Moment */}
+      {/* Mindfulness Moment 
       <Card
         className="rounded-organic stone-shadow border-0 relative"
         style={{
@@ -199,9 +184,9 @@ export default function Home() {
           </div>
         </CardContent>
       </Card>
-
+*/}
       {/* Recent Journal Entries Preview */}
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <h3 className="font-serif font-semibold text-stone-600 text-lg">
           Recent Entries
         </h3>
@@ -238,7 +223,7 @@ export default function Home() {
             </Card>
           ))
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

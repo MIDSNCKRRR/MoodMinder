@@ -1,8 +1,12 @@
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useRouter } from "wouter";
 import { Home, BookOpen, BarChart3 } from "lucide-react";
 
-export default function BottomNavigation() {
-  const [location] = useLocation();
+interface BottomNavigationProps {
+  onJournalClick?: () => void;
+}
+
+export default function BottomNavigation({ onJournalClick }: BottomNavigationProps = {}) {
+  const [location, navigate] = useLocation();
 
   const tabs = [
     { path: "/", icon: Home, label: "Home" },
@@ -16,6 +20,30 @@ export default function BottomNavigation() {
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = location === tab.path;
+          
+          if (tab.label === "Journal") {
+            return (
+              <button 
+                key={tab.path}
+                onClick={() => {
+                  if (location === "/journal" && onJournalClick) {
+                    // If already on journal page, call the reset function
+                    onJournalClick();
+                  } else {
+                    // Otherwise navigate using wouter
+                    navigate(tab.path);
+                  }
+                }}
+                className={`flex flex-col items-center space-y-1 transition-colors ${
+                  isActive ? "text-peach-500" : "text-stone-400 hover:text-peach-500"
+                }`}
+                data-testid={`nav-${tab.label.toLowerCase()}`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{tab.label}</span>
+              </button>
+            );
+          }
           
           return (
             <Link key={tab.path} href={tab.path}>
