@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -109,6 +110,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const [answers, setAnswers] = useState<string[]>(["", "", "", ""]);
   const [reframedSentences, setReframedSentences] = useState<string[]>([]);
   const [isGeneratingReframing, setIsGeneratingReframing] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -299,11 +301,59 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
               </p>
             </div>
 
-            <div className="w-8" />
+            <Button
+              onClick={() => setShowInfo(!showInfo)}
+              variant="ghost"
+              size="sm"
+              className="p-2"
+              data-testid="info-button"
+            >
+              <Info className="w-4 h-4" />
+            </Button>
           </div>
 
           <ProgressBar currentStep={currentStep} totalSteps={3} />
         </div>
+
+        {/* Info Panel for Reframing Journal */}
+        {showInfo && (
+          <div className="p-4 pt-0">
+            <Card
+              className="rounded-organic stone-shadow border-0 relative"
+              style={{
+                background: "linear-gradient(135deg, hsl(261, 35%, 93%) 0%, hsl(261, 30%, 78%) 100%)",
+              }}
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-serif font-semibold text-stone-600 text-lg">
+                    About Reframing Journal
+                  </h3>
+                  <Button
+                    onClick={() => setShowInfo(false)}
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 h-auto"
+                    data-testid="close-info"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-3 text-sm text-stone-600">
+                  <p>The Reframing Journal helps you transform negative thoughts into positive perspectives using cognitive reframing techniques.</p>
+                  <div className="space-y-2">
+                    <p><strong>Step 1:</strong> Choose the emotion you want to explore</p>
+                    <p><strong>Step 2:</strong> Answer guided questions about your feelings and thoughts</p>
+                    <p><strong>Step 3:</strong> AI generates positive reframed perspectives based on your responses</p>
+                  </div>
+                  <p className="text-xs text-purple-600 bg-white/60 p-2 rounded">
+                    💡 This practice can help reduce negative thinking patterns and build emotional resilience over time.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 p-4">{renderCurrentStep()}</div>
