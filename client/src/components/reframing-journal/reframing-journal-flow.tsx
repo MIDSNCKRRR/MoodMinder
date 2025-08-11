@@ -202,7 +202,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={handlePrevious}
-              className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors"
+              className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors p-2 hover:bg-stone-100 rounded-lg"
               data-testid="button-back"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -225,13 +225,13 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t border-stone-200 p-4">
+        <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
           <div className="flex gap-3">
             {currentStep === 2 ? (
               <Button
                 onClick={handleSave}
                 disabled={!canProceed() || mutation.isPending}
-                className="flex-1 bg-sage-600 hover:bg-sage-700 text-white"
+                className="flex-1 bg-sage-600 hover:bg-sage-700 text-white h-12 text-base font-medium shadow-md"
                 data-testid="button-save"
               >
                 {mutation.isPending ? '저장 중...' : '저장하기'}
@@ -240,7 +240,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex-1 bg-sage-600 hover:bg-sage-700 text-white flex items-center justify-center gap-2"
+                className="flex-1 bg-sage-600 hover:bg-sage-700 text-white h-12 text-base font-medium shadow-md flex items-center justify-center gap-2"
                 data-testid="button-next"
               >
                 <span>다음</span>
