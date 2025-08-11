@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface Emotion {
   id: string;
@@ -19,19 +19,19 @@ interface Step2QuestionsProps {
 }
 
 const questionDescriptions = [
-  "(예: 친구가 원하는 일을 시작하는 걸 보며 마음이 불편했어.)",
-  "• 무엇이 나를 불편하게 했을까?\n• 그 감정 아래 숨겨진 나의 바람이나 결핍은 무엇일까?",
-  "• 나는 어떤 선택을 할 수 있을까?\n• 그 욕망을 실현하기 위한 작은 첫걸음은?",
-  "새로운 관점으로 상황을 다시 표현해보세요",
+  '(예: 친구가 원하는 일을 시작하는 걸 보며 마음이 불편했어.)',
+  '• 무엇이 나를 불편하게 했을까?\n• 그 감정 아래 숨겨진 나의 바람이나 결핍은 무엇일까?',
+  '• 나는 어떤 선택을 할 수 있을까?\n• 그 욕망을 실현하기 위한 작은 첫걸음은?',
+  '새로운 관점으로 상황을 다시 표현해보세요'
 ];
 
-export function Step2Questions({
-  emotion,
-  questions,
-  answers,
+export function Step2Questions({ 
+  emotion, 
+  questions, 
+  answers, 
   onAnswersChange,
   onNext,
-  canProceed = false,
+  canProceed = false
 }: Step2QuestionsProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
@@ -82,12 +82,11 @@ export function Step2Questions({
             key={index}
             className={`
               w-3 h-3 rounded-full transition-all duration-300
-              ${
-                index === currentQuestion
-                  ? "bg-sage-600"
-                  : index < currentQuestion
-                    ? "bg-sage-300"
-                    : "bg-stone-200"
+              ${index === currentQuestion 
+                ? 'bg-sage-600' 
+                : index < currentQuestion 
+                  ? 'bg-sage-300' 
+                  : 'bg-stone-200'
               }
             `}
             data-testid={`question-dot-${index}`}
@@ -101,7 +100,7 @@ export function Step2Questions({
           <h3 className="text-lg font-medium text-stone-900 mb-3">
             {questions[currentQuestion]}
           </h3>
-
+          
           {questionDescriptions[currentQuestion] && (
             <div className="mb-4 p-3 bg-stone-50 rounded text-sm text-stone-600 whitespace-pre-line">
               {questionDescriptions[currentQuestion]}
@@ -109,10 +108,8 @@ export function Step2Questions({
           )}
 
           <Textarea
-            value={answers[currentQuestion] || ""}
-            onChange={(e) =>
-              handleAnswerChange(currentQuestion, e.target.value)
-            }
+            value={answers[currentQuestion] || ''}
+            onChange={(e) => handleAnswerChange(currentQuestion, e.target.value)}
             placeholder="여기에 답변을 작성해주세요..."
             className="min-h-[120px] resize-none"
             data-testid={`question-textarea-${currentQuestion}`}
@@ -126,9 +123,9 @@ export function Step2Questions({
           onClick={handlePrevious}
           disabled={!canGoPrevious()}
           className={`flex items-center gap-2 font-medium border ${
-            canGoPrevious()
-              ? "bg-white border-sage-300 text-sage-700 hover:bg-sage-50 shadow-sm"
-              : "bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed"
+            canGoPrevious() 
+              ? 'bg-white border-sage-300 text-sage-700 hover:bg-sage-50 shadow-sm' 
+              : 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
           }`}
           data-testid="button-previous-question"
         >
@@ -142,9 +139,9 @@ export function Step2Questions({
             onClick={handleNext}
             disabled={!canGoNext()}
             className={`flex-1 flex items-center justify-center gap-2 font-medium transition-colors ${
-              canGoNext()
-                ? "bg-sage-600 hover:bg-sage-700 text-white shadow-sm"
-                : "bg-stone-200 text-stone-400 cursor-not-allowed"
+              canGoNext() 
+                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
             }`}
             data-testid="button-next-question"
           >
@@ -159,9 +156,9 @@ export function Step2Questions({
             onClick={onNext}
             disabled={!canProceed}
             className={`flex-1 font-medium transition-colors ${
-              canProceed
-                ? "bg-sage-600 hover:bg-sage-700 text-white shadow-sm"
-                : "bg-stone-200 text-stone-400 cursor-not-allowed"
+              canProceed 
+                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
             }`}
             data-testid="button-complete-questions"
           >
@@ -169,6 +166,7 @@ export function Step2Questions({
           </Button>
         )}
       </div>
+
     </div>
   );
 }
