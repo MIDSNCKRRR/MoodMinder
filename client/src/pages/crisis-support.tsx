@@ -149,7 +149,9 @@ function LonelinessSupport({ onBack }: { onBack: () => void }) {
           <ArrowLeft className="w-5 h-5 text-stone-600" />
         </Button>
         <h1 className="text-lg font-medium text-stone-800">Loneliness Support</h1>
-        <div className="w-9" /> {/* Spacer */}
+        <Button variant="ghost" size="sm" className="p-2" onClick={onBack}>
+          <X className="w-5 h-5 text-stone-600" />
+        </Button>
       </div>
 
       {/* Comforting Message */}
@@ -163,7 +165,7 @@ function LonelinessSupport({ onBack }: { onBack: () => void }) {
       </Card>
 
       {/* Butterfly Hug Animation */}
-      <ButterflyHug onExit={onBack} />
+      <ButterflyHug onExit={onBack} showExitButton={false} />
     </div>
   );
 }

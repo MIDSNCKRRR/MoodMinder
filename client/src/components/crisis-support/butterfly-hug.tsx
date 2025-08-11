@@ -6,6 +6,7 @@ import { Play, Pause, RotateCcw, X } from 'lucide-react';
 
 interface ButterflyHugProps {
   onExit: () => void;
+  showExitButton?: boolean;
 }
 
 type HugPhase = 'left' | 'right';
@@ -15,7 +16,7 @@ const phaseInstructions = {
   right: 'Right Hand'
 };
 
-export function ButterflyHug({ onExit }: ButterflyHugProps) {
+export function ButterflyHug({ onExit, showExitButton = true }: ButterflyHugProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [phase, setPhase] = useState<HugPhase>('left');
   const [seconds, setSeconds] = useState(3);
@@ -130,11 +131,13 @@ export function ButterflyHug({ onExit }: ButterflyHugProps) {
   return (
     <div className="space-y-4">
       {/* Exit Button */}
-      <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          <X className="w-5 h-5" />
-        </Button>
-      </div>
+      {showExitButton && (
+        <div className="flex justify-end">
+          <Button variant="ghost" size="sm" onClick={onExit}>
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+      )}
 
       {/* Session Stats */}
       <Card className="rounded-organic stone-shadow border-0 bg-white/90">
