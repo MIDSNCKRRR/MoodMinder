@@ -1,3 +1,6 @@
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
 interface Emotion {
   id: string;
   name: string;
@@ -8,12 +11,16 @@ interface Step1EmotionSelectionProps {
   emotions: Emotion[];
   selectedEmotion: Emotion | null;
   onEmotionSelect: (emotion: Emotion) => void;
+  onNext?: () => void;
+  canProceed?: boolean;
 }
 
 export function Step1EmotionSelection({ 
   emotions, 
   selectedEmotion, 
-  onEmotionSelect 
+  onEmotionSelect,
+  onNext,
+  canProceed = false
 }: Step1EmotionSelectionProps) {
   return (
     <div className="space-y-6">
@@ -57,15 +64,29 @@ export function Step1EmotionSelection({
       </div>
 
       {selectedEmotion && (
-        <div className="bg-sage-50 rounded-stone p-4 border border-sage-200">
-          <div className="text-center space-y-2">
-            <div className="text-sage-800 font-medium">
-              선택된 감정: {selectedEmotion.name}
-            </div>
-            <div className="text-sage-600 text-sm">
-              이 감정에 대해 깊이 탐구해보겠습니다
+        <div className="flex items-center gap-3">
+          <div className="flex-1 bg-sage-50 rounded-stone p-4 border border-sage-200">
+            <div className="text-center space-y-2">
+              <div className="text-sage-800 font-medium">
+                선택된 감정: {selectedEmotion.name}
+              </div>
+              <div className="text-sage-600 text-sm">
+                이 감정에 대해 깊이 탐구해보겠습니다
+              </div>
             </div>
           </div>
+          
+          {onNext && (
+            <Button
+              onClick={onNext}
+              disabled={!canProceed}
+              className="bg-sage-600 hover:bg-sage-700 text-white flex items-center gap-2 px-6 py-3"
+              data-testid="button-next-inline"
+            >
+              <span>다음</span>
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       )}
     </div>

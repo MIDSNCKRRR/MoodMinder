@@ -178,6 +178,8 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
             emotions={emotions}
             selectedEmotion={selectedEmotion}
             onEmotionSelect={setSelectedEmotion}
+            onNext={handleNext}
+            canProceed={canProceed()}
           />
         );
       case 2:
@@ -224,10 +226,10 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
           {renderCurrentStep()}
         </div>
 
-        {/* Footer */}
-        <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
-          <div className="flex gap-3">
-            {currentStep === 2 ? (
+        {/* Footer - only show on step 2 */}
+        {currentStep === 2 && (
+          <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
+            <div className="flex gap-3">
               <Button
                 onClick={handleSave}
                 disabled={!canProceed() || mutation.isPending}
@@ -236,19 +238,9 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
               >
                 {mutation.isPending ? '저장 중...' : '저장하기'}
               </Button>
-            ) : (
-              <Button
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className="flex-1 bg-sage-600 hover:bg-sage-700 text-white h-12 text-base font-medium shadow-md flex items-center justify-center gap-2"
-                data-testid="button-next"
-              >
-                <span>다음</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
