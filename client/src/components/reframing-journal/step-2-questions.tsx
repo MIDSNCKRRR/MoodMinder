@@ -14,6 +14,8 @@ interface Step2QuestionsProps {
   questions: string[];
   answers: string[];
   onAnswersChange: (answers: string[]) => void;
+  onNext?: () => void;
+  canProceed?: boolean;
 }
 
 const questionDescriptions = [
@@ -27,7 +29,9 @@ export function Step2Questions({
   emotion, 
   questions, 
   answers, 
-  onAnswersChange 
+  onAnswersChange,
+  onNext,
+  canProceed = false
 }: Step2QuestionsProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
@@ -138,11 +142,12 @@ export function Step2Questions({
           </Button>
         ) : (
           <Button
-            disabled={!canGoNext()}
+            onClick={onNext}
+            disabled={!canProceed}
             className="flex-1 bg-sage-600 hover:bg-sage-700 text-white"
             data-testid="button-complete-questions"
           >
-            질문 완료
+            리프레이밍 생성하기
           </Button>
         )}
       </div>

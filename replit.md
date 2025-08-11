@@ -32,6 +32,7 @@ Preferred communication style: Simple, everyday language.
 ## Key Features
 - **Emotion Tracking**: Visual emotion faces with 5-point scale and body mapping for physical sensations
 - **Journaling**: Rich text journaling with emotion correlation and body awareness
+- **Reframing Journal**: 3-step AI-powered emotion reframing process with GPT integration (test mode enabled)
 - **Analytics Dashboard**: Wave charts showing emotional trends over time with weekly and monthly insights
 - **Crisis Support**: Emergency logging system for mental health crisis management
 - **Mobile UX**: Touch-optimized interface with bottom navigation and card-based layouts
@@ -71,3 +72,9 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Replit-specific plugins for enhanced development experience
 - **Runtime**: Node.js with ES modules for modern JavaScript features
 - **Package Management**: npm with lock file for reproducible builds
+
+## AI Integration
+- **OpenAI GPT-4o**: Emotion reframing service with test mode for development
+- **Service Layer**: Dedicated GPT reframing service with configurable test/production modes
+- **Test Data**: Comprehensive dummy responses for 11 emotions during development
+- **API Configuration**: Ready for production OpenAI API key integration

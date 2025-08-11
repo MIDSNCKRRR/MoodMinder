@@ -7,6 +7,8 @@ import { apiRequest } from '@/lib/queryClient';
 import { ProgressBar } from '@/components/reframing-journal/progress-bar';
 import { Step1EmotionSelection } from '@/components/reframing-journal/step-1-emotion-selection';
 import { Step2Questions } from '@/components/reframing-journal/step-2-questions';
+import { Step3ReframingResult } from '@/components/reframing-journal/step-3-reframing-result';
+import { gptReframingService } from '@/services/gpt-reframing';
 
 type Emotion = {
   id: string;
@@ -105,6 +107,8 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null);
   const [answers, setAnswers] = useState<string[]>(['', '', '', '']);
+  const [reframedSentences, setReframedSentences] = useState<string[]>([]);
+  const [isGeneratingReframing, setIsGeneratingReframing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -133,29 +137,78 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const handleNext = () => {
     if (currentStep === 1 && selectedEmotion) {
       setCurrentStep(2);
+    } else if (currentStep === 2 && canProceedFromStep2()) {
+      generateReframing();
     }
   };
 
+  const generateReframing = async () => {
+    if (!selectedEmotion) return;
+    
+    setIsGeneratingReframing(true);
+    setCurrentStep(3);
+    
+    try {
+      const response = await gptReframingService.reframeEmotion({
+        emotion: selectedEmotion.id,
+        emotionName: selectedEmotion.name,
+        answers: answers.filter(answer => answer.trim()) // Only non-empty answers
+      });
+
+      if (response.success) {
+        setReframedSentences(response.reframedSentences);
+      } else {
+        toast({
+          title: "리프레이밍 생성 실패",
+          description: response.error || "다시 시도해 주세요.",
+          variant: "destructive",
+        });
+        setCurrentStep(2); // Go back to questions
+      }
+    } catch (error) {
+      console.error('Reframing generation error:', error);
+      toast({
+        title: "오류 발생",
+        description: "리프레이밍 생성 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+      setCurrentStep(2); // Go back to questions
+    } finally {
+      setIsGeneratingReframing(false);
+    }
+  };
+
+  const handleRegenerateReframing = () => {
+    generateReframing();
+  };
+
   const handlePrevious = () => {
-    if (currentStep === 2) {
+    if (currentStep === 3) {
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
       setCurrentStep(1);
     } else {
       onBack();
     }
   };
 
-  const handleSave = () => {
+  const handleSave = (selectedSentences?: string[]) => {
     if (!selectedEmotion) return;
+
+    const finalContent = selectedSentences 
+      ? [...answers.filter(answer => answer.trim()), '', '=== 리프레이밍 결과 ===', ...selectedSentences].join('\n\n')
+      : answers.join('\n\n');
 
     const journalData = {
       userId: 'temp-user',
       journalType: 'reframing',
       emotionLevel: 3,
       emotionType: selectedEmotion.id,
-      content: answers.join('\n\n'),
+      content: finalContent,
       bodyMapping: {
         selectedEmotion: selectedEmotion.name,
         answers: answers,
+        reframedSentences: selectedSentences || [],
         timestamp: new Date().toISOString(),
       },
     };
@@ -167,7 +220,12 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const canProceed = () => {
     if (currentStep === 1) return !!selectedEmotion;
     if (currentStep === 2) return answers.every(answer => answer.trim());
+    if (currentStep === 3) return reframedSentences.length > 0;
     return false;
+  };
+
+  const canProceedFromStep2 = () => {
+    return answers.every(answer => answer.trim());
   };
 
   const renderCurrentStep = () => {
@@ -189,6 +247,21 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
             questions={emotionQuestions[selectedEmotion!.id] || []}
             answers={answers}
             onAnswersChange={setAnswers}
+            onNext={handleNext}
+            canProceed={canProceed()}
+          />
+        );
+      case 3:
+        return (
+          <Step3ReframingResult
+            emotion={selectedEmotion!}
+            answers={answers}
+            reframedSentences={reframedSentences}
+            isLoading={isGeneratingReframing}
+            onBack={handlePrevious}
+            onRegenerate={handleRegenerateReframing}
+            onSave={handleSave}
+            canSave={!mutation.isPending}
           />
         );
       default:
@@ -218,7 +291,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
             <div className="w-16" />
           </div>
           
-          <ProgressBar currentStep={currentStep} totalSteps={2} />
+          <ProgressBar currentStep={currentStep} totalSteps={3} />
         </div>
 
         {/* Content */}
@@ -226,17 +299,17 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
           {renderCurrentStep()}
         </div>
 
-        {/* Footer - only show on step 2 */}
-        {currentStep === 2 && (
+        {/* Footer - hide on step 2 and 3 since they have their own buttons */}
+        {currentStep === 1 && (
           <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
             <div className="flex gap-3">
               <Button
-                onClick={handleSave}
-                disabled={!canProceed() || mutation.isPending}
+                onClick={handleNext}
+                disabled={!canProceed()}
                 className="flex-1 bg-sage-600 hover:bg-sage-700 text-white h-12 text-base font-medium shadow-md"
-                data-testid="button-save"
+                data-testid="button-continue"
               >
-                {mutation.isPending ? '저장 중...' : '저장하기'}
+                계속하기
               </Button>
             </div>
           </div>
