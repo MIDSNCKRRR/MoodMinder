@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface Emotion {
@@ -63,29 +64,36 @@ export function Step2Questions({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-semibold text-stone-900">
-          {emotion.name} 탐구하기
-        </h2>
-        <div className="bg-sage-50 rounded-stone p-3 border border-sage-200">
-          <div className="text-sage-800 text-sm font-medium">
-            질문 {currentQuestion + 1} / {questions.length}
+      {/* Header Card */}
+      <Card 
+        className="rounded-organic stone-shadow border-0"
+        style={{
+          background: "linear-gradient(135deg, hsl(261, 35%, 93%) 0%, hsl(261, 30%, 78%) 100%)",
+        }}
+      >
+        <CardContent className="p-6 text-center">
+          <h2 className="text-xl font-semibold text-stone-900 mb-3 font-serif">
+            {emotion.name} 탐구하기
+          </h2>
+          <div className="bg-white/60 rounded-stone p-3 border border-purple-200">
+            <div className="text-purple-800 text-sm font-medium">
+              질문 {currentQuestion + 1} / {questions.length}
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Question Progress Dots */}
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-3">
         {questions.map((_, index) => (
           <div
             key={index}
             className={`
-              w-3 h-3 rounded-full transition-all duration-300
+              w-4 h-4 rounded-full transition-all duration-300 shadow-sm
               ${index === currentQuestion 
-                ? 'bg-sage-600' 
+                ? 'bg-gradient-to-br from-purple-500 to-purple-600 scale-110' 
                 : index < currentQuestion 
-                  ? 'bg-sage-300' 
+                  ? 'bg-gradient-to-br from-purple-300 to-purple-400' 
                   : 'bg-stone-200'
               }
             `}
@@ -94,37 +102,44 @@ export function Step2Questions({
         ))}
       </div>
 
-      {/* Current Question */}
-      <div className="space-y-4">
-        <div className="bg-white rounded-stone p-6 border border-stone-200 shadow-sm">
-          <h3 className="text-lg font-medium text-stone-900 mb-3">
+      {/* Current Question Card */}
+      <Card 
+        className="rounded-organic stone-shadow border-0"
+        style={{
+          background: "linear-gradient(135deg, hsl(261, 35%, 95%) 0%, hsl(261, 25%, 88%) 100%)",
+        }}
+      >
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-stone-900 mb-4 font-serif">
             {questions[currentQuestion]}
           </h3>
           
           {questionDescriptions[currentQuestion] && (
-            <div className="mb-4 p-3 bg-stone-50 rounded text-sm text-stone-600 whitespace-pre-line">
+            <div className="mb-6 p-4 bg-white/60 rounded-stone text-sm text-purple-700 whitespace-pre-line border border-purple-200">
               {questionDescriptions[currentQuestion]}
             </div>
           )}
 
-          <Textarea
-            value={answers[currentQuestion] || ''}
-            onChange={(e) => handleAnswerChange(currentQuestion, e.target.value)}
-            placeholder="여기에 답변을 작성해주세요..."
-            className="min-h-[120px] resize-none"
-            data-testid={`question-textarea-${currentQuestion}`}
-          />
-        </div>
-      </div>
+          <div className="bg-white/70 p-4 rounded-stone border border-purple-200">
+            <Textarea
+              value={answers[currentQuestion] || ''}
+              onChange={(e) => handleAnswerChange(currentQuestion, e.target.value)}
+              placeholder="여기에 답변을 작성해주세요..."
+              className="min-h-[120px] resize-none border-0 bg-transparent focus:ring-0 text-stone-700 placeholder:text-stone-400"
+              data-testid={`question-textarea-${currentQuestion}`}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Navigation */}
       <div className="flex gap-3">
         <Button
           onClick={handlePrevious}
           disabled={!canGoPrevious()}
-          className={`flex items-center gap-2 font-medium border ${
+          className={`flex items-center gap-2 font-medium rounded-stone border transition-all ${
             canGoPrevious() 
-              ? 'bg-white border-sage-300 text-sage-700 hover:bg-sage-50 shadow-sm' 
+              ? 'bg-white border-purple-300 text-purple-700 hover:bg-purple-50 shadow-sm' 
               : 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
           }`}
           data-testid="button-previous-question"
@@ -138,11 +153,14 @@ export function Step2Questions({
           <Button
             onClick={handleNext}
             disabled={!canGoNext()}
-            className={`flex-1 flex items-center justify-center gap-2 font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 font-medium rounded-stone transition-all ${
               canGoNext() 
-                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
-                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                ? 'text-white shadow-sm' 
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300'
             }`}
+            style={canGoNext() ? {
+              background: "linear-gradient(to right, hsl(261, 60%, 60%), hsl(261, 65%, 50%))"
+            } : {}}
             data-testid="button-next-question"
           >
             <span>다음 질문</span>
@@ -155,11 +173,14 @@ export function Step2Questions({
           <Button
             onClick={onNext}
             disabled={!canProceed}
-            className={`flex-1 font-medium transition-colors ${
+            className={`flex-1 font-medium rounded-stone transition-all ${
               canProceed 
-                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
-                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                ? 'text-white shadow-sm' 
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300'
             }`}
+            style={canProceed ? {
+              background: "linear-gradient(to right, hsl(261, 60%, 60%), hsl(261, 65%, 50%))"
+            } : {}}
             data-testid="button-complete-questions"
           >
             리프레이밍 생성하기

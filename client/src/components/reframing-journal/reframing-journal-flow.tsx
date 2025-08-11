@@ -275,21 +275,28 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{
+      background: "linear-gradient(135deg, hsl(261, 15%, 96%) 0%, hsl(261, 10%, 92%) 100%)"
+    }}>
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b border-stone-200 p-4">
+        <div 
+          className="shadow-sm border-b border-purple-200 p-4"
+          style={{
+            background: "linear-gradient(135deg, hsl(261, 25%, 97%) 0%, hsl(261, 20%, 93%) 100%)"
+          }}
+        >
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={handlePrevious}
-              className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors p-2 hover:bg-stone-100 rounded-lg"
+              className="flex items-center gap-2 text-purple-600 hover:text-purple-800 transition-colors p-2 hover:bg-purple-50 rounded-stone"
               data-testid="button-back"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="text-sm font-medium"></span>
             </button>
 
-            <h1 className="text-lg font-semibold text-stone-900">
+            <h1 className="text-lg font-semibold text-stone-900 font-serif">
               Reframing Journal
             </h1>
 
@@ -304,12 +311,24 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
         {/* Footer - hide on step 2 and 3 since they have their own buttons */}
         {currentStep === 1 && (
-          <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
+          <div 
+            className="border-t border-purple-200 p-4 shadow-lg"
+            style={{
+              background: "linear-gradient(135deg, hsl(261, 25%, 97%) 0%, hsl(261, 20%, 93%) 100%)"
+            }}
+          >
             <div className="flex gap-3">
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex-1 bg-sage-600 hover:bg-sage-700 text-white h-12 text-base font-medium shadow-md"
+                className={`flex-1 h-12 text-base font-medium shadow-md rounded-stone transition-all ${
+                  canProceed() 
+                    ? 'text-white' 
+                    : 'bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300'
+                }`}
+                style={canProceed() ? {
+                  background: "linear-gradient(to right, hsl(261, 60%, 60%), hsl(261, 65%, 50%))"
+                } : {}}
                 data-testid="button-continue"
               >
                 계속하기

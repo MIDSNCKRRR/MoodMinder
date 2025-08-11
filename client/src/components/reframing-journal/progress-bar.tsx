@@ -5,7 +5,7 @@ interface ProgressBarProps {
 
 export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-3">
       {Array.from({ length: totalSteps }, (_, i) => {
         const stepNumber = i + 1;
         const isActive = stepNumber === currentStep;
@@ -15,13 +15,13 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
           <div
             key={stepNumber}
             className={`
-              w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300
+              w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
               ${
                 isActive
-                  ? "bg-sage-600 shadow-md"
+                  ? "bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-md scale-110"
                   : isCompleted
-                    ? "bg-sage-200 text-sage-700"
-                    : "bg-stone-200 text-stone-500"
+                    ? "bg-gradient-to-br from-purple-200 to-purple-300 text-purple-700 shadow-sm"
+                    : "bg-white border-2 border-purple-200 text-purple-400"
               }
             `}
             data-testid={`progress-step-${stepNumber}`}
