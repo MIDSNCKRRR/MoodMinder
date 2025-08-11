@@ -122,8 +122,11 @@ export function Step2Questions({
         <Button
           onClick={handlePrevious}
           disabled={!canGoPrevious()}
-          variant="outline"
-          className="flex items-center gap-2"
+          className={`flex items-center gap-2 font-medium border ${
+            canGoPrevious() 
+              ? 'bg-white border-sage-300 text-sage-700 hover:bg-sage-50 shadow-sm' 
+              : 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
+          }`}
           data-testid="button-previous-question"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -134,7 +137,11 @@ export function Step2Questions({
           <Button
             onClick={handleNext}
             disabled={!canGoNext()}
-            className="flex-1 bg-sage-600 hover:bg-sage-700 text-white flex items-center justify-center gap-2"
+            className={`flex-1 flex items-center justify-center gap-2 font-medium ${
+              canGoNext() 
+                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+            }`}
             data-testid="button-next-question"
           >
             <span>다음 질문</span>
@@ -144,7 +151,11 @@ export function Step2Questions({
           <Button
             onClick={onNext}
             disabled={!canProceed}
-            className="flex-1 bg-sage-600 hover:bg-sage-700 text-white"
+            className={`flex-1 font-medium ${
+              canProceed 
+                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+            }`}
             data-testid="button-complete-questions"
           >
             리프레이밍 생성하기
