@@ -6,7 +6,6 @@ import ProgressBar from "./progress-bar";
 import Step1Emotion from "./step-1-emotion";
 import Step2BodyMap from "./step-2-body-map";
 import Step3Journal from "./step-3-journal";
-import Step4Keywords from "./step-4-keywords";
 
 interface BodyJournalFlowProps {
   onBack: () => void;
@@ -21,7 +20,6 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   const [emotionIntensity, setEmotionIntensity] = useState<number>(50);
   const [selectedBodyFeelings, setSelectedBodyFeelings] = useState<Record<string, string>>({});
   const [journalContent, setJournalContent] = useState("");
-  const [selectedKeywords, setSelectedKeywords] = useState<Array<{keyword: string, score: number}>>([]);
 
   // Load saved data on component mount
   useEffect(() => {
@@ -29,7 +27,6 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     const savedIntensity = localStorage.getItem('bodyJournal_intensity');
     const savedBodyFeelings = localStorage.getItem('bodyJournal_bodyFeelings');
     const savedContent = localStorage.getItem('bodyJournal_content');
-    const savedKeywords = localStorage.getItem('bodyJournal_keywords');
 
     if (savedEmotion) {
       setSelectedEmotion(parseInt(savedEmotion));
@@ -47,17 +44,10 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     if (savedContent) {
       setJournalContent(savedContent);
     }
-    if (savedKeywords) {
-      try {
-        setSelectedKeywords(JSON.parse(savedKeywords));
-      } catch (e) {
-        console.error('Error parsing saved keywords:', e);
-      }
-    }
   }, []);
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -82,7 +72,6 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
           feelings: selectedBodyFeelings, // Body part specific emotions
           emotionCategory: selectedEmotion, // Original emotion selection (1-12)
           intensity: emotionIntensity, // Overall emotion intensity (0-100)
-          keywords: selectedKeywords, // Keyword scores
           timestamp: new Date().toISOString()
         },
       };
@@ -108,7 +97,6 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       localStorage.removeItem('bodyJournal_intensity');
       localStorage.removeItem('bodyJournal_bodyFeelings');
       localStorage.removeItem('bodyJournal_content');
-      localStorage.removeItem('bodyJournal_keywords');
 
       // Reset form and go back to journal types
       setCurrentStep(1);
@@ -116,7 +104,6 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       setEmotionIntensity(50);
       setSelectedBodyFeelings({});
       setJournalContent("");
-      setSelectedKeywords([]);
       onBack();
     } catch (error) {
       console.error('Error saving journal entry:', error);
@@ -179,16 +166,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
             onBack={handleBack}
             selectedEmotion={selectedEmotion}
             selectedBodyFeelings={selectedBodyFeelings}
-            onComplete={handleNext}
-          />
-        );
-      case 4:
-        return (
-          <Step4Keywords
-            selectedKeywords={selectedKeywords}
-            onKeywordsChange={setSelectedKeywords}
-            onNext={handleComplete}
-            onBack={handleBack}
+            onComplete={handleComplete}
           />
         );
       default:
@@ -212,7 +190,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
         
         <div className="text-center">
           <h2 className="text-xl font-serif font-semibold text-stone-600">Body Journal</h2>
-          <p className="text-stone-400 text-sm">Step {currentStep} of 4</p>
+          <p className="text-stone-400 text-sm">Step {currentStep} of 3</p>
         </div>
         
         <Button
@@ -246,14 +224,13 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
               </Button>
             </div>
             <div className="space-y-3 text-sm text-stone-600">
-              <p>The Body Journal helps you connect with your emotional and physical state through a guided 4-step process.</p>
+              <p>The Body Journal helps you connect with your emotional and physical state through a guided 3-step process.</p>
               <div className="space-y-2">
                 <p><strong>Steps:</strong></p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li><strong>Step 1:</strong> Choose your current emotion from 12 options</li>
                   <li><strong>Step 2:</strong> Map where you feel these emotions in your body</li>
                   <li><strong>Step 3:</strong> Journal about your thoughts and sensations</li>
-                  <li><strong>Step 4:</strong> Rate keyword alignment with today's state (1-5 scale)</li>
                 </ul>
                 <p className="text-xs text-stone-500 mt-3">
                   Your progress is automatically saved as you move through each step.
@@ -265,7 +242,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       )}
 
       {/* Progress Bar */}
-      <ProgressBar currentStep={currentStep} totalSteps={4} />
+      <ProgressBar currentStep={currentStep} totalSteps={3} />
 
       {/* Current Step Content */}
       {renderCurrentStep()}
