@@ -137,7 +137,7 @@ export function Step2Questions({
         <Button
           onClick={handlePrevious}
           disabled={!canGoPrevious()}
-          className={`flex items-center gap-2 font-medium rounded-stone border transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 font-medium rounded-stone border transition-all ${
             canGoPrevious() 
               ? 'bg-white border-purple-300 text-purple-700 hover:bg-purple-50 shadow-sm' 
               : 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'

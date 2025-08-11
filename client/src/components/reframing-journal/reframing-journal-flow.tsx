@@ -18,15 +18,15 @@ type Emotion = {
 };
 
 const emotions: Emotion[] = [
-  { id: "sadness", name: "슬픔", english: "Sadness" },
-  { id: "anger", name: "분노", english: "Anger" },
-  { id: "fear", name: "두려움", english: "Fear" },
+  // { id: "sadness", name: "슬픔", english: "Sadness" },
+  // { id: "anger", name: "분노", english: "Anger" },
+  // { id: "fear", name: "두려움", english: "Fear" },
   { id: "shame", name: "수치심", english: "Shame" },
   { id: "emptiness", name: "공허함", english: "Emptiness" },
   { id: "jealousy", name: "질투", english: "Jealousy" },
   { id: "urgency", name: "조급함", english: "Urgency" },
-  { id: "joy", name: "기쁨", english: "Joy" },
-  { id: "love", name: "사랑", english: "Love" },
+  // { id: "joy", name: "기쁨", english: "Joy" },
+  // { id: "love", name: "사랑", english: "Love" },
   { id: "recognition", name: "인정욕구", english: "Need for Recognition" },
   { id: "inferiority", name: "열등감", english: "Inferiority" },
 ];
@@ -321,7 +321,8 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
             <Card
               className="rounded-organic stone-shadow border-0 relative"
               style={{
-                background: "linear-gradient(135deg, hsl(261, 35%, 93%) 0%, hsl(261, 30%, 78%) 100%)",
+                background:
+                  "linear-gradient(135deg, hsl(261, 35%, 93%) 0%, hsl(261, 30%, 78%) 100%)",
               }}
             >
               <CardContent className="p-4">
@@ -340,14 +341,28 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
                   </Button>
                 </div>
                 <div className="space-y-3 text-sm text-stone-600">
-                  <p>The Reframing Journal helps you transform negative thoughts into positive perspectives using cognitive reframing techniques.</p>
+                  <p>
+                    The Reframing Journal helps you transform negative thoughts
+                    into positive perspectives using cognitive reframing
+                    techniques.
+                  </p>
                   <div className="space-y-2">
-                    <p><strong>Step 1:</strong> Choose the emotion you want to explore</p>
-                    <p><strong>Step 2:</strong> Answer guided questions about your feelings and thoughts</p>
-                    <p><strong>Step 3:</strong> AI generates positive reframed perspectives based on your responses</p>
+                    <p>
+                      <strong>Step 1:</strong> Choose the emotion you want to
+                      explore
+                    </p>
+                    <p>
+                      <strong>Step 2:</strong> Answer guided questions about
+                      your feelings and thoughts
+                    </p>
+                    <p>
+                      <strong>Step 3:</strong> AI generates positive reframed
+                      perspectives based on your responses
+                    </p>
                   </div>
                   <p className="text-xs text-purple-600 bg-white/60 p-2 rounded">
-                    💡 This practice can help reduce negative thinking patterns and build emotional resilience over time.
+                    💡 This practice can help reduce negative thinking patterns
+                    and build emotional resilience over time.
                   </p>
                 </div>
               </CardContent>
@@ -366,13 +381,18 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
                 onClick={handleNext}
                 disabled={!canProceed()}
                 className={`flex-1 h-12 text-base font-medium shadow-md rounded-stone transition-all ${
-                  canProceed() 
-                    ? 'text-white' 
-                    : 'bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300'
+                  canProceed()
+                    ? "text-white"
+                    : "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300"
                 }`}
-                style={canProceed() ? {
-                  background: "linear-gradient(to right, hsl(261, 60%, 60%), hsl(261, 65%, 50%))"
-                } : {}}
+                style={
+                  canProceed()
+                    ? {
+                        background:
+                          "linear-gradient(to right, hsl(261, 60%, 60%), hsl(261, 65%, 50%))",
+                      }
+                    : {}
+                }
                 data-testid="button-continue"
               >
                 계속하기
