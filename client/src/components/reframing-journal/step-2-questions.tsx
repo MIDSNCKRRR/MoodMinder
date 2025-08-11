@@ -87,9 +87,7 @@ export function Step2Questions({
                   w-4 h-4 rounded-full transition-all duration-300 shadow-sm
                   ${index === currentQuestion 
                     ? 'bg-gradient-to-br from-purple-500 to-purple-600 scale-110' 
-                    : index < currentQuestion 
-                      ? 'bg-gradient-to-br from-purple-300 to-purple-400' 
-                      : 'bg-stone-300'
+                    : 'bg-stone-300'
                   }
                 `}
                 data-testid={`question-dot-${index}`}
