@@ -133,34 +133,26 @@ export function Step2Questions({
           이전 질문
         </Button>
 
-        {currentQuestion < questions.length - 1 ? (
-          <Button
-            onClick={handleNext}
-            disabled={!canGoNext()}
-            className={`flex-1 flex items-center justify-center gap-2 font-medium ${
-              canGoNext() 
-                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
-                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-            }`}
-            data-testid="button-next-question"
-          >
-            <span>다음 질문</span>
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button
-            onClick={onNext}
-            disabled={!canProceed}
-            className={`flex-1 font-medium ${
-              canProceed 
-                ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
-                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-            }`}
-            data-testid="button-complete-questions"
-          >
-            리프레이밍 생성하기
-          </Button>
-        )}
+        {/* 항상 버튼을 표시하되, 내용과 동작만 변경 */}
+        <Button
+          onClick={currentQuestion < questions.length - 1 ? handleNext : onNext}
+          disabled={currentQuestion < questions.length - 1 ? !canGoNext() : !canProceed}
+          className={`flex-1 font-medium ${
+            (currentQuestion < questions.length - 1 ? canGoNext() : canProceed)
+              ? 'bg-sage-600 hover:bg-sage-700 text-white shadow-sm' 
+              : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+          }`}
+          data-testid={currentQuestion < questions.length - 1 ? "button-next-question" : "button-complete-questions"}
+        >
+          {currentQuestion < questions.length - 1 ? (
+            <div className="flex items-center justify-center gap-2">
+              <span>다음 질문</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          ) : (
+            "리프레이밍 생성하기"
+          )}
+        </Button>
       </div>
 
       {/* Summary */}
