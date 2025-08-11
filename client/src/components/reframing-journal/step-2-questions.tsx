@@ -17,6 +17,7 @@ interface Step2QuestionsProps {
   onAnswersChange: (answers: string[]) => void;
   onNext?: () => void;
   canProceed?: boolean;
+  onBackToEmotionSelection?: () => void;
 }
 
 const questionDescriptions = [
@@ -32,7 +33,8 @@ export function Step2Questions({
   answers, 
   onAnswersChange,
   onNext,
-  canProceed = false
+  canProceed = false,
+  onBackToEmotionSelection
 }: Step2QuestionsProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
@@ -134,19 +136,30 @@ export function Step2Questions({
 
       {/* Navigation */}
       <div className="flex gap-3">
-        <Button
-          onClick={handlePrevious}
-          disabled={!canGoPrevious()}
-          className={`flex-1 flex items-center justify-center gap-2 font-medium rounded-stone border transition-all ${
-            canGoPrevious() 
-              ? 'bg-white border-purple-300 text-purple-700 hover:bg-purple-50 shadow-sm' 
-              : 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
-          }`}
-          data-testid="button-previous-question"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          이전 질문
-        </Button>
+        {currentQuestion === 0 ? (
+          <Button
+            onClick={onBackToEmotionSelection}
+            className="flex-1 flex items-center justify-center gap-2 font-medium rounded-stone border bg-white border-purple-300 text-purple-700 hover:bg-purple-50 shadow-sm transition-all"
+            data-testid="button-back-to-emotion-selection"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            감정 다시 선택하기
+          </Button>
+        ) : (
+          <Button
+            onClick={handlePrevious}
+            disabled={!canGoPrevious()}
+            className={`flex-1 flex items-center justify-center gap-2 font-medium rounded-stone border transition-all ${
+              canGoPrevious() 
+                ? 'bg-white border-purple-300 text-purple-700 hover:bg-purple-50 shadow-sm' 
+                : 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
+            }`}
+            data-testid="button-previous-question"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            이전 질문
+          </Button>
+        )}
 
         {/* 다음 질문 버튼 - 마지막 질문이 아닐 때 */}
         {currentQuestion < questions.length - 1 && (

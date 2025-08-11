@@ -194,6 +194,12 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
     }
   };
 
+  const handleBackToEmotionSelection = () => {
+    setCurrentStep(1);
+    setSelectedEmotion(null);
+    setAnswers(["", "", "", ""]);
+  };
+
   const handleSave = (selectedSentences?: string[]) => {
     if (!selectedEmotion) return;
 
@@ -256,6 +262,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
             onAnswersChange={setAnswers}
             onNext={handleNext}
             canProceed={canProceed()}
+            onBackToEmotionSelection={handleBackToEmotionSelection}
           />
         );
       case 3:
