@@ -74,35 +74,30 @@ export function Step2Questions({
         }}
       >
         <CardContent className="p-6 text-center">
-          <h2 className="text-xl font-semibold text-stone-900 mb-3 font-serif">
+          <h2 className="text-xl font-semibold text-stone-900 mb-4 font-serif">
             {emotion.name} 탐구하기
           </h2>
-          <div className="bg-white/60 rounded-stone p-3 border border-purple-200">
-            <div className="text-purple-800 text-sm font-medium">
-              질문 {currentQuestion + 1} / {questions.length}
-            </div>
+          
+          {/* Question Progress Dots inside card */}
+          <div className="flex justify-center gap-3">
+            {questions.map((_, index) => (
+              <div
+                key={index}
+                className={`
+                  w-4 h-4 rounded-full transition-all duration-300 shadow-sm
+                  ${index === currentQuestion 
+                    ? 'bg-gradient-to-br from-purple-500 to-purple-600 scale-110' 
+                    : index < currentQuestion 
+                      ? 'bg-gradient-to-br from-purple-300 to-purple-400' 
+                      : 'bg-stone-300'
+                  }
+                `}
+                data-testid={`question-dot-${index}`}
+              />
+            ))}
           </div>
         </CardContent>
       </Card>
-
-      {/* Question Progress Dots */}
-      <div className="flex justify-center gap-3">
-        {questions.map((_, index) => (
-          <div
-            key={index}
-            className={`
-              w-4 h-4 rounded-full transition-all duration-300 shadow-sm
-              ${index === currentQuestion 
-                ? 'bg-gradient-to-br from-purple-500 to-purple-600 scale-110' 
-                : index < currentQuestion 
-                  ? 'bg-gradient-to-br from-purple-300 to-purple-400' 
-                  : 'bg-stone-200'
-              }
-            `}
-            data-testid={`question-dot-${index}`}
-          />
-        ))}
-      </div>
 
       {/* Current Question Card */}
       <Card 
