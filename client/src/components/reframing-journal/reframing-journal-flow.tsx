@@ -280,27 +280,28 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
     }}>
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div 
-          className="shadow-sm border-b border-purple-200 p-4"
-          style={{
-            background: "linear-gradient(135deg, hsl(261, 25%, 97%) 0%, hsl(261, 20%, 93%) 100%)"
-          }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <button
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-4 pt-4">
+            <Button
               onClick={handlePrevious}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-800 transition-colors p-2 hover:bg-purple-50 rounded-stone"
+              variant="ghost"
+              size="sm"
+              className="p-2"
               data-testid="button-back"
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium"></span>
-            </button>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
 
-            <h1 className="text-lg font-semibold text-stone-900 font-serif">
-              Reframing Journal
-            </h1>
+            <div className="text-center">
+              <h2 className="text-xl font-serif font-semibold text-stone-600">
+                Reframing Journal
+              </h2>
+              <p className="text-stone-400 text-sm">
+                Transform negative thoughts into positive perspectives
+              </p>
+            </div>
 
-            <div className="w-16" />
+            <div className="w-8" />
           </div>
 
           <ProgressBar currentStep={currentStep} totalSteps={3} />
@@ -311,12 +312,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
         {/* Footer - hide on step 2 and 3 since they have their own buttons */}
         {currentStep === 1 && (
-          <div 
-            className="border-t border-purple-200 p-4 shadow-lg"
-            style={{
-              background: "linear-gradient(135deg, hsl(261, 25%, 97%) 0%, hsl(261, 20%, 93%) 100%)"
-            }}
-          >
+          <div className="bg-white border-t border-stone-200 p-4 shadow-lg">
             <div className="flex gap-3">
               <Button
                 onClick={handleNext}
