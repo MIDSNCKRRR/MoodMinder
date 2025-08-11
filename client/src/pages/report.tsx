@@ -141,6 +141,117 @@ export default function Report() {
     return weeklyData.labels[maxIndex];
   };
 
+  // Calculate daily sensory expansion scores
+  const getSensoryExpansionData = () => {
+    const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const dailyScores = new Array(7).fill(0);
+    const dailyCounts = new Array(7).fill(0);
+
+    journalEntries
+      .filter((entry) => new Date(entry.createdAt) >= weekAgo)
+      .forEach((entry) => {
+        const dayIndex = new Date(entry.createdAt).getDay();
+        const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+
+        // Calculate components for sensory expansion score
+        const relaxationScore = calculateRelaxationScore(entry);
+        const selfAcceptanceScore = calculateSelfAcceptanceScore(entry);
+        const reframingSuccessRate = calculateReframingSuccessRate(entry);
+
+        // Formula: (이완감 × 0.4) + (자기 수용 × 0.3) + (감정 재서사 성공률 × 0.3)
+        const sensoryExpansionScore = 
+          (relaxationScore * 0.4) + 
+          (selfAcceptanceScore * 0.3) + 
+          (reframingSuccessRate * 0.3);
+
+        dailyScores[adjustedIndex] += sensoryExpansionScore;
+        dailyCounts[adjustedIndex]++;
+      });
+
+    // Calculate averages, default to 3 if no data
+    const averages = dailyScores.map((sum, index) =>
+      dailyCounts[index] > 0 ? sum / dailyCounts[index] : 3,
+    );
+
+    return { data: averages, labels: dayLabels };
+  };
+
+  // Calculate relaxation score based on emotion level and body mapping
+  const calculateRelaxationScore = (entry: JournalEntry): number => {
+    let baseScore = entry.emotionLevel; // 1-5 scale
+    
+    // Adjust based on body mapping - if there are tense areas, reduce relaxation
+    if (entry.bodyMapping && typeof entry.bodyMapping === 'object') {
+      const bodyAreas = Object.keys(entry.bodyMapping);
+      const tenseIndicators = ['head', 'shoulders', 'chest', 'stomach'];
+      const tenseAreaCount = bodyAreas.filter(area => 
+        tenseIndicators.some(indicator => area.toLowerCase().includes(indicator))
+      ).length;
+      
+      // Reduce score for tense areas
+      baseScore = Math.max(1, baseScore - (tenseAreaCount * 0.5));
+    }
+    
+    return Math.min(5, baseScore);
+  };
+
+  // Calculate self-acceptance score based on journal content and type
+  const calculateSelfAcceptanceScore = (entry: JournalEntry): number => {
+    let baseScore = 3; // Default neutral
+    
+    // Identity journal entries indicate higher self-reflection
+    if (entry.journalType === 'identity') {
+      baseScore = 4;
+      
+      // Check matching score if available in bodyMapping
+      if (entry.bodyMapping && typeof entry.bodyMapping === 'object' && 
+          'matchingScore' in entry.bodyMapping) {
+        const matchingScore = entry.bodyMapping.matchingScore as number;
+        baseScore = matchingScore; // Use the direct matching score
+      }
+    }
+    
+    // Adjust based on emotion level (higher emotions suggest better self-acceptance)
+    if (entry.emotionLevel >= 4) {
+      baseScore = Math.min(5, baseScore + 0.5);
+    } else if (entry.emotionLevel <= 2) {
+      baseScore = Math.max(1, baseScore - 0.5);
+    }
+    
+    return baseScore;
+  };
+
+  // Calculate reframing success rate based on journal type and content
+  const calculateReframingSuccessRate = (entry: JournalEntry): number => {
+    let baseScore = 3; // Default neutral
+    
+    // Reframing journal entries have higher success potential
+    if (entry.journalType === 'reframing') {
+      // Higher emotion levels after reframing suggest success
+      baseScore = entry.emotionLevel;
+      
+      // Content length suggests engagement level
+      if (entry.content && entry.content.length > 100) {
+        baseScore = Math.min(5, baseScore + 0.5);
+      }
+    }
+    
+    // Body mapping engagement suggests mindfulness
+    if (entry.bodyMapping && typeof entry.bodyMapping === 'object') {
+      const bodyAreaCount = Object.keys(entry.bodyMapping).length;
+      if (bodyAreaCount > 2) {
+        baseScore = Math.min(5, baseScore + 0.3);
+      }
+    }
+    
+    return baseScore;
+  };
+
+  const sensoryExpansionData = getSensoryExpansionData();
+
   return (
     <div className="px-6 space-y-6">
       {/* Status Bar */}
@@ -189,6 +300,71 @@ export default function Report() {
               <p className="font-semibold text-peach-500">
                 {getTrendDirection()}
               </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sensory Expansion Wave Analysis */}
+      <Card className="bg-gradient-to-br from-lavender-100 to-lavender-200 rounded-organic stone-shadow border-0 relative">
+        <CardContent className="p-6">
+          <div className="botanical-accent relative"></div>
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
+            감각 확장 점수 (Sensory Expansion)
+          </h3>
+          <p className="text-stone-500 text-sm mb-4">
+            이완감(40%) + 자기수용(30%) + 감정재서사(30%)로 계산된 주간 감각 파동
+          </p>
+
+          <WaveChart data={sensoryExpansionData.data} labels={sensoryExpansionData.labels} />
+
+          <div className="flex justify-between text-sm">
+            <div className="text-center">
+              <p className="text-stone-400">평균 점수</p>
+              <p className="font-semibold text-lavender-600">
+                {(sensoryExpansionData.data.reduce((a, b) => a + b, 0) / sensoryExpansionData.data.length).toFixed(1)}/5
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-stone-400">최고의 날</p>
+              <p className="font-semibold text-sage-600">
+                {sensoryExpansionData.labels[sensoryExpansionData.data.indexOf(Math.max(...sensoryExpansionData.data))]}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-stone-400">감각 파동</p>
+              <p className="font-semibold text-peach-600">
+                {(() => {
+                  const data = sensoryExpansionData.data;
+                  const variance = data.reduce((sum, val, i, arr) => {
+                    const mean = arr.reduce((a, b) => a + b) / arr.length;
+                    return sum + Math.pow(val - mean, 2);
+                  }, 0) / data.length;
+                  return variance > 0.5 ? "🌊 활발" : variance > 0.2 ? "〰️ 보통" : "─ 안정";
+                })()}
+              </p>
+            </div>
+          </div>
+
+          {/* Component breakdown */}
+          <div className="mt-4 pt-4 border-t border-white/50">
+            <h4 className="text-sm font-medium text-stone-600 mb-3">구성 요소별 분석</h4>
+            <div className="grid grid-cols-3 gap-3 text-xs">
+              <div className="bg-white/60 p-2 rounded-stone text-center">
+                <p className="text-stone-500">이완감</p>
+                <p className="font-semibold text-sage-600">40%</p>
+                <p className="text-stone-400">감정 & 신체</p>
+              </div>
+              <div className="bg-white/60 p-2 rounded-stone text-center">
+                <p className="text-stone-500">자기수용</p>
+                <p className="font-semibold text-lavender-600">30%</p>
+                <p className="text-stone-400">정체성 인식</p>
+              </div>
+              <div className="bg-white/60 p-2 rounded-stone text-center">
+                <p className="text-stone-500">감정재서사</p>
+                <p className="font-semibold text-peach-600">30%</p>
+                <p className="text-stone-400">리프레이밍</p>
+              </div>
             </div>
           </div>
         </CardContent>
