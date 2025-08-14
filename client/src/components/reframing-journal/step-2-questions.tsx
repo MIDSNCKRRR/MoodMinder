@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic } from 'lucide-react';
+import { VoiceQuestionFlow } from '@/components/voice/voice-question-flow';
 
 interface Emotion {
   id: string;
@@ -37,6 +38,7 @@ export function Step2Questions({
   onBackToEmotionSelection
 }: Step2QuestionsProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
 
   const handleAnswerChange = (questionIndex: number, value: string) => {
     const newAnswers = [...answers];
@@ -64,6 +66,27 @@ export function Step2Questions({
     }
   };
 
+  const handleVoiceAnswersComplete = (voiceAnswers: string[]) => {
+    onAnswersChange(voiceAnswers);
+    setIsVoiceMode(false);
+  };
+
+  const handleBackToTextMode = () => {
+    setIsVoiceMode(false);
+  };
+
+  // Voice mode rendering
+  if (isVoiceMode) {
+    return (
+      <VoiceQuestionFlow
+        emotion={emotion}
+        questions={questions}
+        onAnswersComplete={handleVoiceAnswersComplete}
+        onBack={handleBackToTextMode}
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Header Card */}
@@ -74,13 +97,26 @@ export function Step2Questions({
         }}
       >
         <CardContent className="p-4 text-center">
-          <h2 className="text-lg font-medium text-stone-900 mb-3">
-            {emotion.name} 탐구하기
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-medium text-stone-900">
+              {emotion.name} 탐구하기
+            </h2>
+            
+            {/* Voice Mode Toggle */}
+            <Button
+              onClick={() => setIsVoiceMode(true)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 text-purple-600 border-purple-300 hover:bg-purple-50"
+            >
+              <Mic className="w-4 h-4" />
+              음성모드
+            </Button>
+          </div>
           
           {/* Question Progress Dots inside card */}
           <div className="flex justify-center gap-2">
-            {[0, 1, 2, 3].map((index) => (
+            {questions.map((_, index) => (
               <div
                 key={index}
                 className={`

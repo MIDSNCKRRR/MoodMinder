@@ -85,13 +85,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Analytics
+  // Analytics - START WITH TEST FUNCTIONS, REPLACE WITH DB FUNCTIONS LATER
+  // import * as analytics from "./analytics-test";    // Use this first
+  // import * as analytics from "./analytics-db";      // Replace with this later
+  const analytics = await import("./analytics-test");
+
   app.get("/api/emotion-stats", async (req, res) => {
     try {
-      const stats = await storage.getEmotionStats();
+      const stats = await analytics.getEmotionStats();
       res.json(stats);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch emotion statistics" });
+    }
+  });
+
+  app.get("/api/weekly-emotion-data", async (req, res) => {
+    try {
+      const data = await analytics.getWeeklyEmotionData();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch weekly emotion data" });
+    }
+  });
+
+  app.get("/api/sensory-expansion-data", async (req, res) => {
+    try {
+      const data = await analytics.getSensoryExpansionData();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sensory expansion data" });
+    }
+  });
+
+  app.get("/api/body-mapping-insights", async (req, res) => {
+    try {
+      const data = await analytics.getBodyMappingInsights();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch body mapping insights" });
+    }
+  });
+
+  app.get("/api/emotion-patterns", async (req, res) => {
+    try {
+      const patterns = await analytics.getEmotionPatterns();
+      res.json(patterns);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch emotion patterns" });
+    }
+  });
+
+  app.get("/api/routine-execution-data", async (req, res) => {
+    try {
+      const data = await analytics.getRoutineExecutionData();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch routine execution data" });
+    }
+  });
+
+  app.get("/api/self-acceptance-data", async (req, res) => {
+    try {
+      const data = await analytics.getSelfAcceptanceData();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch self-acceptance data" });
+    }
+  });
+
+  app.get("/api/recovery-tendency", async (req, res) => {
+    try {
+      const data = await analytics.getRecoveryTendency();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch recovery tendency data" });
     }
   });
 

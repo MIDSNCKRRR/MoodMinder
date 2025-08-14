@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import WaveChart from "@/components/wave-chart";
-import type { JournalEntry } from "@shared/schema";
+import SensoryScoreChart from "@/components/sensory-score-chart";
 
 interface EmotionStats {
   averageEmotion: number;
@@ -10,247 +10,121 @@ interface EmotionStats {
   monthlyStreak: number;
 }
 
+interface ChartData {
+  data: number[];
+  labels: string[];
+}
+
+interface EmotionPattern {
+  text: string;
+  color: string;
+}
+
+interface RoutineExecutionData {
+  redButtonExecutions: {
+    totalClicks: number;
+    weeklyData: number[];
+    labels: string[];
+  };
+  effectivenessRate: {
+    totalResponses: number;
+    positiveResponses: number;
+    rate: number;
+    weeklyRates: number[];
+  };
+}
+
+interface RecoveryTendency {
+  grade: string;
+  gradeText: string;
+  color: string;
+  sensoryScore: number;
+  interpretation: string;
+  suggestions: string[];
+  isRecoveryDetected: boolean;
+  detectionDate: string;
+  summary: string;
+  // Decline detection fields
+  declineDetected?: boolean;
+  declineType?: string | null;
+  declineResponse?: {
+    cause: string;
+    primaryResponse: string;
+    secondaryResponse: string;
+  } | null;
+  historicalData?: {
+    currentWeekAvg: number;
+    previousWeekAvg: number;
+    twoWeeksAvg: number;
+    recent3DaysScores: number[];
+    recent14DaysChange: number;
+    volatility: number;
+  };
+}
+
 export default function Report() {
-  // Fetch journal entries for analysis
-  const { data: journalEntries = [] } = useQuery<JournalEntry[]>({
-    queryKey: ["/api/journal-entries"],
+  // Fetch analytics data from new endpoints
+  const { data: weeklyEmotionData } = useQuery<ChartData>({
+    queryKey: ["/api/weekly-emotion-data"],
   });
 
-  // Fetch emotion statistics
+  const { data: sensoryExpansionData } = useQuery<ChartData>({
+    queryKey: ["/api/sensory-expansion-data"], 
+  });
+
   const { data: emotionStats } = useQuery<EmotionStats>({
     queryKey: ["/api/emotion-stats"],
   });
 
-  // Process data for weekly wave chart
-  const getWeeklyData = () => {
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+  const { data: bodyMappingData } = useQuery<Record<string, number>>({
+    queryKey: ["/api/body-mapping-insights"],
+  });
 
-    const weeklyEntries = journalEntries.filter(
-      (entry) => new Date(entry.createdAt) >= weekAgo,
-    );
+  const { data: emotionPatterns = [] } = useQuery<EmotionPattern[]>({
+    queryKey: ["/api/emotion-patterns"],
+  });
 
-    const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const dailyData = new Array(7).fill(0);
-    const dailyCounts = new Array(7).fill(0);
+  const { data: routineExecutionData } = useQuery<RoutineExecutionData>({
+    queryKey: ["/api/routine-execution-data"],
+  });
 
-    weeklyEntries.forEach((entry) => {
-      const dayIndex = new Date(entry.createdAt).getDay();
-      const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1; // Adjust Sunday to be index 6
-      dailyData[adjustedIndex] += entry.emotionLevel;
-      dailyCounts[adjustedIndex]++;
-    });
+  const { data: selfAcceptanceData } = useQuery<ChartData & { averageScore: number; trend: string }>({
+    queryKey: ["/api/self-acceptance-data"],
+  });
 
-    // Calculate averages, default to 3 if no data
-    const averages = dailyData.map((sum, index) =>
-      dailyCounts[index] > 0 ? sum / dailyCounts[index] : 3,
-    );
+  const { data: recoveryTendency } = useQuery<RecoveryTendency>({
+    queryKey: ["/api/recovery-tendency"],
+  });
 
-    return { data: averages, labels: dayLabels };
-  };
+  // Use data from API endpoints directly
+  const weeklyData = weeklyEmotionData || { data: [3, 3, 3, 3, 3, 3, 3], labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] };
+  const sensoryData = sensoryExpansionData || { data: [3, 3, 3, 3, 3, 3, 3], labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] };
+  // const bodyMapping = bodyMappingData || {};
 
-  // Get body mapping insights
-  const getBodyMappingInsights = () => {
-    const areaCounts: Record<string, number> = {};
-
-    journalEntries.forEach((entry) => {
-      if (entry.bodyMapping && typeof entry.bodyMapping === "object") {
-        Object.keys(entry.bodyMapping).forEach((area) => {
-          areaCounts[area] = (areaCounts[area] || 0) + 1;
-        });
-      }
-    });
-
-    return areaCounts;
-  };
-
-  // Get emotion patterns
-  const getEmotionPatterns = () => {
-    if (journalEntries.length === 0) return [];
-
-    const morningEntries = journalEntries.filter((entry) => {
-      const hour = new Date(entry.createdAt).getHours();
-      return hour >= 6 && hour < 12;
-    });
-
-    const morningAvg =
-      morningEntries.length > 0
-        ? morningEntries.reduce((sum, entry) => sum + entry.emotionLevel, 0) /
-          morningEntries.length
-        : 0;
-
-    const overallAvg = emotionStats?.averageEmotion || 0;
-    const morningBoost = morningAvg > overallAvg;
-
-    const emotionCounts = journalEntries.reduce(
-      (acc, entry) => {
-        acc[entry.emotionType] = (acc[entry.emotionType] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
-    const mostFrequentEmotion = Object.entries(emotionCounts).sort(
-      ([, a], [, b]) => b - a,
-    )[0];
-
-    return [
-      {
-        text: morningBoost
-          ? `Mornings show ${Math.round(((morningAvg - overallAvg) * 100) / overallAvg)}% higher emotional balance`
-          : "Evening reflections tend to be more balanced",
-        color: "bg-sage-400",
-      },
-      {
-        text: `Average journaling session: ${Math.round(Math.random() * 2 + 3)} minutes`,
-        color: "bg-lavender-400",
-      },
-      {
-        text: mostFrequentEmotion
-          ? `Most frequent emotion: ${mostFrequentEmotion[0]} (${Math.round((mostFrequentEmotion[1] / journalEntries.length) * 100)}%)`
-          : "Building emotional awareness through journaling",
-        color: "bg-coral-400",
-      },
-    ];
-  };
-
-  const weeklyData = getWeeklyData();
-  const bodyMappingData = getBodyMappingInsights();
-  const emotionPatterns = getEmotionPatterns();
+  // All data now comes from API endpoints
 
   const getTrendDirection = () => {
-    if (journalEntries.length < 2) return "📊 Building data";
+    if (!weeklyData?.data || weeklyData.data.length < 2) return "📊 Building data";
 
-    const recent =
-      journalEntries
-        .slice(0, 3)
-        .reduce((sum, entry) => sum + entry.emotionLevel, 0) / 3;
-    const older =
-      journalEntries
-        .slice(-3)
-        .reduce((sum, entry) => sum + entry.emotionLevel, 0) / 3;
+    const firstHalf = weeklyData.data.slice(0, 3);
+    const secondHalf = weeklyData.data.slice(-3);
+    
+    const firstAvg = firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
 
-    if (recent > older) return "↗️ Rising";
-    if (recent < older) return "↘️ Declining";
+    if (secondAvg > firstAvg) return "↗️ Rising";
+    if (secondAvg < firstAvg) return "↘️ Declining";
     return "→ Stable";
   };
 
   const getBestDay = () => {
+    if (!weeklyData?.data) return "Mon";
     const dayAverages = weeklyData.data;
     const maxIndex = dayAverages.indexOf(Math.max(...dayAverages));
     return weeklyData.labels[maxIndex];
   };
 
-  // Calculate daily sensory expansion scores
-  const getSensoryExpansionData = () => {
-    const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-
-    const dailyScores = new Array(7).fill(0);
-    const dailyCounts = new Array(7).fill(0);
-
-    journalEntries
-      .filter((entry) => new Date(entry.createdAt) >= weekAgo)
-      .forEach((entry) => {
-        const dayIndex = new Date(entry.createdAt).getDay();
-        const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
-
-        // Calculate components for sensory expansion score
-        const relaxationScore = calculateRelaxationScore(entry);
-        const selfAcceptanceScore = calculateSelfAcceptanceScore(entry);
-        const reframingSuccessRate = calculateReframingSuccessRate(entry);
-
-        // Formula: (이완감 × 0.4) + (자기 수용 × 0.3) + (감정 재서사 성공률 × 0.3)
-        const sensoryExpansionScore = 
-          (relaxationScore * 0.4) + 
-          (selfAcceptanceScore * 0.3) + 
-          (reframingSuccessRate * 0.3);
-
-        dailyScores[adjustedIndex] += sensoryExpansionScore;
-        dailyCounts[adjustedIndex]++;
-      });
-
-    // Calculate averages, default to 3 if no data
-    const averages = dailyScores.map((sum, index) =>
-      dailyCounts[index] > 0 ? sum / dailyCounts[index] : 3,
-    );
-
-    return { data: averages, labels: dayLabels };
-  };
-
-  // Calculate relaxation score based on emotion level and body mapping
-  const calculateRelaxationScore = (entry: JournalEntry): number => {
-    let baseScore = entry.emotionLevel; // 1-5 scale
-    
-    // Adjust based on body mapping - if there are tense areas, reduce relaxation
-    if (entry.bodyMapping && typeof entry.bodyMapping === 'object') {
-      const bodyAreas = Object.keys(entry.bodyMapping);
-      const tenseIndicators = ['head', 'shoulders', 'chest', 'stomach'];
-      const tenseAreaCount = bodyAreas.filter(area => 
-        tenseIndicators.some(indicator => area.toLowerCase().includes(indicator))
-      ).length;
-      
-      // Reduce score for tense areas
-      baseScore = Math.max(1, baseScore - (tenseAreaCount * 0.5));
-    }
-    
-    return Math.min(5, baseScore);
-  };
-
-  // Calculate self-acceptance score based on journal content and type
-  const calculateSelfAcceptanceScore = (entry: JournalEntry): number => {
-    let baseScore = 3; // Default neutral
-    
-    // Identity journal entries indicate higher self-reflection
-    if (entry.journalType === 'identity') {
-      baseScore = 4;
-      
-      // Check matching score if available in bodyMapping
-      if (entry.bodyMapping && typeof entry.bodyMapping === 'object' && 
-          'matchingScore' in entry.bodyMapping) {
-        const matchingScore = entry.bodyMapping.matchingScore as number;
-        baseScore = matchingScore; // Use the direct matching score
-      }
-    }
-    
-    // Adjust based on emotion level (higher emotions suggest better self-acceptance)
-    if (entry.emotionLevel >= 4) {
-      baseScore = Math.min(5, baseScore + 0.5);
-    } else if (entry.emotionLevel <= 2) {
-      baseScore = Math.max(1, baseScore - 0.5);
-    }
-    
-    return baseScore;
-  };
-
-  // Calculate reframing success rate based on journal type and content
-  const calculateReframingSuccessRate = (entry: JournalEntry): number => {
-    let baseScore = 3; // Default neutral
-    
-    // Reframing journal entries have higher success potential
-    if (entry.journalType === 'reframing') {
-      // Higher emotion levels after reframing suggest success
-      baseScore = entry.emotionLevel;
-      
-      // Content length suggests engagement level
-      if (entry.content && entry.content.length > 100) {
-        baseScore = Math.min(5, baseScore + 0.5);
-      }
-    }
-    
-    // Body mapping engagement suggests mindfulness
-    if (entry.bodyMapping && typeof entry.bodyMapping === 'object') {
-      const bodyAreaCount = Object.keys(entry.bodyMapping).length;
-      if (bodyAreaCount > 2) {
-        baseScore = Math.min(5, baseScore + 0.3);
-      }
-    }
-    
-    return baseScore;
-  };
-
-  const sensoryExpansionData = getSensoryExpansionData();
+  // All calculations now done in backend
 
   return (
     <div className="px-6 space-y-6">
@@ -265,7 +139,7 @@ export default function Report() {
       </div>
 
       {/* Report Header */}
-      <div className="text-center pt-4">
+      <div className="text-center pt-2 pb-2">
         <h1 className="text-2xl font-serif font-semibold text-stone-600">
           Insights
         </h1>
@@ -275,14 +149,14 @@ export default function Report() {
       </div>
 
       {/* Emotion Wave Analysis */}
-      <Card className="bg-white rounded-organic stone-shadow border border-stone-100 relative">
+      {/* <Card className="bg-white rounded-organic stone-shadow border border-stone-100 relative">
         <CardContent className="p-6">
           <div className="botanical-accent relative"></div>
           <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
             Emotion Wave Analysis
           </h3>
 
-          <WaveChart data={weeklyData.data} labels={weeklyData.labels} />
+          <WaveChart data={weeklyData?.data || []} labels={weeklyData?.labels || []} />
 
           <div className="flex justify-between text-sm">
             <div className="text-center">
@@ -303,41 +177,47 @@ export default function Report() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Sensory Expansion Wave Analysis */}
-      <Card className="bg-gradient-to-br from-lavender-100 to-lavender-200 rounded-organic stone-shadow border-0 relative">
-        <CardContent className="p-6">
-          <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
-            감각 확장 점수 (Sensory Expansion)
+      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-organic stone-shadow border-0 relative -mt-4">
+        <CardContent className="p-4">
+          <div className="absolute top-3 right-4 text-purple-400">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 2h12v12H2z" opacity="0.3"/>
+              <path d="M1 8l3-3 3 3 4-4 4 4" stroke="currentColor" strokeWidth="2" fill="none"/>
+            </svg>
+          </div>
+          <h3 className="font-sans font-semibold text-stone-600 text-lg mb-3 border-b border-purple-300 pb-2">
+            감정 루프 분석
           </h3>
-          <p className="text-stone-500 text-sm mb-4">
+          {/* <p className="text-stone-500 text-sm mb-4">
             이완감(40%) + 자기수용(30%) + 감정재서사(30%)로 계산된 주간 감각 파동
-          </p>
+          </p> */}
 
-          <WaveChart data={sensoryExpansionData.data} labels={sensoryExpansionData.labels} />
+          <SensoryScoreChart data={sensoryData?.data || []} labels={sensoryData?.labels || []} />
 
           <div className="flex justify-between text-sm">
             <div className="text-center">
               <p className="text-stone-400">평균 점수</p>
-              <p className="font-semibold text-lavender-600">
-                {(sensoryExpansionData.data.reduce((a, b) => a + b, 0) / sensoryExpansionData.data.length).toFixed(1)}/5
+              <p className="font-semibold text-purple-600">
+                {sensoryData?.data ? (sensoryData.data.reduce((a: number, b: number) => a + b, 0) / sensoryData.data.length).toFixed(1) : "3.0"}/5
               </p>
             </div>
             <div className="text-center">
               <p className="text-stone-400">최고의 날</p>
-              <p className="font-semibold text-sage-600">
-                {sensoryExpansionData.labels[sensoryExpansionData.data.indexOf(Math.max(...sensoryExpansionData.data))]}
+              <p className="font-semibold text-purple-700">
+                {sensoryData?.data && sensoryData?.labels ? sensoryData.labels[sensoryData.data.indexOf(Math.max(...sensoryData.data))] : "Thu"}
               </p>
             </div>
             <div className="text-center">
               <p className="text-stone-400">감각 파동</p>
-              <p className="font-semibold text-peach-600">
+              <p className="font-semibold text-purple-600">
                 {(() => {
-                  const data = sensoryExpansionData.data;
-                  const variance = data.reduce((sum, val, i, arr) => {
-                    const mean = arr.reduce((a, b) => a + b) / arr.length;
+                  if (!sensoryData?.data) return "─ 안정";
+                  const data = sensoryData.data;
+                  const variance = data.reduce((sum: number, val: number) => {
+                    const mean = data.reduce((a: number, b: number) => a + b) / data.length;
                     return sum + Math.pow(val - mean, 2);
                   }, 0) / data.length;
                   return variance > 0.5 ? "🌊 활발" : variance > 0.2 ? "〰️ 보통" : "─ 안정";
@@ -370,11 +250,130 @@ export default function Report() {
         </CardContent>
       </Card>
 
-      {/* Routine Report */}
-      <Card className="bg-gradient-to-br from-peach-100 to-peach-200 rounded-organic stone-shadow border-0 relative">
+      {/* Recovery Tendency Highlight - Only shown when recovery is detected */}
+      {recoveryTendency?.isRecoveryDetected && (
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-organic shadow-lg border-2 border-emerald-300 relative">
+          <CardContent className="p-5">
+            <div className="absolute top-3 right-4 text-emerald-500">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                {/* <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white ${
+                  recoveryTendency?.grade === 'S' ? 'bg-green-500' :
+                  recoveryTendency?.grade === 'A' ? 'bg-blue-500' :
+                  recoveryTendency?.grade === 'B' ? 'bg-yellow-500' :
+                  recoveryTendency?.grade === 'C' ? 'bg-orange-500' : 'bg-red-500'
+                }`}>
+                  {recoveryTendency?.grade}
+                </div> */}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="inline-block w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                  <h3 className="font-semibold text-lg text-emerald-800">
+                    {recoveryTendency?.gradeText} 감지됨
+                  </h3>
+                </div>
+                <p className="text-sm text-stone-600 mb-3">
+                  {recoveryTendency?.summary}
+                </p>
+                <div className="bg-white/80 p-3 rounded-lg mb-3">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-stone-700">회복 등급</span>
+                    <span className={`font-bold ${recoveryTendency?.color}`}>
+                      {recoveryTendency?.gradeText}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-stone-700">감각 확장 점수</span>
+                    <span className="font-bold text-emerald-600">
+                      {recoveryTendency?.sensoryScore}점/100점
+                    </span>
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <h4 className="text-sm font-medium text-stone-700 mb-2">제안 루틴</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {recoveryTendency?.suggestions?.map((suggestion, index) => (
+                      <span key={index} className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+                        {suggestion}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-xs text-stone-500">
+                  감지일: {recoveryTendency?.detectionDate}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Decline Detection Alert - Only shown when decline is detected */}
+      {recoveryTendency?.declineDetected && (
+        <Card className="bg-gradient-to-br from-red-50 to-orange-100 rounded-organic shadow-lg border-2 border-red-300 relative">
+          <CardContent className="p-5">
+            <div className="absolute top-3 right-4 text-red-500">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.99-.833-2.76 0L4.054 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+            </div>
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                {/* <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div> */}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="inline-block w-2 h-2 bg-red-400 rounded-full animate-pulse"></span>
+                  <h3 className="font-semibold text-lg text-red-800">
+                    {recoveryTendency?.declineType} 패턴 감지
+                  </h3>
+                </div>
+                
+                {recoveryTendency?.declineResponse && (
+                  <>
+                    <div className="bg-white/80 p-3 rounded-lg mb-3">
+                      <div className="mb-2">
+                        <span className="text-sm font-medium text-stone-700">가능 원인:</span>
+                        <p className="text-sm text-stone-600 mt-1">{recoveryTendency.declineResponse.cause}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                        <h4 className="text-sm font-medium text-amber-800 mb-2">1차 대응</h4>
+                        <p className="text-sm text-amber-700">{recoveryTendency.declineResponse.primaryResponse}</p>
+                      </div>
+                      
+                      <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                        <h4 className="text-sm font-medium text-orange-800 mb-2">2차 대응</h4>
+                        <p className="text-sm text-orange-700">{recoveryTendency.declineResponse.secondaryResponse}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+                
+                <div className="text-xs text-stone-500 mt-3">
+                  패턴 감지일: {recoveryTendency?.detectionDate}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Wellness Patterns */}
+      {/* <Card className="bg-gradient-to-br from-peach-100 to-peach-200 rounded-organic stone-shadow border-0 relative">
         <CardContent className="p-6">
-          <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
+          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4 border-b border-peach-300 pb-2">
             Wellness Patterns
           </h3>
 
@@ -391,122 +390,115 @@ export default function Report() {
             ))}
           </div>
         </CardContent>
+      </Card> */}
+
+      {/* Routine Execution Report */}
+      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-organic stone-shadow border-0 relative">
+        <CardContent className="p-4">
+          <div className="absolute top-3 right-4 text-purple-400">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="8" cy="8" r="6" opacity="0.3"/>
+              <path d="M6 8l2 2 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+            </svg>
+          </div>
+          <h3 className="font-sans font-semibold text-stone-600 text-lg mb-3 border-b border-purple-300 pb-2">
+            루틴 실행 리포트
+          </h3>
+
+          <div className="space-y-4">
+            {/* Red Button Execution Count */}
+            <div className="bg-white/80 p-4 rounded-stone">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium text-stone-700">Red Button 실행 횟수</h4>
+                <span className="text-2xl font-bold text-red-500">
+                  {routineExecutionData?.redButtonExecutions?.totalClicks || 0}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-stone-500">
+                {routineExecutionData?.redButtonExecutions?.labels?.map((day: string, index: number) => (
+                  <div key={day} className="text-center">
+                    <div className="text-xs mb-1">{day}</div>
+                    <div className="w-6 h-6 bg-red-100 rounded flex items-center justify-center text-xs font-medium">
+                      {routineExecutionData?.redButtonExecutions?.weeklyData?.[index] || 0}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Effectiveness Rate */}
+            <div className="bg-white/80 p-4 rounded-stone">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium text-stone-700">효과 응답 비율</h4>
+                <span className="text-2xl font-bold text-green-500">
+                  {routineExecutionData?.effectivenessRate?.rate?.toFixed(1) || 0}%
+                </span>
+              </div>
+              <div className="text-sm text-stone-500 mb-2">
+                {routineExecutionData?.effectivenessRate?.positiveResponses || 0} / {routineExecutionData?.effectivenessRate?.totalResponses || 0} 긍정적 응답
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-400 h-2 rounded-full" 
+                  style={{ width: `${routineExecutionData?.effectivenessRate?.rate || 0}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
       </Card>
+
+      {/* Self-Acceptance Graph */}
+      {/* <Card className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-organic stone-shadow border-0 relative">
+        <CardContent className="p-4">
+          <div className="absolute top-3 right-4 text-amber-600">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" opacity="0.3"/>
+              <circle cx="8" cy="6" r="2" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            </svg>
+          </div>
+          <h3 className="font-sans font-semibold text-stone-600 text-lg mb-3 border-b border-amber-400 pb-2">
+            자기 수용 그래프
+          </h3>
+
+          <SensoryScoreChart 
+            data={selfAcceptanceData?.data || []} 
+            labels={selfAcceptanceData?.labels || []} 
+          />
+
+          <div className="flex justify-between text-sm mt-4">
+            <div className="text-center">
+              <p className="text-stone-400">평균 점수</p>
+              <p className="font-semibold text-amber-700">
+                {selfAcceptanceData?.averageScore?.toFixed(1) || "0.0"}/5
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-stone-400">변화 추세</p>
+              <p className="font-semibold text-stone-600">
+                {selfAcceptanceData?.trend === "increasing" ? "↗️ 상승" : 
+                 selfAcceptanceData?.trend === "decreasing" ? "↘️ 하락" : "→ 안정"}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-stone-400">기반 데이터</p>
+              <p className="font-semibold text-stone-600 text-xs">
+                체크아웃 일치도
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 text-center">
+            <div className="text-xs text-stone-500 bg-white/60 px-3 py-1 rounded-full">
+              Check-out 기반 자기 일치도 변화 추적
+            </div>
+          </div>
+        </CardContent> 
+      </Card> */}
 
       {/* Body Emotion Mapping Report */}
-      <Card className="bg-gradient-to-br from-sage-100 to-sage-200 rounded-organic stone-shadow border-0 relative">
-        <CardContent className="p-6">
-          <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-4">
-            Physical Emotion Map
-          </h3>
-
-          <div className="flex justify-center mb-4">
-            <div
-              className="relative w-20 h-32 bg-white/80 rounded-full"
-              style={{ borderRadius: "50% 50% 50% 50% / 60% 60% 40% 40%" }}
-            >
-              {/* Head */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-white/90 rounded-full"></div>
-
-              {/* Show body areas based on data */}
-              {Object.entries(bodyMappingData).map(([area, count]) => {
-                const positions: Record<string, { x: string; y: string }> = {
-                  head: { x: "50%", y: "8%" },
-                  chest: { x: "50%", y: "25%" },
-                  stomach: { x: "50%", y: "40%" },
-                  arms: { x: "30%", y: "25%" },
-                  legs: { x: "50%", y: "65%" },
-                };
-
-                const pos = positions[area];
-                if (!pos) return null;
-
-                const intensity = Math.min(
-                  count / Math.max(journalEntries.length * 0.2, 1),
-                  1,
-                );
-                const bgColor =
-                  intensity > 0.6
-                    ? "bg-coral-300"
-                    : intensity > 0.3
-                      ? "bg-sage-300"
-                      : "bg-stone-200";
-
-                return (
-                  <div
-                    key={area}
-                    className={`absolute w-4 h-4 ${bgColor} rounded-full`}
-                    style={{
-                      left: pos.x,
-                      top: pos.y,
-                      transform: "translate(-50%, -50%)",
-                      opacity: 0.7,
-                    }}
-                    title={`${area} - ${count} times`}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-stone-500">
-              Most common areas of emotional sensation
-            </p>
-            <div className="flex justify-center space-x-4 mt-2 text-xs">
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-coral-300 rounded-full"></div>
-                <span className="text-stone-400">High</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-sage-300 rounded-full"></div>
-                <span className="text-stone-400">Medium</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-stone-200 rounded-full"></div>
-                <span className="text-stone-400">Low</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Monthly Summary */}
-      <Card className="bg-white rounded-organic stone-shadow border border-stone-100">
-        <CardContent className="p-6 space-y-4">
-          <h3 className="font-serif font-semibold text-stone-600 text-lg">
-            Monthly Summary
-          </h3>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-lavender-50 rounded-stone">
-              <p className="text-2xl font-bold text-lavender-500">
-                {emotionStats?.totalEntries || 0}
-              </p>
-              <p className="text-sm text-stone-500">Journal Entries</p>
-            </div>
-            <div className="text-center p-4 bg-sage-50 rounded-stone">
-              <p className="text-2xl font-bold text-sage-500">
-                {emotionStats?.monthlyStreak || 0}
-              </p>
-              <p className="text-sm text-stone-500">Mindful Days</p>
-            </div>
-            <div className="text-center p-4 bg-peach-50 rounded-stone">
-              <p className="text-2xl font-bold text-peach-500">
-                {emotionStats?.averageEmotion?.toFixed(1) || "0.0"}
-              </p>
-              <p className="text-sm text-stone-500">Avg Mood</p>
-            </div>
-            <div className="text-center p-4 bg-coral-50 rounded-stone">
-              <p className="text-2xl font-bold text-coral-500">
-                {Math.max(emotionStats?.monthlyStreak || 0, 0)}
-              </p>
-              <p className="text-sm text-stone-500">Day Streak</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+  
+     
     </div>
   );
 }

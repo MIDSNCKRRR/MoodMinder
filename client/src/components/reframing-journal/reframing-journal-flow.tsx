@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,8 +35,8 @@ const emotionQuestions: Record<string, string[]> = {
   sadness: [
     "오늘 느낀 슬픈 감정/상황은?",
     "이 슬픔 속에서 어떤 감정이 스쳤지?",
-    "그 슬픔을 지금의 나에게 허용한다면?",
-    "리프레이밍 문장으로 다시 써보기",
+    // "그 슬픔을 지금의 나에게 허용한다면?",
+    // "리프레이밍 문장으로 다시 써보기",
   ],
   anger: [
     "오늘 느낀 분노 감정/상황은?",
@@ -53,8 +53,8 @@ const emotionQuestions: Record<string, string[]> = {
   shame: [
     "오늘 느낀 수치심 감정/상황은?",
     "그 수치심을 보며 어떤 감정이 스쳤지?",
-    "그 수치심을 지금의 나에게 허용한다면?",
-    "리프레이밍 문장으로 다시 써보기",
+    // "그 수치심을 지금의 나에게 허용한다면?",
+    // "리프레이밍 문장으로 다시 써보기",
   ],
   emptiness: [
     "오늘 느낀 공허함 감정/상황은?",
@@ -107,12 +107,20 @@ interface ReframingJournalFlowProps {
 export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null);
-  const [answers, setAnswers] = useState<string[]>(["", "", "", ""]);
+  // const [answers, setAnswers] = useState<string[]>(["", "", "", ""]);
+  const [answers ,setAnswers] = useState<string[]>([]);
   const [reframedSentences, setReframedSentences] = useState<string[]>([]);
   const [isGeneratingReframing, setIsGeneratingReframing] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (selectedEmotion) {
+      const questionCount = emotionQuestions[selectedEmotion.id]?.length || 0;
+      setAnswers(new Array(questionCount).fill(""));
+    }
+  }, [selectedEmotion]);
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
@@ -197,7 +205,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const handleBackToEmotionSelection = () => {
     setCurrentStep(1);
     setSelectedEmotion(null);
-    setAnswers(["", "", "", ""]);
+    setAnswers([]);
   };
 
   const handleSave = (selectedSentences?: string[]) => {
@@ -232,13 +240,15 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
   const canProceed = () => {
     if (currentStep === 1) return !!selectedEmotion;
-    if (currentStep === 2) return answers.every((answer) => answer.trim());
+    if (currentStep === 2) return canProceedFromStep2();
     if (currentStep === 3) return reframedSentences.length > 0;
     return false;
   };
 
   const canProceedFromStep2 = () => {
-    return answers.every((answer) => answer.trim());
+    if (!selectedEmotion) return false;
+    const questionCount = emotionQuestions[selectedEmotion.id]?.length || 0;
+    return answers.length === questionCount && answers.every((answer) => answer.trim());
   };
 
   const renderCurrentStep = () => {

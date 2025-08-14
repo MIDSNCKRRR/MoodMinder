@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voice Chat Orb Animation</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #0f141b;
+      --text: #e6edf3;
+      --muted: #9aa4af;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 800px at 70% 20%, #0e1724 0%, var(--bg) 60%);
+      color: var(--text);
+      font: 14px/1.4 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      display: grid;
+      place-items: center;
+    }
+    .wrap {
+      width: min(92vw, 720px);
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 18px 18px 12px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 30px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .title { font-weight: 600; letter-spacing: 0.2px; }
+    .muted { color: var(--muted); }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 540px;
+      border-radius: 24px;
+      background: radial-gradient(600px 420px at 50% 30%, rgba(31, 41, 55, 0.65) 0%, rgba(17, 24, 39, 0.8) 60%, rgba(2, 6, 15, 0.9) 100%);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #8bd6d1, #8aa4ff 50%, #c08bff);
+      color: #0a0f14;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(139, 214, 209, 0.25);
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+    }
+    button:hover { filter: brightness(1.05); box-shadow: 0 10px 22px rgba(138,164,255,0.28); }
+    button:active { transform: translateY(1px) scale(0.99); }
+
+    .legend { text-align: center; font-size: 13px; color: var(--muted); }
+    .small { font-size: 12px; }
+    .pill { padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="row" style="margin-bottom: 10px;">
+        <div class="title">Voice Orb</div>
+        <div class="pill muted" id="status">idle</div>
+      </div>
+      <canvas id="orb" width="1000" height="700" aria-label="Voice animation" role="img"></canvas>
+      <div class="row" style="margin-top: 8px;">
+        <button id="toggle">Enable Mic</button>
+        <span class="muted small">Mic drives the pulse & ring</span>
+      </div>
+    </div>
+    <div class="legend">A minimal, natural-color orb that reacts to your voice. Drop this file into any page or import the <span class="pill">VoiceOrb</span> class below.</div>
+  </div>
+
+  <script>
+    /*
+      VoiceOrb — a lightweight canvas animation with a soft, natural-color orb
+      that pulses to microphone input via the Web Audio API.
+
+      Usage:
+        const orb = new VoiceOrb(canvas, { palette: 'seafoam' });
+        await orb.enableMic(); // starts mic-reactive mode
+        orb.disableMic();      // falls back to auto idle motion
+    */
+
+    class VoiceOrb {
+      constructor(canvas, opts = {}) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.dpr = Math.max(1, window.devicePixelRatio || 1);
+        this.w = canvas.width; this.h = canvas.height;
+        this.center = { x: this.w / 2, y: this.h * 0.58 };
+        this.baseR = Math.min(this.w, this.h) * 0.22;
+        this.time = 0;
+        this.level = 0; // 0..1
+        this.micEnabled = false;
+        this.audio = { ctx: null, analyser: null, data: null, stream: null };
+
+        // Options
+        this.opts = Object.assign({
+          palette: 'seafoam',    // 'seafoam' | 'sunset' | 'violet'
+          blur: 30 * this.dpr,   // glow blur
+          ringWidth: 12 * this.dpr,
+          ringMaxBoost: 0.55,    // how much the ring grows with level
+          wobbleLayers: 5,       // number of shape harmonics
+          wobbleDepth: 0.12,     // shape distortion amount
+          idleBreath: 0.06,      // gentle breathing when no mic
+        }, opts);
+
+        this._resize();
+        window.addEventListener('resize', () => this._resize());
+        this._tick = this._tick.bind(this);
+        requestAnimationFrame(this._tick);
+      }
+
+      _resize() {
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = Math.max(800, Math.floor(rect.width * this.dpr));
+        this.canvas.height = Math.max(520, Math.floor(rect.width * 0.7 * this.dpr));
+        this.w = this.canvas.width; this.h = this.canvas.height;
+        this.center = { x: this.w / 2, y: this.h * 0.58 };
+        this.baseR = Math.min(this.w, this.h) * 0.22;
+      }
+
+      // Public API
+      async enableMic() {
+        if (this.micEnabled) return;
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          const ctx = new AudioCtx();
+          const src = ctx.createMediaStreamSource(stream);
+          const analyser = ctx.createAnalyser();
+          analyser.fftSize = 1024;
+          analyser.smoothingTimeConstant = 0.85;
+          src.connect(analyser);
+          this.audio = { ctx, analyser, data: new Uint8Array(analyser.frequencyBinCount), stream };
+          this.micEnabled = true;
+        } catch (err) {
+          console.warn('Mic permission denied or unavailable:', err);
+          this.micEnabled = false;
+        }
+      }
+
+      disableMic() {
+        if (!this.micEnabled) return;
+        try {
+          this.audio.stream.getTracks().forEach(t => t.stop());
+          this.audio.ctx.close();
+        } catch {}
+        this.micEnabled = false;
+      }
+
+      _tick(t) {
+        this.time = (t || 0) / 1000; // seconds
+        this._updateLevel();
+        this._draw();
+        requestAnimationFrame(this._tick);
+      }
+
+      _updateLevel() {
+        if (this.micEnabled && this.audio.analyser) {
+          const { analyser, data } = this.audio;
+          analyser.getByteTimeDomainData(data);
+          // Compute RMS in [0..1]
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) {
+            const v = (data[i] - 128) / 128;
+            sum += v * v;
+          }
+          const rms = Math.sqrt(sum / data.length);
+          // Smooth with a little inertia
+          this.level = this.level * 0.8 + Math.min(1, rms * 3.0) * 0.2;
+        } else {
+          // Idle breathing when no mic
+          const breath = (Math.sin(this.time * 1.5) + 1) / 2; // 0..1
+          this.level = this.opts.idleBreath * (0.4 + 0.6 * breath);
+        }
+      }
+
+      _palette() {
+        switch (this.opts.palette) {
+          case 'sunset': return ['#ffd29e', '#ff9a9e', '#fad0c4'];
+          case 'violet': return ['#a78bfa', '#7dd3fc', '#f0abfc'];
+          default:       return ['#8bd6d1', '#8aa4ff', '#c08bff']; // seafoam
+        }
+      }
+
+      _draw() {
+        const ctx = this.ctx;
+        const { w, h } = this;
+        ctx.save();
+        ctx.clearRect(0, 0, w, h);
+
+        // Backdrop subtle vignette
+        const vign = ctx.createRadialGradient(this.center.x, this.center.y * 0.9, this.baseR * 0.2, this.center.x, this.center.y, Math.max(w, h) * 0.7);
+        vign.addColorStop(0, 'rgba(0,0,0,0.0)');
+        vign.addColorStop(1, 'rgba(0,0,0,0.5)');
+        ctx.fillStyle = vign;
+        ctx.fillRect(0, 0, w, h);
+
+        // Parameters influenced by audio level
+        const boost = this.level; // 0..~0.5 typical
+        const r = this.baseR * (1 + boost * 0.6);
+        const wobble = this.opts.wobbleDepth * (0.6 + 0.4 * Math.min(1, boost * 2));
+
+        // Draw glow
+        ctx.save();
+        ctx.translate(this.center.x, this.center.y);
+        ctx.filter = `blur(${this.opts.blur}px)`;
+        const g = ctx.createRadialGradient(0, 0, r * 0.4, 0, 0, r * 1.35);
+        const [c1, c2, c3] = this._palette();
+        g.addColorStop(0, this._withAlpha(c1, 0.95));
+        g.addColorStop(0.6, this._withAlpha(c2, 0.9));
+        g.addColorStop(1, this._withAlpha(c3, 0.75));
+        ctx.fillStyle = g;
+        this._organicBlob(ctx, r * 1.06, wobble, 0.8);
+        ctx.restore();
+
+        // Core orb
+        ctx.save();
+        ctx.translate(this.center.x, this.center.y);
+        const coreGrad = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 1.1);
+        coreGrad.addColorStop(0, this._withAlpha(c1, 1));
+        coreGrad.addColorStop(0.65, this._withAlpha(c2, 0.95));
+        coreGrad.addColorStop(1, this._withAlpha(c3, 0.9));
+        ctx.fillStyle = coreGrad;
+        this._organicBlob(ctx, r, wobble, 1);
+        ctx.restore();
+
+        // Soft highlights that drift around the orb
+        ctx.save();
+        ctx.translate(this.center.x, this.center.y);
+        const angle = this.time * 0.7;
+        this._highlight(ctx, r, angle, 0.9);
+        this._highlight(ctx, r * 0.85, -angle * 1.15, 0.6);
+        ctx.restore();
+
+        // Outer reactive ring
+        ctx.save();
+        ctx.translate(this.center.x, this.center.y);
+        ctx.lineWidth = this.opts.ringWidth * (0.6 + boost * 1.2);
+        const ringGrad = ctx.createLinearGradient(-r, 0, r, 0);
+        ringGrad.addColorStop(0, this._withAlpha(c1, 0.8));
+        ringGrad.addColorStop(0.5, this._withAlpha(c2, 0.9));
+        ringGrad.addColorStop(1, this._withAlpha(c3, 0.8));
+        ctx.strokeStyle = ringGrad;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        const ringR = r * (1 + this.opts.ringMaxBoost * (0.25 + boost));
+        ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.restore();
+      }
+
+      _highlight(ctx, r, angle, alpha) {
+        ctx.save();
+        ctx.rotate(angle);
+        const grad = ctx.createRadialGradient(r * 0.3, -r * 0.2, r * 0.1, r * 0.3, -r * 0.2, r * 0.8);
+        grad.addColorStop(0, `rgba(255,255,255,${0.14 * alpha})`);
+        grad.addColorStop(1, `rgba(255,255,255,0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(r * 0.35, -r * 0.22, r * 0.9, r * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      _organicBlob(ctx, radius, depth, alpha) {
+        const steps = 180;
+        ctx.beginPath();
+        for (let i = 0; i <= steps; i++) {
+          const t = (i / steps) * Math.PI * 2;
+          const n = this._noiseAngle(t, this.time);
+          const k = 1 + depth * n; // 1 +/- depth
+          const rr = radius * k;
+          const x = Math.cos(t) * rr;
+          const y = Math.sin(t) * rr;
+          (i === 0) ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.globalAlpha = alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      // Smooth pseudo-noise built from a few sine harmonics evolving over time
+      _noiseAngle(theta, time) {
+        const a = Math.sin(theta * 1 + time * 0.9) * 0.7;
+        const b = Math.sin(theta * 2.3 + time * 0.55) * 0.2;
+        const c = Math.sin(theta * 3.7 - time * 0.35) * 0.1;
+        return (a + b + c); // ~[-1,1]
+      }
+
+      _withAlpha(hex, a) {
+        const { r, g, b } = this._hexToRgb(hex);
+        return `rgba(${r},${g},${b},${a})`;
+      }
+
+      _hexToRgb(hex) {
+        const s = hex.replace('#', '');
+        const bigint = parseInt(s.length === 3 ? s.split('').map(ch => ch + ch).join('') : s, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return { r, g, b };
+      }
+    }
+
+    // Boot it up
+    const canvas = document.getElementById('orb');
+    const statusEl = document.getElementById('status');
+    const toggle = document.getElementById('toggle');
+    const orb = new VoiceOrb(canvas, { palette: 'seafoam' });
+
+    async function toggleMic() {
+      if (!orb.micEnabled) {
+        statusEl.textContent = 'requesting mic…';
+        await orb.enableMic();
+        statusEl.textContent = orb.micEnabled ? 'listening' : 'idle';
+        toggle.textContent = orb.micEnabled ? 'Disable Mic' : 'Enable Mic';
+      } else {
+        orb.disableMic();
+        statusEl.textContent = 'idle';
+        toggle.textContent = 'Enable Mic';
+      }
+    }
+    toggle.addEventListener('click', toggleMic);
+  </script>
+</body>
+</html>

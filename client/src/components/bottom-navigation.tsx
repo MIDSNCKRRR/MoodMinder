@@ -11,7 +11,7 @@ export default function BottomNavigation({ onJournalClick }: BottomNavigationPro
   const tabs = [
     { path: "/", icon: Home, label: "Home" },
     { path: "/journal", icon: BookOpen, label: "Journal" },
-    { path: "/report", icon: BarChart3, label: "Insights" },
+    { path: "/insights", icon: BarChart3, label: "Insights" },
   ];
 
   return (
