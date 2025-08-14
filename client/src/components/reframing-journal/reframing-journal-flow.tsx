@@ -17,6 +17,12 @@ type Emotion = {
   english: string;
 };
 
+type AnswerWithMethod = {
+  content: string;
+  inputMethod: 'text' | 'voice';
+  lastUpdated: Date;
+};
+
 const emotions: Emotion[] = [
   // { id: "sadness", name: "슬픔", english: "Sadness" },
   // { id: "anger", name: "분노", english: "Anger" },
@@ -107,8 +113,7 @@ interface ReframingJournalFlowProps {
 export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null);
-  // const [answers, setAnswers] = useState<string[]>(["", "", "", ""]);
-  const [answers ,setAnswers] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<AnswerWithMethod[]>([]);
   const [reframedSentences, setReframedSentences] = useState<string[]>([]);
   const [isGeneratingReframing, setIsGeneratingReframing] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -118,7 +123,11 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   useEffect(() => {
     if (selectedEmotion) {
       const questionCount = emotionQuestions[selectedEmotion.id]?.length || 0;
-      setAnswers(new Array(questionCount).fill(""));
+      setAnswers(new Array(questionCount).fill({
+        content: "",
+        inputMethod: 'text' as const,
+        lastUpdated: new Date()
+      }));
     }
   }, [selectedEmotion]);
 
@@ -162,7 +171,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
       const response = await gptReframingService.reframeEmotion({
         emotion: selectedEmotion.id,
         emotionName: selectedEmotion.name,
-        answers: answers.filter((answer) => answer.trim()), // Only non-empty answers
+        answers: answers.filter((answer) => answer.content.trim()).map((answer) => answer.content), // Only non-empty answers
       });
 
       if (response.success) {
@@ -213,12 +222,12 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
     const finalContent = selectedSentences
       ? [
-          ...answers.filter((answer) => answer.trim()),
+          ...answers.filter((answer) => answer.content.trim()).map((answer) => answer.content),
           "",
           "=== 리프레이밍 결과 ===",
           ...selectedSentences,
         ].join("\n\n")
-      : answers.join("\n\n");
+      : answers.map((answer) => answer.content).join("\n\n");
 
     const journalData = {
       userId: "temp-user",
@@ -228,7 +237,11 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
       content: finalContent,
       bodyMapping: {
         selectedEmotion: selectedEmotion.name,
-        answers: answers,
+        answers: answers.map(answer => ({
+          content: answer.content,
+          inputMethod: answer.inputMethod,
+          timestamp: answer.lastUpdated.toISOString()
+        })),
         reframedSentences: selectedSentences || [],
         timestamp: new Date().toISOString(),
       },
@@ -248,7 +261,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
   const canProceedFromStep2 = () => {
     if (!selectedEmotion) return false;
     const questionCount = emotionQuestions[selectedEmotion.id]?.length || 0;
-    return answers.length === questionCount && answers.every((answer) => answer.trim());
+    return answers.length === questionCount && answers.every((answer) => answer.content.trim());
   };
 
   const renderCurrentStep = () => {

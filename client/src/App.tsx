@@ -9,7 +9,6 @@ import Home from "@/pages/home";
 import Journal from "@/pages/journal";
 import Report from "@/pages/report";
 import CrisisSupport from "@/pages/crisis-support";
-import TestVoiceReframing from "@/pages/test-voice-reframing";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
@@ -22,7 +21,6 @@ function Router() {
         <Route path="/journal" component={() => <Journal onResetRef={journalResetRef} />} />
         <Route path="/insights" component={Report} />
         <Route path="/crisis-support" component={CrisisSupport} />
-        <Route path="/test-voice-reframing" component={TestVoiceReframing} />
         <Route component={NotFound} />
       </Switch>
       <BottomNavigation onJournalClick={() => journalResetRef.current?.()} />

@@ -1,0 +1,10 @@
+emotion_color = [
+  { "emotion_id": 1, "emotion_kr": "기쁨", "emotion_en": "Joy", "colorName": "bright yellow", "hex": "#FFD93B" },
+  { "emotion_id": 2, "emotion_kr": "신뢰", "emotion_en": "Trust", "colorName": "light green", "hex": "#77DD77" },
+  { "emotion_id": 3, "emotion_kr": "공포", "emotion_en": "Fear", "colorName": "bright green", "hex": "#03C03C" },
+  { "emotion_id": 4, "emotion_kr": "놀람", "emotion_en": "Surprise", "colorName": "sky blue", "hex": "#76D7EA" },
+  { "emotion_id": 5, "emotion_kr": "슬픔", "emotion_en": "Sadness", "colorName": "blue", "hex": "#5DADEC" },
+  { "emotion_id": 6, "emotion_kr": "혐오", "emotion_en": "Disgust", "colorName": "pea + olive", "hex": "#B5E655" },
+  { "emotion_id": 7, "emotion_kr": "분노", "emotion_en": "Anger", "colorName": "red-orange", "hex": "#FF6961" },
+  { "emotion_id": 8, "emotion_kr": "기대", "emotion_en": "Anticipation", "colorName": "orange", "hex": "#FFB347" }
+]

@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface VoiceOrbProps {
   isListening?: boolean;
-  palette?: 'seafoam' | 'sunset' | 'violet';
-  size?: 'small' | 'medium' | 'large';
+  palette?: "seafoam" | "sunset" | "violet";
+  size?: "small" | "medium" | "large";
   className?: string;
   onMicEnabled?: (enabled: boolean) => void;
 }
@@ -38,7 +38,7 @@ class VoiceOrbEngine {
 
   constructor(canvas: HTMLCanvasElement, opts: Partial<VoiceOrbProps> = {}) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d')!;
+    this.ctx = canvas.getContext("2d")!;
     this.dpr = Math.max(1, window.devicePixelRatio || 1);
     this.w = canvas.width;
     this.h = canvas.height;
@@ -47,7 +47,7 @@ class VoiceOrbEngine {
     this.audio = { ctx: null, analyser: null, data: null, stream: null };
 
     this.opts = {
-      palette: opts.palette || 'seafoam',
+      palette: opts.palette || "seafoam",
       blur: 30 * this.dpr,
       ringWidth: 12 * this.dpr,
       ringMaxBoost: 0.55,
@@ -87,18 +87,24 @@ class VoiceOrbEngine {
     if (this.micEnabled) return true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
       const ctx = new AudioCtx();
       const src = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 1024;
       analyser.smoothingTimeConstant = 0.85;
       src.connect(analyser);
-      this.audio = { ctx, analyser, data: new Uint8Array(analyser.frequencyBinCount), stream };
+      this.audio = {
+        ctx,
+        analyser,
+        data: new Uint8Array(analyser.frequencyBinCount),
+        stream,
+      };
       this.micEnabled = true;
       return true;
     } catch (err) {
-      console.warn('Mic permission denied or unavailable:', err);
+      console.warn("Mic permission denied or unavailable:", err);
       this.micEnabled = false;
       return false;
     }
@@ -107,7 +113,7 @@ class VoiceOrbEngine {
   disableMic() {
     if (!this.micEnabled) return;
     try {
-      this.audio.stream?.getTracks().forEach(t => t.stop());
+      this.audio.stream?.getTracks().forEach((t) => t.stop());
       this.audio.ctx?.close();
     } catch {}
     this.micEnabled = false;
@@ -141,9 +147,12 @@ class VoiceOrbEngine {
 
   _palette() {
     switch (this.opts.palette) {
-      case 'sunset': return ['#ffd29e', '#ff9a9e', '#fad0c4'];
-      case 'violet': return ['#a78bfa', '#7dd3fc', '#f0abfc'];
-      default: return ['#8bd6d1', '#8aa4ff', '#c08bff']; // seafoam
+      case "sunset":
+        return ["#ffd29e", "#ff9a9e", "#fad0c4"];
+      case "violet":
+        return ["#a78bfa", "#7dd3fc", "#f0abfc"];
+      default:
+        return ["#8bd6d1", "#8aa4ff", "#c08bff"]; // seafoam
     }
   }
 
@@ -154,14 +163,18 @@ class VoiceOrbEngine {
     ctx.clearRect(0, 0, w, h);
 
     // Background
-    const vign = ctx.createRadialGradient(
-      this.center.x, this.center.y * 0.9, this.baseR * 0.2,
-      this.center.x, this.center.y, Math.max(w, h) * 0.7
-    );
-    vign.addColorStop(0, 'rgba(0,0,0,0.0)');
-    vign.addColorStop(1, 'rgba(0,0,0,0.3)');
-    ctx.fillStyle = vign;
-    ctx.fillRect(0, 0, w, h);
+    // const vign = ctx.createRadialGradient(
+    //   this.center.x,
+    //   this.center.y * 0.9,
+    //   this.baseR * 0.2,
+    //   this.center.x,
+    //   this.center.y,
+    //   Math.max(w, h) * 0.7,
+    // );
+    // vign.addColorStop(0, "rgba(0,0,0,0.0)");
+    // vign.addColorStop(1, "rgba(0,0,0,0.3)");
+    // ctx.fillStyle = vign;
+    // ctx.fillRect(0, 0, w, h);
 
     const boost = this.level;
     const r = this.baseR * (1 + boost * 0.6);
@@ -218,10 +231,22 @@ class VoiceOrbEngine {
     ctx.restore();
   }
 
-  _highlight(ctx: CanvasRenderingContext2D, r: number, angle: number, alpha: number) {
+  _highlight(
+    ctx: CanvasRenderingContext2D,
+    r: number,
+    angle: number,
+    alpha: number,
+  ) {
     ctx.save();
     ctx.rotate(angle);
-    const grad = ctx.createRadialGradient(r * 0.3, -r * 0.2, r * 0.1, r * 0.3, -r * 0.2, r * 0.8);
+    const grad = ctx.createRadialGradient(
+      r * 0.3,
+      -r * 0.2,
+      r * 0.1,
+      r * 0.3,
+      -r * 0.2,
+      r * 0.8,
+    );
     grad.addColorStop(0, `rgba(255,255,255,${0.14 * alpha})`);
     grad.addColorStop(1, `rgba(255,255,255,0)`);
     ctx.fillStyle = grad;
@@ -231,7 +256,12 @@ class VoiceOrbEngine {
     ctx.restore();
   }
 
-  _organicBlob(ctx: CanvasRenderingContext2D, radius: number, depth: number, alpha: number) {
+  _organicBlob(
+    ctx: CanvasRenderingContext2D,
+    radius: number,
+    depth: number,
+    alpha: number,
+  ) {
     const steps = 180;
     ctx.beginPath();
     for (let i = 0; i <= steps; i++) {
@@ -241,7 +271,7 @@ class VoiceOrbEngine {
       const rr = radius * k;
       const x = Math.cos(t) * rr;
       const y = Math.sin(t) * rr;
-      (i === 0) ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.closePath();
     ctx.globalAlpha = alpha;
@@ -262,8 +292,16 @@ class VoiceOrbEngine {
   }
 
   _hexToRgb(hex: string) {
-    const s = hex.replace('#', '');
-    const bigint = parseInt(s.length === 3 ? s.split('').map(ch => ch + ch).join('') : s, 16);
+    const s = hex.replace("#", "");
+    const bigint = parseInt(
+      s.length === 3
+        ? s
+            .split("")
+            .map((ch) => ch + ch)
+            .join("")
+        : s,
+      16,
+    );
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
     const b = bigint & 255;
@@ -271,21 +309,21 @@ class VoiceOrbEngine {
   }
 }
 
-export function VoiceOrb({ 
-  isListening = false, 
-  palette = 'seafoam', 
-  size = 'medium',
-  className = '',
-  onMicEnabled
+export function VoiceOrb({
+  isListening = false,
+  palette = "seafoam",
+  size = "medium",
+  className = "",
+  onMicEnabled,
 }: VoiceOrbProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const orbRef = useRef<VoiceOrbEngine | null>(null);
   const [micEnabled, setMicEnabled] = useState(false);
 
   const sizeClasses = {
-    small: 'w-32 h-24',
-    medium: 'w-48 h-36',
-    large: 'w-64 h-48'
+    small: "w-32 h-24",
+    medium: "w-48 h-36",
+    large: "w-64 h-48",
   };
 
   useEffect(() => {
@@ -299,10 +337,10 @@ export function VoiceOrb({
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       if (orbRef.current) {
         orbRef.current.stop();
         orbRef.current.disableMic();
@@ -333,15 +371,17 @@ export function VoiceOrb({
         height={280}
         className="w-full h-full rounded-2xl"
         style={{
-          background: 'radial-gradient(600px 420px at 50% 30%, rgba(31, 41, 55, 0.15) 0%, rgba(17, 24, 39, 0.2) 60%, rgba(2, 6, 15, 0.3) 100%)'
+          background: "transparent",
         }}
       />
-      
+
       {/* Status indicator */}
       <div className="absolute top-2 right-2">
-        <div className={`w-2 h-2 rounded-full ${
-          micEnabled ? 'bg-green-400 animate-pulse' : 'bg-stone-400'
-        }`} />
+        <div
+          className={`w-2 h-2 rounded-full ${
+            micEnabled ? "bg-green-400 animate-pulse" : "bg-stone-400"
+          }`}
+        />
       </div>
     </div>
   );

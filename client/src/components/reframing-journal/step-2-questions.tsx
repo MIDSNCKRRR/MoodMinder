@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, Mic } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic, Type } from 'lucide-react';
 import { VoiceQuestionFlow } from '@/components/voice/voice-question-flow';
 
 interface Emotion {
@@ -11,11 +11,17 @@ interface Emotion {
   english: string;
 }
 
+type AnswerWithMethod = {
+  content: string;
+  inputMethod: 'text' | 'voice';
+  lastUpdated: Date;
+};
+
 interface Step2QuestionsProps {
   emotion: Emotion;
   questions: string[];
-  answers: string[];
-  onAnswersChange: (answers: string[]) => void;
+  answers: AnswerWithMethod[];
+  onAnswersChange: (answers: AnswerWithMethod[]) => void;
   onNext?: () => void;
   canProceed?: boolean;
   onBackToEmotionSelection?: () => void;
@@ -42,12 +48,16 @@ export function Step2Questions({
 
   const handleAnswerChange = (questionIndex: number, value: string) => {
     const newAnswers = [...answers];
-    newAnswers[questionIndex] = value;
+    newAnswers[questionIndex] = {
+      content: value,
+      inputMethod: 'text',
+      lastUpdated: new Date()
+    };
     onAnswersChange(newAnswers);
   };
 
   const canGoNext = () => {
-    return answers[currentQuestion]?.trim().length > 0;
+    return answers[currentQuestion]?.content.trim().length > 0;
   };
 
   const canGoPrevious = () => {
@@ -67,20 +77,48 @@ export function Step2Questions({
   };
 
   const handleVoiceAnswersComplete = (voiceAnswers: string[]) => {
-    onAnswersChange(voiceAnswers);
+    console.log('🔄 Voice answers received:', voiceAnswers);
+    console.log('📝 Current answers before update:', answers);
+    
+    const updatedAnswers = answers.map((answer, index) => {
+      const voiceContent = voiceAnswers[index] || '';
+      const hasVoiceContent = voiceContent.trim().length > 0;
+      
+      return {
+        content: hasVoiceContent ? voiceContent.trim() : answer.content,
+        inputMethod: hasVoiceContent ? 'voice' as const : answer.inputMethod,
+        lastUpdated: hasVoiceContent ? new Date() : answer.lastUpdated
+      };
+    });
+    
+    console.log('✅ Updated answers:', updatedAnswers);
+    onAnswersChange(updatedAnswers);
     setIsVoiceMode(false);
   };
 
-  const handleBackToTextMode = () => {
-    setIsVoiceMode(false);
+  const handleBackToTextMode = (partialVoiceAnswers?: string[]) => {
+    console.log('🔄 Switching back to text mode', partialVoiceAnswers ? 'with partial answers:' : 'without completing voice answers', partialVoiceAnswers);
+    
+    // If we have partial voice answers, preserve them
+    if (partialVoiceAnswers) {
+      handleVoiceAnswersComplete(partialVoiceAnswers);
+    } else {
+      setIsVoiceMode(false);
+    }
   };
 
   // Voice mode rendering
   if (isVoiceMode) {
+    const initialAnswerContents = answers.map(answer => answer.content);
+    console.log('🎤 Switching to voice mode with initial answers:', initialAnswerContents);
+    console.log('🎤 Full answers object:', answers);
+    
     return (
       <VoiceQuestionFlow
         emotion={emotion}
         questions={questions}
+        initialAnswers={initialAnswerContents}
+        startFromQuestion={currentQuestion}
         onAnswersComplete={handleVoiceAnswersComplete}
         onBack={handleBackToTextMode}
       />
@@ -141,9 +179,17 @@ export function Step2Questions({
         }}
       >
         <CardContent className="p-6">
-          <h3 className="text-lg font-medium text-stone-900 mb-4">
-            {questions[currentQuestion]}
-          </h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-medium text-stone-900">
+              {questions[currentQuestion]}
+            </h3>
+            {answers[currentQuestion]?.inputMethod === 'voice' && (
+              <Mic className="w-4 h-4 text-purple-500" title="Voice input" />
+            )}
+            {answers[currentQuestion]?.inputMethod === 'text' && answers[currentQuestion]?.content.trim() && (
+              <Type className="w-4 h-4 text-blue-500" title="Text input" />
+            )}
+          </div>
           
           {questionDescriptions[currentQuestion] && (
             <div className="mb-6 p-4 bg-white/60 rounded-stone text-sm text-purple-700 whitespace-pre-line border border-purple-200">
@@ -151,12 +197,18 @@ export function Step2Questions({
             </div>
           )}
 
-          <div className="bg-white/70 p-4 rounded-stone border border-purple-200">
+          <div className={`p-4 rounded-stone border transition-colors ${
+            answers[currentQuestion]?.inputMethod === 'voice' 
+              ? 'bg-purple-50/70 border-purple-200' 
+              : 'bg-white/70 border-purple-200'
+          }`}>
             <Textarea
-              value={answers[currentQuestion] || ''}
+              value={answers[currentQuestion]?.content || ''}
               onChange={(e) => handleAnswerChange(currentQuestion, e.target.value)}
               placeholder="여기에 답변을 작성해주세요..."
-              className="min-h-[120px] resize-none border-0 bg-transparent focus:ring-0 text-stone-700 placeholder:text-stone-400"
+              className={`min-h-[120px] resize-none border-0 bg-transparent focus:ring-0 text-stone-700 placeholder:text-stone-400 ${
+                answers[currentQuestion]?.inputMethod === 'voice' ? 'text-purple-900' : ''
+              }`}
               data-testid={`question-textarea-${currentQuestion}`}
             />
           </div>

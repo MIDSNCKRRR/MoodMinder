@@ -95,25 +95,6 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* Development Test Links - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <Card className="rounded-organic border-orange-200 bg-orange-50">
-          <CardContent className="p-4">
-            <h3 className="font-medium text-orange-800 mb-2 flex items-center gap-2">
-              🧪 개발 테스트
-            </h3>
-            <Link href="/test-voice-reframing">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-orange-700 border-orange-300 hover:bg-orange-100"
-              >
-                음성 리프레이밍 테스트
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Today's Question Card */}
       <Card

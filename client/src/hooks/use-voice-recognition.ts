@@ -68,30 +68,62 @@ export const useVoiceRecognition = (
       return;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    // 레퍼런스와 동일한 방식으로 초기화
+    const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
 
     recognition.continuous = continuous;
     recognition.interimResults = interimResults;
-    recognition.lang = language;
-    recognition.maxAlternatives = 1;
+    recognition.lang = "ko"; // 레퍼런스와 동일하게 설정
+    recognition.maxAlternatives = 5; // 레퍼런스와 동일하게 설정
     
-    // 세션을 더 오래 유지하기 위한 설정
-    if ('webkitSpeechRecognition' in window) {
-      // 더 긴 세션 유지를 위한 설정
-      (recognition as any).continuous = true;
-      (recognition as any).interimResults = true;
+    // 브라우저 감지 개선
+    const userAgent = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isChrome = /Chrome/.test(userAgent);
+    const isSafari = /Safari/.test(userAgent) && !isChrome;
+    
+    console.log('🔍 Browser detection:', {
+      userAgent,
+      isIOS,
+      isMobile, 
+      isChrome,
+      isSafari,
+      platform: navigator.platform
+    });
+    
+    if (isIOS && isSafari) {
+      console.log('🍎 iOS Safari detected - applying special settings');
+      recognition.continuous = false; 
+      recognition.interimResults = true;
+    } else {
+      console.log('💻 Desktop/Chrome detected - using standard settings');
+      // 표준 설정 사용
     }
 
-    recognition.onstart = () => {
-      console.log('🎤 Speech recognition onstart triggered');
+    // 레퍼런스 방식: addEventListener 사용
+    recognition.addEventListener("start", () => {
+      console.log('🎤 Speech recognition started');
+      console.log('📱 Recognition state:', {
+        continuous: recognition.continuous,
+        interimResults: recognition.interimResults,
+        lang: recognition.lang
+      });
       setIsListening(true);
       setError(null);
       onStart?.();
-    };
+    });
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      console.log('📝 Speech recognition onresult triggered');
+    recognition.addEventListener("speechstart", () => {
+      console.log('🗣️ Speech detected');
+    });
+
+    recognition.addEventListener("speechend", () => {
+      console.log('🔇 Speech ended');
+    });
+
+    recognition.addEventListener("result", (event: SpeechRecognitionEvent) => {
+      console.log('📝 Speech recognition result received');
       let interimTranscript = '';
       let finalTranscript = '';
 
@@ -117,26 +149,69 @@ export const useVoiceRecognition = (
         setFinalTranscript(prev => prev + finalTranscript);
         setTranscript(prev => prev + finalTranscript);
         onResult?.(finalTranscript, true);
-      } else if (interimTranscript) {
+      }
+      
+      // interimTranscript는 항상 업데이트 (실시간 표시용)
+      if (interimTranscript) {
         console.log('⏳ Setting interim transcript:', interimTranscript);
         onResult?.(interimTranscript, false);
       }
-    };
+    });
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      const errorMessage = `Speech recognition error: ${event.error}`;
-      console.error('❌ Speech recognition error:', event.error, event.message);
-      setError(errorMessage);
+    recognition.addEventListener("error", (event: SpeechRecognitionErrorEvent) => {
+      const errorDetails = {
+        error: event.error,
+        message: event.message,
+        timeStamp: event.timeStamp,
+        type: event.type
+      };
+      
+      console.error('❌ Speech recognition error details:', errorDetails);
+      
+      let errorMessage = `Speech recognition error: ${event.error}`;
+      let userMessage = '음성 인식 중 오류가 발생했습니다.';
+      
+      // 에러 타입별 상세 처리
+      switch (event.error) {
+        case 'not-allowed':
+          userMessage = '마이크 권한이 거부되었습니다. 브라우저에서 마이크 권한을 허용해주세요.';
+          break;
+        case 'network':
+          userMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
+          break;
+        case 'audio-capture':
+          userMessage = '마이크에 접근할 수 없습니다. 마이크가 연결되어 있는지 확인해주세요.';
+          break;
+        case 'no-speech':
+          userMessage = '음성이 감지되지 않았습니다. 다시 시도해주세요.';
+          console.log('ℹ️ No speech detected - this is normal if user is silent');
+          break;
+        case 'aborted':
+          userMessage = '음성 인식이 중단되었습니다.';
+          break;
+        case 'language-not-supported':
+          userMessage = '지원되지 않는 언어입니다.';
+          break;
+        default:
+          userMessage = `알 수 없는 오류가 발생했습니다: ${event.error}`;
+      }
+      
+      setError(userMessage);
       setIsListening(false);
-      onError?.(errorMessage);
-    };
+      onError?.(userMessage);
+      
+      // no-speech 에러는 사용자에게 알리지 않음 (정상적인 상황)
+      if (event.error !== 'no-speech') {
+        console.error('🚨 User-facing error:', userMessage);
+      }
+    });
 
-    recognition.onend = () => {
-      console.log('⏹️ Speech recognition onend triggered');
+    recognition.addEventListener("end", () => {
+      console.log('⏹️ Speech recognition ended');
       setIsListening(false);
       setInterimTranscript('');
       onEnd?.();
-    };
+    });
 
     recognitionRef.current = recognition;
 
@@ -157,16 +232,27 @@ export const useVoiceRecognition = (
       return;
     }
 
+    if (!recognitionRef.current) {
+      console.log('❌ Recognition reference is null');
+      setError('Speech recognition not initialized');
+      return;
+    }
+
+    // 표준 시작 로직
     if (!isListening && recognitionRef.current) {
       try {
         console.log('🚀 Starting speech recognition...');
         recognitionRef.current.start();
       } catch (err) {
         console.error('❌ Failed to start speech recognition:', err);
-        setError('Failed to start speech recognition');
+        setError(`Speech recognition failed: ${err}`);
       }
     } else {
-      console.log('⚠️ Cannot start speech recognition:', { isListening, hasRecognition: !!recognitionRef.current });
+      console.log('⚠️ Cannot start speech recognition:', { 
+        isListening, 
+        hasRecognition: !!recognitionRef.current,
+        reason: isListening ? 'Already listening' : 'No recognition reference'
+      });
     }
   }, [isListening, isSupported]);
 

@@ -9,9 +9,15 @@ interface Emotion {
   english: string;
 }
 
+type AnswerWithMethod = {
+  content: string;
+  inputMethod: 'text' | 'voice';
+  lastUpdated: Date;
+};
+
 interface Step3ReframingResultProps {
   emotion: Emotion;
-  answers: string[];
+  answers: AnswerWithMethod[];
   reframedSentences: string[];
   isLoading: boolean;
   onBack: () => void;
@@ -79,7 +85,7 @@ export function Step3ReframingResult({
           <div className="space-y-3">
             {answers.slice(0, 3).map((answer, index) => (
               <div key={index} className="text-sm text-stone-700 bg-white/70 p-4 rounded-stone border border-purple-200">
-                "{answer.length > 100 ? answer.substring(0, 100) + '...' : answer}"
+                "{answer.content.length > 100 ? answer.content.substring(0, 100) + '...' : answer.content}"
               </div>
             ))}
           </div>
