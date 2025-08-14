@@ -74,19 +74,34 @@ export const useVoiceRecognition = (
     recognition.continuous = continuous;
     recognition.interimResults = interimResults;
     recognition.lang = language;
+    recognition.maxAlternatives = 1;
+    
+    // 세션을 더 오래 유지하기 위한 설정
+    if ('webkitSpeechRecognition' in window) {
+      // 더 긴 세션 유지를 위한 설정
+      (recognition as any).continuous = true;
+      (recognition as any).interimResults = true;
+    }
 
     recognition.onstart = () => {
+      console.log('🎤 Speech recognition onstart triggered');
       setIsListening(true);
       setError(null);
       onStart?.();
     };
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
+      console.log('📝 Speech recognition onresult triggered');
       let interimTranscript = '';
       let finalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
+        console.log(`Result ${i}:`, { 
+          transcript: result[0].transcript, 
+          isFinal: result.isFinal,
+          confidence: result[0].confidence 
+        });
         if (result.isFinal) {
           finalTranscript += result[0].transcript;
         } else {
@@ -94,25 +109,30 @@ export const useVoiceRecognition = (
         }
       }
 
+      console.log('📊 Processed transcripts:', { interimTranscript, finalTranscript });
       setInterimTranscript(interimTranscript);
       
       if (finalTranscript) {
+        console.log('✅ Setting final transcript:', finalTranscript);
         setFinalTranscript(prev => prev + finalTranscript);
         setTranscript(prev => prev + finalTranscript);
         onResult?.(finalTranscript, true);
       } else if (interimTranscript) {
+        console.log('⏳ Setting interim transcript:', interimTranscript);
         onResult?.(interimTranscript, false);
       }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       const errorMessage = `Speech recognition error: ${event.error}`;
+      console.error('❌ Speech recognition error:', event.error, event.message);
       setError(errorMessage);
       setIsListening(false);
       onError?.(errorMessage);
     };
 
     recognition.onend = () => {
+      console.log('⏹️ Speech recognition onend triggered');
       setIsListening(false);
       setInterimTranscript('');
       onEnd?.();
@@ -129,17 +149,24 @@ export const useVoiceRecognition = (
   }, [continuous, interimResults, language, onResult, onError, onStart, onEnd, isSupported]);
 
   const startListening = useCallback(() => {
+    console.log('🎯 startListening called', { isSupported, isListening, hasRecognition: !!recognitionRef.current });
+    
     if (!isSupported) {
+      console.log('❌ Speech recognition not supported');
       setError('Speech recognition is not supported');
       return;
     }
 
     if (!isListening && recognitionRef.current) {
       try {
+        console.log('🚀 Starting speech recognition...');
         recognitionRef.current.start();
       } catch (err) {
+        console.error('❌ Failed to start speech recognition:', err);
         setError('Failed to start speech recognition');
       }
+    } else {
+      console.log('⚠️ Cannot start speech recognition:', { isListening, hasRecognition: !!recognitionRef.current });
     }
   }, [isListening, isSupported]);
 

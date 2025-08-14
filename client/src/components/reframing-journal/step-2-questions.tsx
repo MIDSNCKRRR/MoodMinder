@@ -97,25 +97,12 @@ export function Step2Questions({
         }}
       >
         <CardContent className="p-4 text-center">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-medium text-stone-900">
-              {emotion.name} 탐구하기
-            </h2>
-            
-            {/* Voice Mode Toggle */}
-            <Button
-              onClick={() => setIsVoiceMode(true)}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 text-purple-600 border-purple-300 hover:bg-purple-50"
-            >
-              <Mic className="w-4 h-4" />
-              음성모드
-            </Button>
-          </div>
+          <h2 className="text-lg font-medium text-stone-900 mb-3">
+            {emotion.name} 탐구하기
+          </h2>
           
           {/* Question Progress Dots inside card */}
-          <div className="flex justify-center gap-2">
+          <div className="flex justify-center gap-2 mb-4">
             {questions.map((_, index) => (
               <div
                 key={index}
@@ -129,6 +116,19 @@ export function Step2Questions({
                 data-testid={`question-dot-${index}`}
               />
             ))}
+          </div>
+          
+          {/* Voice Mode Toggle */}
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setIsVoiceMode(true)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 text-purple-600 border-purple-300 hover:bg-purple-50"
+            >
+              <Mic className="w-4 h-4" />
+              음성모드로 전환
+            </Button>
           </div>
         </CardContent>
       </Card>
