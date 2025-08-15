@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { VoiceOrb } from "./voice-orb";
 import { useVoiceRecognition } from "@/hooks/use-voice-recognition";
+import emotionsData from "/data/emotion_color.json";
 
 interface VoiceQuestionFlowProps {
   emotion: {
@@ -53,6 +54,19 @@ export function VoiceQuestionFlow({
     "idle" | "listening" | "processing" | "speaking"
   >("idle");
   const [realtimeTranscript, setRealtimeTranscript] = useState("");
+  const [emotionColor, setEmotionColor] = useState<string>("#a78bfa"); // Default purple
+
+  // Get emotion color from Body Journal localStorage
+  useEffect(() => {
+    const savedEmotion = localStorage.getItem("bodyJournal_emotion");
+    if (savedEmotion) {
+      const emotionId = parseInt(savedEmotion);
+      const emotionData = emotionsData.find(e => e.emotion_id === emotionId);
+      if (emotionData) {
+        setEmotionColor(emotionData.hex);
+      }
+    }
+  }, []);
 
   // Unified state configuration
   const stateConfig = {
@@ -428,7 +442,8 @@ export function VoiceQuestionFlow({
               <div className="relative">
                 <VoiceOrb
                   isListening={hasStartedListening}
-                  palette="violet"
+                  palette="emotion"
+                  emotionColor={emotionColor}
                   size="large"
                   className="mx-auto transition-all duration-500 ease-in-out transform drop-shadow-2xl"
                   style={{
@@ -601,46 +616,6 @@ export function VoiceQuestionFlow({
         </CardContent>
       </Card>
 
-      {/* Current Question Progress */}
-      <Card
-        className="rounded-organic stone-shadow border-0"
-        style={{
-          background:
-            "linear-gradient(135deg, hsl(261, 10%, 96%) 0%, hsl(261, 15%, 90%) 100%)",
-        }}
-      >
-        <CardContent className="p-4">
-          <h4 className="font-medium text-stone-800 mb-3">현재 질문 답변</h4>
-          <div className="flex items-start gap-3">
-            <div
-              className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                answers[currentQuestionIndex]?.trim()
-                  ? "bg-purple-500"
-                  : "bg-stone-300"
-              }`}
-            />
-            <div className="flex-1">
-              <p className="text-sm text-stone-600 mb-1">
-                {questions[currentQuestionIndex]}
-              </p>
-              {answers[currentQuestionIndex]?.trim() && (
-                <div className="text-xs text-stone-500 bg-white/60 p-2 rounded-stone border border-purple-200 max-h-20 overflow-y-auto">
-                  <p className="break-words">
-                    {answers[currentQuestionIndex].length > 150
-                      ? `${answers[currentQuestionIndex].substring(0, 150)}...`
-                      : answers[currentQuestionIndex]}
-                  </p>
-                </div>
-              )}
-              {!answers[currentQuestionIndex]?.trim() && (
-                <p className="text-xs text-stone-400 italic">
-                  아직 답변이 없습니다
-                </p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Navigation */}
       <div className="flex gap-3">

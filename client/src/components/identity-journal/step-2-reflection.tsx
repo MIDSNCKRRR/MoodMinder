@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -9,6 +9,7 @@ interface Step2ReflectionProps {
   selectedKeywords: string[];
   onComplete: () => void;
   onBack: () => void;
+  isGeneratingMeme?: boolean;
 }
 
 export default function Step2Reflection({
@@ -17,6 +18,7 @@ export default function Step2Reflection({
   selectedKeywords,
   onComplete,
   onBack,
+  isGeneratingMeme = false,
 }: Step2ReflectionProps) {
   const [wordCount, setWordCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -145,7 +147,7 @@ export default function Step2Reflection({
 
         <Button
           onClick={handleComplete}
-          disabled={!canSave || isLoading}
+          disabled={!canSave || isLoading || isGeneratingMeme}
           className="px-6 py-3 rounded-stone font-medium transition-all"
           style={{
             background:
@@ -154,15 +156,20 @@ export default function Step2Reflection({
           }}
           data-testid="save-identity-journal"
         >
-          {isLoading ? (
+          {isGeneratingMeme ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+              밈 생성 중...
+            </>
+          ) : isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
               Saving...
             </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
-              Save Entry
+              <Wand2 className="mr-2 h-4 w-4" />
+              저장 & 밈 생성
             </>
           )}
         </Button>

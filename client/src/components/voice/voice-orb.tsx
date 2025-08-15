@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 interface VoiceOrbProps {
   isListening?: boolean;
-  palette?: "seafoam" | "sunset" | "violet";
+  palette?: "seafoam" | "sunset" | "violet" | "emotion";
+  emotionColor?: string; // Hex color from emotion data
   size?: "small" | "medium" | "large";
   className?: string;
   onMicEnabled?: (enabled: boolean) => void;
@@ -27,6 +28,7 @@ class VoiceOrbEngine {
   };
   private opts: {
     palette: string;
+    emotionColor?: string;
     blur: number;
     ringWidth: number;
     ringMaxBoost: number;
@@ -48,6 +50,7 @@ class VoiceOrbEngine {
 
     this.opts = {
       palette: opts.palette || "seafoam",
+      emotionColor: opts.emotionColor,
       blur: 30 * this.dpr,
       ringWidth: 12 * this.dpr,
       ringMaxBoost: 0.55,
@@ -150,6 +153,21 @@ class VoiceOrbEngine {
       case "sunset":
         return ["#ffd29e", "#ff9a9e", "#fad0c4"];
       case "violet":
+        return ["#a78bfa", "#7dd3fc", "#f0abfc"];
+      case "emotion":
+        if (this.opts.emotionColor) {
+          // Generate gradient colors based on the emotion hex color
+          const baseColor = this.opts.emotionColor;
+          const { r, g, b } = this._hexToRgb(baseColor);
+          
+          // Create variations for gradient effect
+          const lighter = `rgb(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)})`;
+          const medium = baseColor;
+          const darker = `rgb(${Math.max(0, r - 30)}, ${Math.max(0, g - 30)}, ${Math.max(0, b - 30)})`;
+          
+          return [lighter, medium, darker];
+        }
+        // Fallback to violet if no emotion color provided
         return ["#a78bfa", "#7dd3fc", "#f0abfc"];
       default:
         return ["#8bd6d1", "#8aa4ff", "#c08bff"]; // seafoam
@@ -312,6 +330,7 @@ class VoiceOrbEngine {
 export function VoiceOrb({
   isListening = false,
   palette = "seafoam",
+  emotionColor,
   size = "medium",
   className = "",
   onMicEnabled,
@@ -329,7 +348,7 @@ export function VoiceOrb({
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    orbRef.current = new VoiceOrbEngine(canvasRef.current, { palette });
+    orbRef.current = new VoiceOrbEngine(canvasRef.current, { palette, emotionColor });
 
     const handleResize = () => {
       if (orbRef.current) {
@@ -346,7 +365,7 @@ export function VoiceOrb({
         orbRef.current.disableMic();
       }
     };
-  }, [palette]);
+  }, [palette, emotionColor]);
 
   useEffect(() => {
     if (!orbRef.current) return;

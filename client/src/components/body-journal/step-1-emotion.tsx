@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import emotionsData from "/data/emotion_color.json";
 
 interface Step1EmotionProps {
   selectedEmotion: number;
@@ -19,20 +20,14 @@ export default function Step1Emotion({
   onIntensityChange,
   onNext,
 }: Step1EmotionProps) {
-  const emotionCategories = [
-    { id: 1, emoji: "😭", label: "Overwhelmed", type: "overwhelmed" },
-    { id: 2, emoji: "😰", label: "Anxious", type: "anxious" },
-    { id: 3, emoji: "😔", label: "Sad", type: "sad" },
-    { id: 4, emoji: "😐", label: "Neutral", type: "neutral" },
-    { id: 5, emoji: "😊", label: "Content", type: "content" },
-    { id: 6, emoji: "😄", label: "Happy", type: "happy" },
-    { id: 7, emoji: "🤗", label: "Loving", type: "loving" },
-    { id: 8, emoji: "😌", label: "Peaceful", type: "peaceful" },
-    { id: 9, emoji: "💪", label: "Energized", type: "energized" },
-    { id: 10, emoji: "🔥", label: "Excited", type: "excited" },
-    { id: 11, emoji: "😴", label: "Tired", type: "tired" },
-    { id: 12, emoji: "🧘", label: "Mindful", type: "mindful" },
-  ];
+  const emotionCategories = emotionsData.map(emotion => ({
+    id: emotion.emotion_id,
+    emoji: emotion.emoji,
+    label: emotion.emotion_en,
+    labelKr: emotion.emotion_kr,
+    type: emotion.emotion_en.toLowerCase(),
+    hex: emotion.hex
+  }));
 
   // Auto-save emotion selection and intensity
   useEffect(() => {
@@ -59,7 +54,7 @@ export default function Step1Emotion({
           </p>
 
           {/* Emotion Categories Grid */}
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-4 gap-3 mb-8">
             {emotionCategories.map((category) => (
               <div
                 key={category.id}
@@ -70,11 +65,18 @@ export default function Step1Emotion({
                 }`}
                 onClick={() => onEmotionChange(category.id)}
                 data-testid={`emotion-${category.id}`}
+                style={{
+                  borderColor: selectedEmotion === category.id ? category.hex : 'transparent',
+                  borderWidth: selectedEmotion === category.id ? '2px' : '0px'
+                }}
               >
                 <div className="text-3xl mb-2">{category.emoji}</div>
                 <span className="text-xs text-stone-600 font-medium">
-                  {category.label}
+                  {category.labelKr}
                 </span>
+                <div className="text-xs text-stone-400 mt-1">
+                  {category.label}
+                </div>
               </div>
             ))}
           </div>

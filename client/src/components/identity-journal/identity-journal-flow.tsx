@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import ProgressBar from "./progress-bar";
 import Step1Keywords from "./step-1-keywords";
 import Step2Reflection from "./step-2-reflection";
+import { memeGenerationService } from "@/services/meme-generation";
 
 interface IdentityJournalFlowProps {
   onBack: () => void;
@@ -20,6 +22,8 @@ export default function IdentityJournalFlow({
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [reflectionContent, setReflectionContent] = useState("");
   const [matchingScore, setMatchingScore] = useState<number>(3);
+  const [isGeneratingMeme, setIsGeneratingMeme] = useState(false);
+  const { toast } = useToast();
 
   // Load saved data on component mount
   useEffect(() => {
@@ -56,7 +60,25 @@ export default function IdentityJournalFlow({
 
   const handleComplete = async () => {
     try {
-      // Prepare journal entry data
+      setIsGeneratingMeme(true);
+      
+      // Generate meme first
+      const memeResponse = await memeGenerationService.generateMeme({
+        keywords: selectedKeywords,
+        reflection: reflectionContent,
+        matchingScore: matchingScore
+      });
+
+      if (!memeResponse.success) {
+        toast({
+          title: "밈 생성 실패",
+          description: memeResponse.error || "밈 생성 중 오류가 발생했습니다.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Prepare journal entry data with meme
       const journalData = {
         userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
         journalType: "identity" as const,
@@ -67,6 +89,8 @@ export default function IdentityJournalFlow({
           keywords: selectedKeywords,
           keywordCount: selectedKeywords.length,
           matchingScore: matchingScore,
+          memeUrl: memeResponse.memeUrl,
+          memeDescription: memeResponse.description,
           timestamp: new Date().toISOString(),
         },
       };
@@ -87,6 +111,11 @@ export default function IdentityJournalFlow({
       const savedEntry = await response.json();
       console.log("Identity journal entry saved:", savedEntry);
 
+      toast({
+        title: "저장 완료",
+        description: "정체성 저널과 개인 밈이 생성되었습니다!",
+      });
+
       // Clear localStorage
       localStorage.removeItem("identityJournal_keywords");
       localStorage.removeItem("identityJournal_content");
@@ -100,7 +129,13 @@ export default function IdentityJournalFlow({
       onBack();
     } catch (error) {
       console.error("Error saving identity journal entry:", error);
-      // You could show a toast notification here
+      toast({
+        title: "저장 실패",
+        description: "저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingMeme(false);
     }
   };
 
@@ -140,6 +175,7 @@ export default function IdentityJournalFlow({
             selectedKeywords={selectedKeywords}
             onComplete={handleComplete}
             onBack={handleBack}
+            isGeneratingMeme={isGeneratingMeme}
           />
         );
       default:

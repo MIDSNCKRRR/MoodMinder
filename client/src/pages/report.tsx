@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Lock, Download, Share2 } from "lucide-react";
 import WaveChart from "@/components/wave-chart";
 import SensoryScoreChart from "@/components/sensory-score-chart";
+import type { JournalEntry } from "@shared/schema";
 
 interface EmotionStats {
   averageEmotion: number;
@@ -63,6 +66,11 @@ interface RecoveryTendency {
 }
 
 export default function Report() {
+  // Fetch journal entries to check for memes and reframing completion
+  const { data: journalEntries = [] } = useQuery<JournalEntry[]>({
+    queryKey: ["/api/journal-entries"],
+  });
+
   // Fetch analytics data from new endpoints
   const { data: weeklyEmotionData } = useQuery<ChartData>({
     queryKey: ["/api/weekly-emotion-data"],
@@ -95,6 +103,30 @@ export default function Report() {
   const { data: recoveryTendency } = useQuery<RecoveryTendency>({
     queryKey: ["/api/recovery-tendency"],
   });
+
+  // Helper functions for meme unlock logic
+  const getIdentityMemes = () => {
+    return journalEntries
+      .filter(entry => entry.journalType === "identity" && entry.bodyMapping?.memeUrl)
+      .map(entry => ({
+        id: entry.id,
+        memeUrl: entry.bodyMapping.memeUrl,
+        description: entry.bodyMapping.memeDescription || "개인 밈",
+        keywords: entry.bodyMapping.keywords || [],
+        createdAt: entry.createdAt
+      }));
+  };
+
+  const hasCompletedReframing = () => {
+    return journalEntries.some(entry => 
+      entry.journalType === "reframing" && 
+      entry.content && 
+      entry.content.includes("=== 리프레이밍 결과 ===")
+    );
+  };
+
+  const identityMemes = getIdentityMemes();
+  const canViewMemes = hasCompletedReframing();
 
   // Use data from API endpoints directly
   const weeklyData = weeklyEmotionData || { data: [3, 3, 3, 3, 3, 3, 3], labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] };
@@ -495,6 +527,121 @@ export default function Report() {
           </div>
         </CardContent> 
       </Card> */}
+
+      {/* Identity Meme Gallery */}
+      <Card className="bg-gradient-to-br from-pink-50 to-rose-100 rounded-organic stone-shadow border-0 relative">
+          <CardContent className="p-4">
+            <div className="absolute top-3 right-4 text-pink-400">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" opacity="0.7"/>
+              </svg>
+            </div>
+            <h3 className="font-sans font-semibold text-stone-600 text-lg mb-3 border-b border-pink-300 pb-2">
+              개인 밈 갤러리
+            </h3>
+
+            {!canViewMemes ? (
+              // Locked state
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-8 h-8 text-stone-400" />
+                </div>
+                <h4 className="font-medium text-stone-600 mb-2">밈 갤러리 잠금 상태</h4>
+                <p className="text-sm text-stone-500 mb-4">
+                  리프레이밍 저널을 완료하면 개인 밈을 확인할 수 있습니다
+                </p>
+                <div className="bg-white/60 p-3 rounded-stone text-xs text-stone-600">
+                  💡 Body Journal → Reframing Journal 순서로 완료해주세요
+                </div>
+              </div>
+            ) : (
+              // Unlocked state - show memes
+              <div className="space-y-4">
+                <div className="text-center mb-4">
+                  <p className="text-sm text-stone-600">
+                    🎉 축하합니다! 리프레이밍을 완료하여 밈 갤러리가 열렸습니다
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {identityMemes.map((meme) => (
+                    <div key={meme.id} className="bg-white/80 p-4 rounded-stone">
+                      <div className="aspect-square bg-stone-100 rounded-lg mb-3 overflow-hidden">
+                        <img 
+                          src={meme.memeUrl} 
+                          alt={meme.description}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x400/E5E7EB/9CA3AF?text=Meme";
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="text-center">
+                        <h4 className="font-medium text-stone-700 mb-2">{meme.description}</h4>
+                        <div className="flex flex-wrap gap-1 justify-center mb-3">
+                          {meme.keywords.slice(0, 3).map((keyword: string) => (
+                            <span 
+                              key={keyword}
+                              className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full"
+                            >
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        <div className="flex gap-2 justify-center">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="text-xs"
+                            onClick={() => {
+                              // Download functionality
+                              const link = document.createElement('a');
+                              link.href = meme.memeUrl;
+                              link.download = `my-meme-${meme.id}.jpg`;
+                              link.click();
+                            }}
+                          >
+                            <Download className="w-3 h-3 mr-1" />
+                            저장
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="text-xs"
+                            onClick={() => {
+                              // Share functionality
+                              if (navigator.share) {
+                                navigator.share({
+                                  title: meme.description,
+                                  url: meme.memeUrl
+                                });
+                              } else {
+                                navigator.clipboard.writeText(meme.memeUrl);
+                              }
+                            }}
+                          >
+                            <Share2 className="w-3 h-3 mr-1" />
+                            공유
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {identityMemes.length === 0 && (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-stone-500">
+                      아직 생성된 밈이 없습니다. Identity Journal을 작성해보세요!
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
       {/* Body Emotion Mapping Report */}
   
