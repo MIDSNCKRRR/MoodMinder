@@ -1,0 +1,3 @@
+      case "dual":
+        // Always return default violet colors for now (to test and avoid black issue)
+        return ["#a78bfa", "#7dd3fc", "#f0abfc"];

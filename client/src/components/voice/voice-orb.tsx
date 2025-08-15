@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 
 interface VoiceOrbProps {
   isListening?: boolean;
-  palette?: "seafoam" | "sunset" | "violet" | "emotion";
+  palette?: "seafoam" | "sunset" | "violet" | "emotion" | "dual";
   emotionColor?: string; // Hex color from emotion data
+  bodyEmotionColor?: string | null; // Body Journal emotion color
+  reframingEmotionColor?: string | null; // Reframing Journal emotion color
   size?: "small" | "medium" | "large";
   className?: string;
   onMicEnabled?: (enabled: boolean) => void;
@@ -29,6 +31,8 @@ class VoiceOrbEngine {
   private opts: {
     palette: string;
     emotionColor?: string;
+    bodyEmotionColor?: string | null;
+    reframingEmotionColor?: string | null;
     blur: number;
     ringWidth: number;
     ringMaxBoost: number;
@@ -51,6 +55,8 @@ class VoiceOrbEngine {
     this.opts = {
       palette: opts.palette || "seafoam",
       emotionColor: opts.emotionColor,
+      bodyEmotionColor: opts.bodyEmotionColor,
+      reframingEmotionColor: opts.reframingEmotionColor,
       blur: 30 * this.dpr,
       ringWidth: 12 * this.dpr,
       ringMaxBoost: 0.55,
@@ -58,6 +64,16 @@ class VoiceOrbEngine {
       wobbleDepth: 0.12,
       idleBreath: 0.06,
     };
+
+    // Debug log only once during initialization
+    if (this.opts.palette === "emotion" || this.opts.palette === "dual") {
+      console.log("VoiceOrb initialized with palette:", {
+        palette: this.opts.palette,
+        emotionColor: this.opts.emotionColor,
+        bodyEmotionColor: this.opts.bodyEmotionColor,
+        reframingEmotionColor: this.opts.reframingEmotionColor,
+      });
+    }
 
     this._resize();
     this._tick = this._tick.bind(this);
@@ -156,18 +172,41 @@ class VoiceOrbEngine {
         return ["#a78bfa", "#7dd3fc", "#f0abfc"];
       case "emotion":
         if (this.opts.emotionColor) {
-          // Generate gradient colors based on the emotion hex color
-          const baseColor = this.opts.emotionColor;
-          const { r, g, b } = this._hexToRgb(baseColor);
-          
-          // Create variations for gradient effect
-          const lighter = `rgb(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)})`;
-          const medium = baseColor;
-          const darker = `rgb(${Math.max(0, r - 30)}, ${Math.max(0, g - 30)}, ${Math.max(0, b - 30)})`;
-          
-          return [lighter, medium, darker];
+          try {
+            // Create safe variations of the emotion color
+            const baseColor = this.opts.emotionColor;
+            
+            // Ensure it's a valid hex color
+            if (!baseColor.startsWith('#')) {
+              return ["#a78bfa", "#7dd3fc", "#f0abfc"];
+            }
+            
+            const { r, g, b } = this._hexToRgb(baseColor);
+            
+            // Create subtle variations to avoid black
+            const lighter = `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}`;
+            const medium = baseColor;
+            const darker = `#${Math.max(50, r - 10).toString(16).padStart(2, '0')}${Math.max(50, g - 10).toString(16).padStart(2, '0')}${Math.max(50, b - 10).toString(16).padStart(2, '0')}`;
+            
+            return [lighter, medium, darker];
+          } catch (error) {
+            console.warn("Emotion color parsing failed, using violet:", error);
+            return ["#a78bfa", "#7dd3fc", "#f0abfc"];
+          }
         }
         // Fallback to violet if no emotion color provided
+        return ["#a78bfa", "#7dd3fc", "#f0abfc"];
+      case "dual":
+        // 50:50 ratio for dual colors
+        if (this.opts.bodyEmotionColor && this.opts.reframingEmotionColor) {
+          // TODAY'S body journal exists + reframing color selected - 50:50 split
+          return [this.opts.bodyEmotionColor, this.opts.reframingEmotionColor, this.opts.reframingEmotionColor];
+        } else if (this.opts.reframingEmotionColor) {
+          // No TODAY'S body journal + reframing color selected - 50:50 with purple
+          return ["#a78bfa", this.opts.reframingEmotionColor, this.opts.reframingEmotionColor];
+        }
+        
+        // Default case - just purple
         return ["#a78bfa", "#7dd3fc", "#f0abfc"];
       default:
         return ["#8bd6d1", "#8aa4ff", "#c08bff"]; // seafoam
@@ -205,7 +244,7 @@ class VoiceOrbEngine {
     const g = ctx.createRadialGradient(0, 0, r * 0.4, 0, 0, r * 1.35);
     const [c1, c2, c3] = this._palette();
     g.addColorStop(0, this._withAlpha(c1, 0.95));
-    g.addColorStop(0.6, this._withAlpha(c2, 0.9));
+    g.addColorStop(0.5, this._withAlpha(c2, 0.9));
     g.addColorStop(1, this._withAlpha(c3, 0.75));
     ctx.fillStyle = g;
     this._organicBlob(ctx, r * 1.06, wobble, 0.8);
@@ -216,7 +255,7 @@ class VoiceOrbEngine {
     ctx.translate(this.center.x, this.center.y);
     const coreGrad = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 1.1);
     coreGrad.addColorStop(0, this._withAlpha(c1, 1));
-    coreGrad.addColorStop(0.65, this._withAlpha(c2, 0.95));
+    coreGrad.addColorStop(0.5, this._withAlpha(c2, 0.95));
     coreGrad.addColorStop(1, this._withAlpha(c3, 0.9));
     ctx.fillStyle = coreGrad;
     this._organicBlob(ctx, r, wobble, 1);
@@ -231,22 +270,22 @@ class VoiceOrbEngine {
     ctx.restore();
 
     // Outer ring
-    ctx.save();
-    ctx.translate(this.center.x, this.center.y);
-    ctx.lineWidth = this.opts.ringWidth * (0.6 + boost * 1.2);
-    const ringGrad = ctx.createLinearGradient(-r, 0, r, 0);
-    ringGrad.addColorStop(0, this._withAlpha(c1, 0.8));
-    ringGrad.addColorStop(0.5, this._withAlpha(c2, 0.9));
-    ringGrad.addColorStop(1, this._withAlpha(c3, 0.8));
-    ctx.strokeStyle = ringGrad;
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    const ringR = r * (1 + this.opts.ringMaxBoost * (0.25 + boost));
-    ctx.arc(0, 0, ringR, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+    // ctx.save();
+    // ctx.translate(this.center.x, this.center.y);
+    // ctx.lineWidth = this.opts.ringWidth * (0.6 + boost * 1.2);
+    // const ringGrad = ctx.createLinearGradient(-r, 0, r, 0);
+    // ringGrad.addColorStop(0, this._withAlpha(c1, 0.8));
+    // ringGrad.addColorStop(0.5, this._withAlpha(c2, 0.9));
+    // ringGrad.addColorStop(1, this._withAlpha(c3, 0.8));
+    // ctx.strokeStyle = ringGrad;
+    // ctx.globalAlpha = 0.85;
+    // ctx.beginPath();
+    // const ringR = r * (1 + this.opts.ringMaxBoost * (0.25 + boost));
+    // ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+    // ctx.stroke();
+    // ctx.restore();
 
-    ctx.restore();
+    // ctx.restore();
   }
 
   _highlight(
@@ -331,6 +370,8 @@ export function VoiceOrb({
   isListening = false,
   palette = "seafoam",
   emotionColor,
+  bodyEmotionColor,
+  reframingEmotionColor,
   size = "medium",
   className = "",
   onMicEnabled,
@@ -348,7 +389,12 @@ export function VoiceOrb({
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    orbRef.current = new VoiceOrbEngine(canvasRef.current, { palette, emotionColor });
+    orbRef.current = new VoiceOrbEngine(canvasRef.current, {
+      palette,
+      emotionColor,
+      bodyEmotionColor,
+      reframingEmotionColor,
+    });
 
     const handleResize = () => {
       if (orbRef.current) {
@@ -365,7 +411,16 @@ export function VoiceOrb({
         orbRef.current.disableMic();
       }
     };
-  }, [palette, emotionColor]);
+  }, [palette]);
+
+  // Update colors dynamically without recreating the engine
+  useEffect(() => {
+    if (orbRef.current) {
+      orbRef.current.opts.emotionColor = emotionColor;
+      orbRef.current.opts.bodyEmotionColor = bodyEmotionColor;
+      orbRef.current.opts.reframingEmotionColor = reframingEmotionColor;
+    }
+  }, [emotionColor, bodyEmotionColor, reframingEmotionColor]);
 
   useEffect(() => {
     if (!orbRef.current) return;

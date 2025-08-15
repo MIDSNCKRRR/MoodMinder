@@ -62,6 +62,9 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     try {
       // Prepare journal entry data
       const emotionData = getEmotionData(selectedEmotion);
+      console.log("Selected emotion:", selectedEmotion);
+      console.log("Emotion data:", emotionData);
+      
       const journalData = {
         userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
         journalType: "body" as const,
@@ -75,6 +78,8 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
           timestamp: new Date().toISOString()
         },
       };
+      
+      console.log("Journal data being sent:", journalData);
 
       // Save to backend
       const response = await fetch('/api/journal-entries', {
@@ -111,21 +116,17 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
     }
   };
 
-  // Helper function to convert emotion ID to type and level
+  // Helper function to convert emotion ID to type and level (using new emotion_color.json)
   const getEmotionData = (emotionId: number) => {
     const emotionCategories = [
-      { id: 1, label: "Overwhelmed", type: "overwhelmed", level: 1 },
-      { id: 2, label: "Anxious", type: "anxious", level: 2 },
-      { id: 3, label: "Sad", type: "sad", level: 2 },
-      { id: 4, label: "Neutral", type: "neutral", level: 3 },
-      { id: 5, label: "Content", type: "content", level: 4 },
-      { id: 6, label: "Happy", type: "happy", level: 4 },
-      { id: 7, label: "Loving", type: "loving", level: 5 },
-      { id: 8, label: "Peaceful", type: "peaceful", level: 5 },
-      { id: 9, label: "Energized", type: "energized", level: 5 },
-      { id: 10, label: "Excited", type: "excited", level: 5 },
-      { id: 11, label: "Tired", type: "tired", level: 2 },
-      { id: 12, label: "Mindful", type: "mindful", level: 4 },
+      { id: 1, label: "Joy", type: "joy", level: 5 },        // 기쁨 - very positive
+      { id: 2, label: "Trust", type: "trust", level: 4 },    // 신뢰 - positive  
+      { id: 3, label: "Fear", type: "fear", level: 2 },      // 공포 - negative
+      { id: 4, label: "Surprise", type: "surprise", level: 3 }, // 놀람 - neutral
+      { id: 5, label: "Sadness", type: "sadness", level: 2 }, // 슬픔 - negative
+      { id: 6, label: "Disgust", type: "disgust", level: 1 }, // 혐오 - very negative
+      { id: 7, label: "Anger", type: "anger", level: 1 },     // 분노 - very negative
+      { id: 8, label: "Anticipation", type: "anticipation", level: 4 }, // 기대 - positive
     ];
     
     const emotion = emotionCategories.find(e => e.id === emotionId);

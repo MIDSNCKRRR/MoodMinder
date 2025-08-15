@@ -53,11 +53,36 @@ export default function Step3Journal({
 
   const createEntryMutation = useMutation({
     mutationFn: async () => {
+      // Get emotion data using the same mapping as body-journal-flow
+      const getEmotionData = (emotionId: number) => {
+        const emotionCategories = [
+          { id: 1, label: "Joy", type: "joy", level: 5 },
+          { id: 2, label: "Trust", type: "trust", level: 4 },
+          { id: 3, label: "Fear", type: "fear", level: 2 },
+          { id: 4, label: "Surprise", type: "surprise", level: 3 },
+          { id: 5, label: "Sadness", type: "sadness", level: 2 },
+          { id: 6, label: "Disgust", type: "disgust", level: 1 },
+          { id: 7, label: "Anger", type: "anger", level: 1 },
+          { id: 8, label: "Anticipation", type: "anticipation", level: 4 },
+        ];
+        const emotion = emotionCategories.find(e => e.id === emotionId);
+        return emotion || { type: "neutral", level: 3 };
+      };
+
+      const emotionData = getEmotionData(selectedEmotion);
+      
       await apiRequest("POST", "/api/journal-entries", {
-        emotion: selectedEmotion,
-        emotionType: getEmotionType(selectedEmotion),
+        userId: "temp-user",
+        journalType: "body",
+        emotionLevel: emotionData.level,
+        emotionType: emotionData.type,
         content: journalContent,
-        bodyFeelings: selectedBodyFeelings,
+        bodyMapping: {
+          feelings: selectedBodyFeelings,
+          emotionCategory: selectedEmotion,
+          intensity: 50, // Default intensity since we don't have it in this flow
+          timestamp: new Date().toISOString()
+        },
       });
     },
     onSuccess: () => {

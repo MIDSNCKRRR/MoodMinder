@@ -1,4 +1,4 @@
-import emotionsData from "/data/emotion_color.json";
+import emotionsData from "../data/emotion_color.json";
 
 export interface StandardEmotion {
   emotion_id: number;

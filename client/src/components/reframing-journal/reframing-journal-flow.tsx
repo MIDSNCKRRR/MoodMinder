@@ -10,7 +10,7 @@ import { Step1EmotionSelection } from "@/components/reframing-journal/step-1-emo
 import { Step2Questions } from "@/components/reframing-journal/step-2-questions";
 import { Step3ReframingResult } from "@/components/reframing-journal/step-3-reframing-result";
 import { gptReframingService } from "@/services/gpt-reframing";
-import emotionsData from "/data/emotion_color.json";
+import emotionsData from "../../data/emotion_color.json";
 
 type Emotion = {
   id: string;

@@ -29,7 +29,7 @@ export const users = pgTable("users", {
 export const journalEntries = pgTable("journal_entries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  journalType: text("journal_type").notNull().default("emotion"), // emotion, gratitude, reflection
+  journalType: text("journal_type").notNull().default("body"), // body, identity, reframing
   emotionLevel: integer("emotion_level").notNull(), // 1-5 scale
   emotionType: text("emotion_type").notNull(), // sad, neutral, happy, etc.
   content: text("content").notNull(),

@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { VoiceOrb } from "./voice-orb";
 import { useVoiceRecognition } from "@/hooks/use-voice-recognition";
-import emotionsData from "/data/emotion_color.json";
+import emotionsData from "../../data/emotion_color.json";
 
 interface VoiceQuestionFlowProps {
   emotion: {
@@ -51,22 +51,129 @@ export function VoiceQuestionFlow({
   const [shouldKeepListening, setShouldKeepListening] = useState(false);
   const [restartCount, setRestartCount] = useState(0);
   const [voiceState, setVoiceState] = useState<
-    "idle" | "listening" | "processing" | "speaking"
+    "idle" | "listening" | "temp-saving" | "speaking"
   >("idle");
+  const [lastCapturedText, setLastCapturedText] = useState<string>(""); // Store what was just captured
   const [realtimeTranscript, setRealtimeTranscript] = useState("");
-  const [emotionColor, setEmotionColor] = useState<string>("#a78bfa"); // Default purple
+  const [bodyEmotionColor, setBodyEmotionColor] = useState<string | null>(null); // Body Journal color
+  const [reframingEmotionColor, setReframingEmotionColor] = useState<string | null>(null); // Reframing Journal color
+  const [isDataLoaded, setIsDataLoaded] = useState(false); // Track if data is loaded
 
-  // Get emotion color from Body Journal localStorage
+  // Helper function to safely blend two hex colors
+  const blendColors = (color1: string, color2: string): string => {
+    try {
+      const hexToRgb = (hex: string) => {
+        const s = hex.replace("#", "");
+        const bigint = parseInt(
+          s.length === 3
+            ? s.split("").map((ch) => ch + ch).join("")
+            : s,
+          16,
+        );
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return { r, g, b };
+      };
+
+      const rgb1 = hexToRgb(color1);
+      const rgb2 = hexToRgb(color2);
+
+      // Blend the colors (average)
+      const blended = {
+        r: Math.floor((rgb1.r + rgb2.r) / 2),
+        g: Math.floor((rgb1.g + rgb2.g) / 2),
+        b: Math.floor((rgb1.b + rgb2.b) / 2)
+      };
+
+      // Return as hex instead of rgb
+      const toHex = (n: number) => {
+        const hex = n.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      };
+      
+      return `#${toHex(blended.r)}${toHex(blended.g)}${toHex(blended.b)}`;
+    } catch (error) {
+      console.warn("Color blending failed, using first color:", error);
+      return color1;
+    }
+  };
+
+  // Calculate the emotion color to display
+  const getEmotionColor = (): string => {
+    const result = (() => {
+      if (bodyEmotionColor && reframingEmotionColor) {
+        // Both colors available - blend them
+        return blendColors(bodyEmotionColor, reframingEmotionColor);
+      } else if (reframingEmotionColor) {
+        // Only reframing color
+        return reframingEmotionColor;
+      } else if (bodyEmotionColor) {
+        // Only body color
+        return bodyEmotionColor;
+      }
+      // Default purple
+      return "#a78bfa";
+    })();
+    
+    console.log("🎨 Final emotion color:", result);
+    return result;
+  };
+
+  // Get emotion color from TODAY'S Body Journal entry
   useEffect(() => {
-    const savedEmotion = localStorage.getItem("bodyJournal_emotion");
-    if (savedEmotion) {
-      const emotionId = parseInt(savedEmotion);
-      const emotionData = emotionsData.find(e => e.emotion_id === emotionId);
-      if (emotionData) {
-        setEmotionColor(emotionData.hex);
+    const fetchTodayBodyJournalEmotion = async () => {
+      try {
+        const response = await fetch('/api/journal-entries');
+        const entries = await response.json();
+        
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Find TODAY'S body journal entry
+        const todayBodyEntry = entries
+          .filter((entry: any) => {
+            const entryDate = new Date(entry.createdAt).toISOString().split('T')[0];
+            return entry.journalType === 'body' && entryDate === today;
+          })[0];
+        
+        console.log("Voice orb - today's body journal entry:", todayBodyEntry);
+        
+        if (todayBodyEntry && todayBodyEntry.bodyMapping?.emotionCategory) {
+          const emotionId = todayBodyEntry.bodyMapping.emotionCategory;
+          const emotionData = emotionsData.find(e => e.emotion_id === emotionId);
+          console.log("Voice orb - found TODAY'S emotion data for ID", emotionId, ":", emotionData);
+          
+          if (emotionData) {
+            console.log("Voice orb - setting TODAY'S body emotion color to:", emotionData.hex);
+            setBodyEmotionColor(emotionData.hex);
+          }
+        } else {
+          console.log("Voice orb - no TODAY'S body journal entry found");
+          setBodyEmotionColor(null);
+        }
+      } catch (error) {
+        console.error("Voice orb - error fetching journal entries:", error);
+        setBodyEmotionColor(null);
+      } finally {
+        setIsDataLoaded(true); // Mark data as loaded regardless of success/failure
+      }
+    };
+
+    fetchTodayBodyJournalEmotion();
+  }, []);
+
+  // Update reframing emotion color when emotion is selected
+  useEffect(() => {
+    if (emotion?.id) {
+      // Find the emotion data with hex color
+      const emotionData = emotionsData.find(e => e.emotion_id.toString() === emotion.id);
+      if (emotionData?.hex) {
+        console.log("Voice orb - setting reframing emotion color to:", emotionData.hex);
+        setReframingEmotionColor(emotionData.hex);
       }
     }
-  }, []);
+  }, [emotion]);
 
   // Unified state configuration
   const stateConfig = {
@@ -88,13 +195,13 @@ export function VoiceQuestionFlow({
       description: "",
       animation: "animate-pulse",
     },
-    processing: {
+    "temp-saving": {
       color: "amber",
-      bgColor: "bg-amber-100",
+      bgColor: "bg-amber-100", 
       textColor: "text-amber-600",
       indicatorColor: "bg-amber-500",
-      title: "Processing...",
-      description: "Understanding your response",
+      title: "Saving...",
+      description: "",
       animation: "animate-bounce",
     },
     speaking: {
@@ -217,8 +324,8 @@ export function VoiceQuestionFlow({
     });
 
     recognition.addEventListener("speechend", () => {
-      console.log("🤫 Speech ended - processing...");
-      setVoiceState("processing");
+      console.log("🤫 Speech ended - temp saving...");
+      setVoiceState("temp-saving");
     });
 
     recognition.addEventListener("result", (e) => {
@@ -242,6 +349,7 @@ export function VoiceQuestionFlow({
 
       if (finalTranscript.trim()) {
         console.log("📝 Recognition result:", finalTranscript);
+        setLastCapturedText(finalTranscript.trim()); // Store what was captured
         setVoiceState("speaking"); // Show as if AI is "understanding"
 
         // Accumulate answers
@@ -429,7 +537,7 @@ export function VoiceQuestionFlow({
                   transform:
                     voiceState === "listening"
                       ? "scale(1.2)"
-                      : voiceState === "processing"
+                      : voiceState === "temp-saving"
                         ? "scale(0.9)"
                         : voiceState === "speaking"
                           ? "scale(1.3)"
@@ -440,24 +548,31 @@ export function VoiceQuestionFlow({
 
               {/* Voice Orb with Transparent Background */}
               <div className="relative">
-                <VoiceOrb
-                  isListening={hasStartedListening}
-                  palette="emotion"
-                  emotionColor={emotionColor}
-                  size="large"
-                  className="mx-auto transition-all duration-500 ease-in-out transform drop-shadow-2xl"
-                  style={{
-                    transform:
-                      voiceState === "listening"
-                        ? "scale(1.05)"
-                        : voiceState === "processing"
-                          ? "scale(0.95)"
-                          : voiceState === "speaking"
-                            ? "scale(1.1)"
-                            : "scale(1)",
-                    filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))",
-                  }}
-                />
+                {isDataLoaded ? (
+                  <VoiceOrb
+                    isListening={hasStartedListening}
+                    palette="dual"
+                    bodyEmotionColor={bodyEmotionColor}
+                    reframingEmotionColor={reframingEmotionColor}
+                    size="large"
+                    className="mx-auto transition-all duration-500 ease-in-out transform drop-shadow-2xl"
+                    style={{
+                      transform:
+                        voiceState === "listening"
+                          ? "scale(1.05)"
+                          : voiceState === "temp-saving"
+                            ? "scale(0.95)"
+                            : voiceState === "speaking"
+                              ? "scale(1.1)"
+                              : "scale(1)",
+                      filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))",
+                    }}
+                  />
+                ) : (
+                  <div className="w-64 h-48 flex items-center justify-center">
+                    <div className="text-stone-400 text-sm">Loading...</div>
+                  </div>
+                )}
 
                 {/* Floating State Badge */}
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
@@ -485,6 +600,20 @@ export function VoiceQuestionFlow({
                   className={`text-sm ${currentState.textColor} opacity-75 transition-all duration-300`}
                 >
                   {currentState.description}
+                </div>
+              </div>
+            )}
+
+            {/* Show captured text during temp-saving and speaking states */}
+            {(voiceState === "temp-saving" || voiceState === "speaking") && lastCapturedText && (
+              <div className="text-center max-w-md mx-auto">
+                <div className="bg-green-50/90 backdrop-blur-sm px-4 py-3 rounded-lg border border-green-200/50 shadow-sm">
+                  <div className="text-green-800 text-xs mb-1 font-medium">
+                    {voiceState === "temp-saving" ? "Saving:" : "Just captured:"}
+                  </div>
+                  <div className="text-green-700 text-sm leading-relaxed">
+                    "{lastCapturedText}"
+                  </div>
                 </div>
               </div>
             )}
@@ -564,14 +693,6 @@ export function VoiceQuestionFlow({
               </div>
             ) : (
               <div className="text-center space-y-4">
-                <Button
-                  onClick={handleStopListening}
-                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-                >
-                  <MicOff className="w-5 h-5 mr-2" />
-                  Stop Listening
-                </Button>
-
                 <div className="text-sm text-stone-500">
                   <p>Voice session active</p>
                   <p>Keep speaking - I'm accumulating your responses</p>
@@ -582,18 +703,10 @@ export function VoiceQuestionFlow({
             {/* Voice input display */}
             {hasStartedListening && (
               <div className="bg-white/60 p-4 rounded-stone border border-purple-200 space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="text-center">
                   <p className="text-purple-700 text-sm font-medium">
                     음성 인식 중... 계속 말씀해주세요
                   </p>
-                  <Button
-                    onClick={handleStopListening}
-                    variant="outline"
-                    size="sm"
-                    className="text-red-600 border-red-300 hover:bg-red-50"
-                  >
-                    중단
-                  </Button>
                 </div>
 
                 {/* 실시간 누적 답변 표시 */}
@@ -607,8 +720,7 @@ export function VoiceQuestionFlow({
                 )}
 
                 <p className="text-xs text-stone-500">
-                  말씀하신 내용이 계속 추가됩니다. 완료되면 "중단" 버튼을
-                  눌러주세요.
+                  말씀하신 내용이 계속 추가됩니다. 완료되면 하단의 "다음 질문" 또는 "리프레이밍 생성하기" 버튼을 눌러주세요.
                 </p>
               </div>
             )}

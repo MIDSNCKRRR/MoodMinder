@@ -4,6 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["lsof"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -34,9 +35,22 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "start app"
+mode = "sequential"
+author = 46001719
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm start dev"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 54545
+externalPort = 3000
 
 [agent]
 integrations = ["javascript_database==1.0.0", "javascript_openai==1.0.0", "javascript_log_in_with_replit==1.0.0"]

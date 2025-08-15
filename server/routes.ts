@@ -7,11 +7,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Journal Entries
   app.post("/api/journal-entries", async (req, res) => {
     try {
+      console.log("Received journal entry data:", JSON.stringify(req.body, null, 2));
       const validatedData = insertJournalEntrySchema.parse(req.body);
       const entry = await storage.createJournalEntry(validatedData);
       res.json(entry);
     } catch (error) {
-      res.status(400).json({ error: "Invalid journal entry data" });
+      console.error("Journal entry validation error:", error);
+      console.error("Request body was:", JSON.stringify(req.body, null, 2));
+      res.status(400).json({ 
+        error: "Invalid journal entry data",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
