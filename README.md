@@ -2,6 +2,11 @@
 
 A comprehensive mental health and wellness mobile application that empowers users to track emotions, journal their thoughts, and build self-awareness through innovative AI-powered features.
 
+## 🌐 Live Demo
+**[Try MoodMinder Now →](https://softmoves-sujinsuh200-5975s-projects.vercel.app/)**
+
+*Experience the full-featured mental wellness app with AI-powered journaling, emotion tracking, and personalized meme generation.*
+
 ## ✨ Features
 
 ### 🎭 Emotion Tracking & Body Mapping
@@ -74,7 +79,7 @@ A comprehensive mental health and wellness mobile application that empowers user
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/yourusername/MoodMinder.git
 cd MoodMinder
 
 # Install dependencies
@@ -90,6 +95,16 @@ npm run db:seed
 
 # Start development server
 npm run dev
+```
+
+### Deployment
+
+The app is deployed on **Vercel** for seamless full-stack hosting:
+
+```bash
+# Deploy to Vercel
+npm i -g vercel
+vercel --prod
 ```
 
 ### Environment Variables
