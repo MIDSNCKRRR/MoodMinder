@@ -1,0 +1,130 @@
+{
+  "identity": {
+    "templates": [
+      {
+        "id": "confident_combo",
+        "condition": {
+          "keywords": ["confident", "strong", "brave"],
+          "emotion_level": [4, 5],
+          "body_feelings": ["chest", "shoulders"]
+        },
+        "comments": [
+          "어깨에 힘 주고 가슴 펴고 살아가는 당신, 완전 주인공 포스 💪✨",
+          "자신감이 어깨와 가슴에서 뿜어져 나오네요! 오늘도 당당하게! 👑",
+          "가슴 펴고 어깨 쫙! 당신의 자신감이 온 몸으로 표현되고 있어요 🦸‍♀️"
+        ]
+      },
+      {
+        "id": "creative_mood",
+        "condition": {
+          "keywords": ["creative", "curious", "playful"],
+          "emotion_level": [3, 4, 5],
+          "body_feelings": ["head", "hands"]
+        },
+        "comments": [
+          "머리에서 아이디어가 팡팡! 손으로는 뭔가 만들고 있나요? 창의력 폭발! 🎨💡",
+          "호기심 가득한 당신의 머리와 손이 오늘도 바쁘게 움직이네요! 🤹‍♀️",
+          "창작하는 손과 생각하는 머리... 당신은 예술가의 영혼을 가졌어요! 🎭"
+        ]
+      },
+      {
+        "id": "calm_peaceful",
+        "condition": {
+          "keywords": ["calm", "peaceful", "authentic"],
+          "emotion_level": [3, 4],
+          "body_feelings": ["heart", "whole_body"]
+        },
+        "comments": [
+          "온몸으로 평온함을 느끼는 당신, 진짜 힐링 마스터! 🧘‍♀️🌸",
+          "마음과 몸 전체가 하나 되어 평화로운 당신... 부러워요! 🕊️",
+          "전신에서 뿜어지는 평온한 에너지, 당신 주변 사람들도 힐링될 듯! 🌿"
+        ]
+      },
+      {
+        "id": "emotional_processing",
+        "condition": {
+          "keywords": ["empathetic", "compassionate", "resilient"],
+          "emotion_level": [2, 3],
+          "body_feelings": ["heart", "stomach"]
+        },
+        "comments": [
+          "마음과 배로 감정을 다 받아내는 당신... 진짜 감정의 달인이에요! 💝",
+          "가슴과 배에서 느끼는 깊은 감정들, 당신의 공감 능력이 최고! 🤗",
+          "마음과 배가 함께 아파하고 기뻐하는 당신, 참 따뜻한 사람이네요! 💕"
+        ]
+      },
+      {
+        "id": "high_energy",
+        "condition": {
+          "keywords": ["energized", "optimistic", "leader"],
+          "emotion_level": [4, 5],
+          "body_feelings": ["whole_body", "legs", "arms"]
+        },
+        "comments": [
+          "온몸이 에너지로 가득 찬 당신! 오늘 뭔가 큰일을 낼 것 같은데요? ⚡🔥",
+          "팔다리가 움틀거리며 에너지를 발산하는 당신, 완전 파워리더! 💪⚡",
+          "전신에서 터져나오는 긍정 에너지! 당신을 보면 저도 힘이 나요! 🌟"
+        ]
+      },
+      {
+        "id": "introspective",
+        "condition": {
+          "keywords": ["independent", "authentic", "curious"],
+          "emotion_level": [3, 4],
+          "body_feelings": ["head", "heart"]
+        },
+        "comments": [
+          "머리로 생각하고 마음으로 느끼는 당신의 깊이... 철학자 같아요! 🤔💭",
+          "생각과 감정이 조화를 이루는 당신, 진정한 자기만의 길을 걷고 있네요! 🛤️",
+          "머리와 마음이 대화하며 성장하는 당신의 모습이 아름다워요! 🌱💖"
+        ]
+      },
+      {
+        "id": "default_positive",
+        "condition": {
+          "keywords": ["any"],
+          "emotion_level": [3, 4, 5]
+        },
+        "comments": [
+          "당신의 정체성이 몸과 마음 곳곳에 새겨져 있어요! 멋진 하루! ✨",
+          "오늘도 자신다운 모습으로 살아가는 당신이 빛나네요! 🌟",
+          "당신만의 특별함이 온몸으로 표현되고 있어요! 계속 그대로! 💫",
+          "몸과 마음이 하나 되어 당신다움을 보여주네요! 최고! 👏",
+          "정체성과 감정이 몸 전체로 퍼져나가는 모습이 아름다워요! 🎨"
+        ]
+      },
+      {
+        "id": "reframing_success",
+        "condition": {
+          "has_reframing": true,
+          "emotion_level": [3, 4, 5]
+        },
+        "comments": [
+          "부정적인 생각도 긍정으로 바꿔내는 당신! 진짜 마음의 연금술사! ⭐🔄",
+          "리프레이밍 마스터 등극! 생각을 바꾸니 몸도 따라 변하네요! 🔄✨",
+          "마음의 관점을 바꾼 후 몸까지 가벼워진 당신... 대단해요! 🦋🌈"
+        ]
+      },
+      {
+        "id": "triple_completion",
+        "condition": {
+          "has_body": true,
+          "has_identity": true,
+          "has_reframing": true
+        },
+        "comments": [
+          "몸, 마음, 생각까지! 3단 콤보 완성한 당신은 진정한 셀프케어 챔피언! 🏆✨",
+          "바디-아이덴티티-리프레이밍 트리플 크라운! 당신은 자기관리의 신! 👑🎯",
+          "전인적 성장을 완성한 당신! 몸도 마음도 생각도 모두 레벨업! 🚀🌟"
+        ]
+      }
+    ],
+    "fallback_comments": [
+      "당신만의 특별한 하루였네요! 몸과 마음이 기억할 거예요! 💝",
+      "오늘 하루 자신과 마주한 용기, 정말 대단해요! 🌟",
+      "당신다움이 오늘도 빛나고 있어요! 계속 그 길로! ✨",
+      "몸과 마음의 이야기를 들어준 당신, 최고! 👏",
+      "자신을 돌아본 오늘, 분명 성장한 하루였을 거예요! 🌱"
+    ]
+  }
+}

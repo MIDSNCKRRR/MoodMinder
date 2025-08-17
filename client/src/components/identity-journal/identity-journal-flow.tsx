@@ -3,6 +3,7 @@ import { ArrowLeft, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import ProgressBar from "./progress-bar";
 import Step1Keywords from "./step-1-keywords";
 import Step2Reflection from "./step-2-reflection";
@@ -62,11 +63,50 @@ export default function IdentityJournalFlow({
     try {
       setIsGeneratingMeme(true);
       
-      // Generate meme first
+      // Fetch today's journal entries to get daily data
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      
+      let dailyJournalData = {};
+      
+      try {
+        const response = await fetch("/api/journal-entries");
+        if (response.ok) {
+          const allEntries = await response.json();
+          const todayEntries = allEntries.filter((entry: any) => {
+            const entryDate = new Date(entry.createdAt);
+            return entryDate >= todayStart;
+          });
+          
+          // Extract body journal data
+          const bodyEntry = todayEntries.find((entry: any) => entry.journalType === "body");
+          if (bodyEntry) {
+            dailyJournalData.bodyJournal = {
+              emotionLevel: bodyEntry.emotionLevel,
+              bodyFeelings: bodyEntry.bodyMapping?.feelings ? Object.keys(bodyEntry.bodyMapping.feelings) : [],
+              content: bodyEntry.content
+            };
+          }
+          
+          // Extract reframing journal data
+          const reframingEntry = todayEntries.find((entry: any) => entry.journalType === "reframing");
+          if (reframingEntry) {
+            dailyJournalData.reframingJournal = {
+              content: reframingEntry.content,
+              hasReframing: reframingEntry.content?.includes("=== 리프레이밍 결과 ===") || false
+            };
+          }
+        }
+      } catch (fetchError) {
+        console.warn("Could not fetch daily journal data:", fetchError);
+      }
+      
+      // Generate meme with daily journal context
       const memeResponse = await memeGenerationService.generateMeme({
         keywords: selectedKeywords,
         reflection: reflectionContent,
-        matchingScore: matchingScore
+        matchingScore: matchingScore,
+        dailyJournalData
       });
 
       if (!memeResponse.success) {
@@ -92,6 +132,8 @@ export default function IdentityJournalFlow({
           memeUrl: memeResponse.memeUrl,
           memeDescription: memeResponse.description,
           timestamp: new Date().toISOString(),
+          // Store related journal data for meme context
+          dailyJournalContext: dailyJournalData,
         },
       };
 
@@ -111,9 +153,12 @@ export default function IdentityJournalFlow({
       const savedEntry = await response.json();
       console.log("Identity journal entry saved:", savedEntry);
 
+      // Invalidate queries to refresh insights page data
+      queryClient.invalidateQueries({ queryKey: ["/api/journal-entries"] });
+
       toast({
         title: "저장 완료",
-        description: "정체성 저널과 개인 밈이 생성되었습니다!",
+        description: "정체성 저널이 저장되었습니다! 3개의 저널을 모두 완료하면 개인 밈을 확인할 수 있습니다.",
       });
 
       // Clear localStorage

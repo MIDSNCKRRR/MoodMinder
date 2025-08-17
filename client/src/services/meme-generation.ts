@@ -1,26 +1,53 @@
 import OpenAI from "openai";
+import memeCommentsData from "@/data/meme/text/identity.json";
 
 // Test mode configuration
 const TEST_MODE = true; // Set to false to use real GPT API
 
-// Test dummy meme responses for development
-const TEST_MEME_RESPONSES: Record<string, string> = {
-  creative: "https://via.placeholder.com/400x400/FF6B6B/FFFFFF?text=Creative+Mastermind",
-  ambitious: "https://via.placeholder.com/400x400/4ECDC4/FFFFFF?text=Goal+Crusher",
-  empathetic: "https://via.placeholder.com/400x400/45B7D1/FFFFFF?text=Heart+of+Gold",
-  resilient: "https://via.placeholder.com/400x400/96CEB4/FFFFFF?text=Bounce+Back+Hero",
-  curious: "https://via.placeholder.com/400x400/FFEAA7/000000?text=Wonder+Explorer",
-  leader: "https://via.placeholder.com/400x400/DDA0DD/FFFFFF?text=Natural+Born+Leader",
-  authentic: "https://via.placeholder.com/400x400/FFB6C1/000000?text=True+to+Self",
-  optimistic: "https://via.placeholder.com/400x400/FFE4B5/000000?text=Sunshine+Spirit",
-  independent: "https://via.placeholder.com/400x400/D3D3D3/000000?text=Solo+Warrior",
-  compassionate: "https://via.placeholder.com/400x400/F0E68C/000000?text=Kind+Soul"
+// Available local meme images
+const LOCAL_MEME_IMAGES = [
+  "/src/data/meme/brave_capibara.png",
+  "/src/data/meme/dummy_cat.png"
+];
+
+// Keyword to image mapping for better selection
+const KEYWORD_TO_IMAGE_MAP: Record<string, string> = {
+  creative: "/src/data/meme/dummy_cat.png",
+  ambitious: "/src/data/meme/brave_capibara.png",
+  empathetic: "/src/data/meme/dummy_cat.png",
+  resilient: "/src/data/meme/brave_capibara.png",
+  curious: "/src/data/meme/dummy_cat.png",
+  leader: "/src/data/meme/brave_capibara.png",
+  authentic: "/src/data/meme/dummy_cat.png",
+  optimistic: "/src/data/meme/dummy_cat.png",
+  independent: "/src/data/meme/brave_capibara.png",
+  compassionate: "/src/data/meme/dummy_cat.png",
+  brave: "/src/data/meme/brave_capibara.png",
+  confident: "/src/data/meme/brave_capibara.png",
+  strong: "/src/data/meme/brave_capibara.png",
+  calm: "/src/data/meme/brave_capibara.png",
+  peaceful: "/src/data/meme/brave_capibara.png",
+  playful: "/src/data/meme/dummy_cat.png",
+  cute: "/src/data/meme/dummy_cat.png",
+  funny: "/src/data/meme/dummy_cat.png",
+  friendly: "/src/data/meme/dummy_cat.png"
 };
 
 interface MemeGenerationRequest {
   keywords: string[];
   reflection: string;
   matchingScore: number;
+  dailyJournalData?: {
+    bodyJournal?: {
+      emotionLevel: number;
+      bodyFeelings: string[];
+      content: string;
+    };
+    reframingJournal?: {
+      content: string;
+      hasReframing: boolean;
+    };
+  };
 }
 
 interface MemeGenerationResponse {
@@ -71,15 +98,31 @@ class MemeGenerationService {
     // Get the primary keyword for meme selection
     const primaryKeyword = request.keywords[0]?.toLowerCase() || "authentic";
     
-    // Find a matching test meme or use default
-    const memeUrl = TEST_MEME_RESPONSES[primaryKeyword] || 
-                    TEST_MEME_RESPONSES.authentic;
+    // Find a matching local meme image based on keywords
+    let selectedImage = KEYWORD_TO_IMAGE_MAP[primaryKeyword];
+    
+    // If no specific mapping found, look for any keyword match
+    if (!selectedImage) {
+      for (const keyword of request.keywords) {
+        const lowerKeyword = keyword.toLowerCase();
+        if (KEYWORD_TO_IMAGE_MAP[lowerKeyword]) {
+          selectedImage = KEYWORD_TO_IMAGE_MAP[lowerKeyword];
+          break;
+        }
+      }
+    }
+    
+    // Fallback to random selection from available images
+    if (!selectedImage) {
+      const randomIndex = Math.floor(Math.random() * LOCAL_MEME_IMAGES.length);
+      selectedImage = LOCAL_MEME_IMAGES[randomIndex];
+    }
 
-    const description = this.generateMemeDescription(request.keywords);
+    const description = this.generateFunnyComment(request);
 
     return {
       success: true,
-      memeUrl,
+      memeUrl: selectedImage,
       description
     };
   }
@@ -132,9 +175,77 @@ ${request.reflection}
 
     return {
       success: true,
-      memeUrl: imageResponse.data[0].url || "",
+      memeUrl: imageResponse.data?.[0]?.url || "",
       description: descriptionResult.korean_title || "당신만의 특별한 밈"
     };
+  }
+
+  private generateFunnyComment(request: MemeGenerationRequest): string {
+    try {
+      const templates = memeCommentsData.identity.templates;
+      const fallbackComments = memeCommentsData.identity.fallback_comments;
+      
+      // Find matching template based on keywords, emotion level, and body feelings
+      for (const template of templates) {
+        if (this.matchesTemplate(template, request)) {
+          const comments = template.comments;
+          const randomIndex = Math.floor(Math.random() * comments.length);
+          return comments[randomIndex];
+        }
+      }
+      
+      // If no template matches, use fallback comment
+      const randomIndex = Math.floor(Math.random() * fallbackComments.length);
+      return fallbackComments[randomIndex];
+      
+    } catch (error) {
+      console.error('Error generating funny comment:', error);
+      return this.generateMemeDescription(request.keywords);
+    }
+  }
+
+  private matchesTemplate(template: any, request: MemeGenerationRequest): boolean {
+    const condition = template.condition;
+    
+    // Check keywords match
+    if (condition.keywords && !condition.keywords.includes("any")) {
+      const hasMatchingKeyword = condition.keywords.some((keyword: string) => 
+        request.keywords.some(userKeyword => 
+          userKeyword.toLowerCase().includes(keyword.toLowerCase())
+        )
+      );
+      if (!hasMatchingKeyword) return false;
+    }
+    
+    // Check emotion level (assume default level 3 if no daily data)
+    const emotionLevel = request.dailyJournalData?.bodyJournal?.emotionLevel || 3;
+    if (condition.emotion_level && !condition.emotion_level.includes(emotionLevel)) {
+      return false;
+    }
+    
+    // Check body feelings
+    if (condition.body_feelings && request.dailyJournalData?.bodyJournal?.bodyFeelings) {
+      const hasMatchingBodyFeeling = condition.body_feelings.some((feeling: string) =>
+        request.dailyJournalData?.bodyJournal?.bodyFeelings.includes(feeling)
+      );
+      if (!hasMatchingBodyFeeling) return false;
+    }
+    
+    // Check for reframing completion
+    if (condition.has_reframing && !request.dailyJournalData?.reframingJournal?.hasReframing) {
+      return false;
+    }
+    
+    // Check for triple completion (this would need to be passed in from the caller)
+    if (condition.has_body && condition.has_identity && condition.has_reframing) {
+      return !!(
+        request.dailyJournalData?.bodyJournal && 
+        request.keywords.length > 0 && 
+        request.dailyJournalData?.reframingJournal?.hasReframing
+      );
+    }
+    
+    return true;
   }
 
   private generateMemeDescription(keywords: string[]): string {

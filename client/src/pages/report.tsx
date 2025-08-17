@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, Download, Share2 } from "lucide-react";
+import { Lock, Download, Share2, Twitter, Instagram, Eye, Gift, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import WaveChart from "@/components/wave-chart";
 import SensoryScoreChart from "@/components/sensory-score-chart";
+import { socialSharingService } from "@/services/social-sharing";
 import type { JournalEntry } from "@shared/schema";
 
 interface EmotionStats {
@@ -66,6 +69,12 @@ interface RecoveryTendency {
 }
 
 export default function Report() {
+  const { toast } = useToast();
+  
+  // State for meme reveal game mechanics
+  const [revealedMemes, setRevealedMemes] = useState<Set<string>>(new Set());
+  const [celebrationMode, setCelebrationMode] = useState(false);
+  
   // Fetch journal entries to check for memes and reframing completion
   const { data: journalEntries = [] } = useQuery<JournalEntry[]>({
     queryKey: ["/api/journal-entries"],
@@ -113,20 +122,41 @@ export default function Report() {
         memeUrl: entry.bodyMapping.memeUrl,
         description: entry.bodyMapping.memeDescription || "개인 밈",
         keywords: entry.bodyMapping.keywords || [],
-        createdAt: entry.createdAt
+        createdAt: entry.createdAt,
+        // Extract journal context data
+        bodyFeelings: entry.bodyMapping?.dailyJournalContext?.bodyJournal?.bodyFeelings || [],
+        emotionLevel: entry.bodyMapping?.dailyJournalContext?.bodyJournal?.emotionLevel,
+        reframingContent: entry.bodyMapping?.dailyJournalContext?.reframingJournal?.content,
+        hasReframing: entry.bodyMapping?.dailyJournalContext?.reframingJournal?.hasReframing || false,
+        reflection: entry.content || ""
       }));
   };
 
-  const hasCompletedReframing = () => {
-    return journalEntries.some(entry => 
-      entry.journalType === "reframing" && 
-      entry.content && 
-      entry.content.includes("=== 리프레이밍 결과 ===")
-    );
+  const hasCompletedJournalType = (journalType: string) => {
+    return journalEntries.some(entry => entry.journalType === journalType);
+  };
+
+  const hasCompletedAllJournals = () => {
+    const requiredJournals = ["body", "identity", "reframing"];
+    return requiredJournals.every(journalType => hasCompletedJournalType(journalType));
+  };
+
+  const getCompletionStatus = () => {
+    const requiredJournals = [
+      { type: "body", name: "Body Journal" },
+      { type: "identity", name: "Identity Journal" },
+      { type: "reframing", name: "Re-Framing Journal" }
+    ];
+    
+    return requiredJournals.map(journal => ({
+      ...journal,
+      completed: hasCompletedJournalType(journal.type)
+    }));
   };
 
   const identityMemes = getIdentityMemes();
-  const canViewMemes = hasCompletedReframing();
+  const canViewMemes = hasCompletedAllJournals();
+  const completionStatus = getCompletionStatus();
 
   // Use data from API endpoints directly
   const weeklyData = weeklyEmotionData || { data: [3, 3, 3, 3, 3, 3, 3], labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] };
@@ -155,6 +185,94 @@ export default function Report() {
     const maxIndex = dayAverages.indexOf(Math.max(...dayAverages));
     return weeklyData.labels[maxIndex];
   };
+
+  // Helper to extract reframing result from content
+  const extractReframingResult = (content: string) => {
+    if (!content) return "";
+    
+    const reframingMarker = "=== 리프레이밍 결과 ===";
+    const startIndex = content.indexOf(reframingMarker);
+    
+    if (startIndex === -1) return "";
+    
+    const resultContent = content.substring(startIndex + reframingMarker.length).trim();
+    return resultContent;
+  };
+
+  // Meme sharing handlers
+  const handleTwitterShare = async (meme: any) => {
+    try {
+      await socialSharingService.shareToTwitter({
+        memeUrl: meme.memeUrl,
+        description: meme.description,
+        keywords: meme.keywords,
+        reflection: `오늘의 정체성: ${meme.keywords.join(', ')} | 몸의 감각: ${meme.bodyFeelings?.join(', ') || '없음'} | 리프레이밍: ${meme.hasReframing ? '완료' : '미완료'}`
+      });
+      toast({
+        title: "트위터 공유",
+        description: "트위터 공유 창이 열렸습니다!",
+      });
+    } catch (error) {
+      toast({
+        title: "공유 실패",
+        description: "트위터 공유에 실패했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleInstagramShare = async (meme: any) => {
+    try {
+      await socialSharingService.shareToInstagram({
+        memeUrl: meme.memeUrl,
+        description: meme.description,
+        keywords: meme.keywords,
+        reflection: `오늘의 정체성: ${meme.keywords.join(', ')} | 몸의 감각: ${meme.bodyFeelings?.join(', ') || '없음'} | 리프레이밍: ${meme.hasReframing ? '완료' : '미완료'}`
+      });
+      toast({
+        title: "Instagram 준비 완료",
+        description: "메시지가 클립보드에 복사되었습니다!",
+      });
+    } catch (error) {
+      toast({
+        title: "공유 실패",
+        description: "Instagram 공유 준비에 실패했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadMeme = async (meme: any) => {
+    try {
+      await socialSharingService.downloadMeme(meme.memeUrl, `identity-meme-${meme.id}.png`);
+      toast({
+        title: "다운로드 완료",
+        description: "밈이 다운로드되었습니다!",
+      });
+    } catch (error) {
+      toast({
+        title: "다운로드 실패",
+        description: "다운로드에 실패했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Meme reveal game mechanics
+  const handleRevealMeme = (memeId: string) => {
+    setRevealedMemes(prev => new Set([...Array.from(prev), memeId]));
+    
+    // Add celebration effect
+    setCelebrationMode(true);
+    setTimeout(() => setCelebrationMode(false), 2000);
+    
+    toast({
+      title: "🎉 밈 발견!",
+      description: "새로운 개인 밈을 발견했습니다! 공유해보세요!",
+    });
+  };
+
+  const isMemeRevealed = (memeId: string) => revealedMemes.has(memeId);
 
   // All calculations now done in backend
 
@@ -541,94 +659,209 @@ export default function Report() {
             </h3>
 
             {!canViewMemes ? (
-              // Locked state
+              // Locked state - show completion requirements
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Lock className="w-8 h-8 text-stone-400" />
                 </div>
                 <h4 className="font-medium text-stone-600 mb-2">밈 갤러리 잠금 상태</h4>
                 <p className="text-sm text-stone-500 mb-4">
-                  리프레이밍 저널을 완료하면 개인 밈을 확인할 수 있습니다
+                  3개의 저널을 모두 완료하면 개인 밈을 확인할 수 있습니다
                 </p>
+                
+                {/* Completion Checklist */}
+                <div className="bg-white/60 p-4 rounded-stone mb-4">
+                  <h5 className="text-sm font-medium text-stone-600 mb-3">완료 현황</h5>
+                  <div className="space-y-2">
+                    {completionStatus.map((journal, index) => (
+                      <div key={journal.type} className="flex items-center justify-between text-sm">
+                        <span className="text-stone-600">{journal.name}</span>
+                        {journal.completed ? (
+                          <span className="text-green-600 font-medium">✓ 완료</span>
+                        ) : (
+                          <span className="text-stone-400">미완료</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
                 <div className="bg-white/60 p-3 rounded-stone text-xs text-stone-600">
-                  💡 Body Journal → Reframing Journal 순서로 완료해주세요
+                  💡 모든 저널을 완료하면 개인 맞춤 밈을 생성하고 공유할 수 있습니다
                 </div>
               </div>
             ) : (
-              // Unlocked state - show memes
+              // Unlocked state - show memes with reveal mechanics
               <div className="space-y-4">
                 <div className="text-center mb-4">
                   <p className="text-sm text-stone-600">
-                    🎉 축하합니다! 리프레이밍을 완료하여 밈 갤러리가 열렸습니다
+                    🎉 축하합니다! 모든 저널을 완료하여 밈 갤러리가 열렸습니다
                   </p>
+                  <p className="text-xs text-stone-500 mt-2">
+                    💎 밈을 클릭해서 발견해보세요! 개인 맞춤 밈을 Twitter와 Instagram에 공유해보세요!
+                  </p>
+                  {celebrationMode && (
+                    <div className="text-center py-2">
+                      <div className="inline-flex items-center space-x-1 text-yellow-600 animate-bounce">
+                        <Sparkles className="w-4 h-4" />
+                        <span className="text-sm font-medium">새로운 밈 발견!</span>
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-1 gap-4">
-                  {identityMemes.map((meme) => (
-                    <div key={meme.id} className="bg-white/80 p-4 rounded-stone">
-                      <div className="aspect-square bg-stone-100 rounded-lg mb-3 overflow-hidden">
-                        <img 
-                          src={meme.memeUrl} 
-                          alt={meme.description}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x400/E5E7EB/9CA3AF?text=Meme";
-                          }}
-                        />
-                      </div>
+                  {identityMemes.map((meme) => {
+                    const isRevealed = isMemeRevealed(meme.id);
+                    
+                    return (
+                      <div key={meme.id} className="bg-white/80 p-4 rounded-stone relative">
+                        {!isRevealed ? (
+                          // Hidden state - clickable mystery box
+                          <div 
+                            className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg mb-3 overflow-hidden cursor-pointer hover:from-purple-200 hover:to-pink-200 transition-all duration-300 border-2 border-dashed border-purple-300 flex flex-col items-center justify-center group"
+                            onClick={() => handleRevealMeme(meme.id)}
+                          >
+                            <div className="text-center space-y-3">
+                              <div className="relative">
+                                <Gift className="w-12 h-12 text-purple-400 group-hover:text-purple-600 transition-colors animate-pulse" />
+                                <div className="absolute -top-1 -right-1">
+                                  <Sparkles className="w-4 h-4 text-yellow-400 animate-spin" />
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-purple-600 group-hover:text-purple-800">
+                                  🎁 신비한 밈 상자
+                                </p>
+                                <p className="text-xs text-purple-500 mt-1">
+                                  클릭해서 발견하세요!
+                                </p>
+                              </div>
+                            </div>
+                            <div className="absolute inset-0 bg-white/20 group-hover:bg-white/30 transition-all duration-300 rounded-lg"></div>
+                          </div>
+                        ) : (
+                          // Revealed state - show actual meme
+                          <div className="aspect-square bg-stone-100 rounded-lg mb-3 overflow-hidden relative">
+                            <img 
+                              src={meme.memeUrl} 
+                              alt={meme.description}
+                              className="w-full h-full object-cover transition-all duration-500 ease-out animate-in slide-in-from-bottom-4 fade-in-0"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x400/E5E7EB/9CA3AF?text=Meme";
+                              }}
+                            />
+                            {/* Revealed badge */}
+                            <div className="absolute top-2 right-2">
+                              <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
+                                <Eye className="w-3 h-3" />
+                                <span>발견됨</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       
-                      <div className="text-center">
-                        <h4 className="font-medium text-stone-700 mb-2">{meme.description}</h4>
-                        <div className="flex flex-wrap gap-1 justify-center mb-3">
-                          {meme.keywords.slice(0, 3).map((keyword: string) => (
-                            <span 
-                              key={keyword}
-                              className="px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full"
-                            >
-                              {keyword}
-                            </span>
-                          ))}
+                      {isRevealed && (
+                        <div className="text-center transition-all duration-500 ease-out animate-in slide-in-from-bottom-2 fade-in-0">
+                          <h4 className="font-medium text-stone-700 mb-3">{meme.description}</h4>
+                        
+                        {/* Identity Keywords */}
+                        <div className="mb-4">
+                          <h5 className="text-xs font-medium text-stone-500 mb-2">🎭 정체성 키워드</h5>
+                          <div className="flex flex-wrap gap-1 justify-center">
+                            {meme.keywords.map((keyword: string) => (
+                              <span 
+                                key={keyword}
+                                className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+                              >
+                                {keyword}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Body Feelings */}
+                        {meme.bodyFeelings && meme.bodyFeelings.length > 0 && (
+                          <div className="mb-4">
+                            <h5 className="text-xs font-medium text-stone-500 mb-2">🫀 몸의 감각</h5>
+                            <div className="flex flex-wrap gap-1 justify-center">
+                              {meme.bodyFeelings.map((feeling: string) => (
+                                <span 
+                                  key={feeling}
+                                  className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+                                >
+                                  {feeling}
+                                </span>
+                              ))}
+                            </div>
+                            {meme.emotionLevel && (
+                              <p className="text-xs text-stone-500 mt-1">
+                                감정 레벨: {meme.emotionLevel}/5
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Reframing Comments */}
+                        {meme.hasReframing && meme.reframingContent && (
+                          <div className="mb-4">
+                            <h5 className="text-xs font-medium text-stone-500 mb-2">🔄 리프레이밍 결과</h5>
+                            <div className="bg-green-50 p-2 rounded-lg">
+                              <p className="text-xs text-green-700 leading-relaxed">
+                                {(() => {
+                                  const reframingResult = extractReframingResult(meme.reframingContent);
+                                  const displayText = reframingResult || meme.reframingContent;
+                                  return displayText.length > 120 
+                                    ? `${displayText.substring(0, 120)}...` 
+                                    : displayText;
+                                })()}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Date */}
+                        <div className="mb-3">
+                          <p className="text-xs text-stone-400">
+                            생성일: {new Date(meme.createdAt).toLocaleDateString('ko-KR')}
+                          </p>
                         </div>
                         
-                        <div className="flex gap-2 justify-center">
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="text-xs bg-[#1DA1F2] text-white border-[#1DA1F2] hover:bg-[#1a8cd8]"
+                            onClick={() => handleTwitterShare(meme)}
+                          >
+                            <Twitter className="w-3 h-3 mr-1" />
+                            Twitter
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600"
+                            onClick={() => handleInstagramShare(meme)}
+                          >
+                            <Instagram className="w-3 h-3 mr-1" />
+                            Instagram
+                          </Button>
                           <Button 
                             size="sm" 
                             variant="outline"
                             className="text-xs"
-                            onClick={() => {
-                              // Download functionality
-                              const link = document.createElement('a');
-                              link.href = meme.memeUrl;
-                              link.download = `my-meme-${meme.id}.jpg`;
-                              link.click();
-                            }}
+                            onClick={() => handleDownloadMeme(meme)}
                           >
                             <Download className="w-3 h-3 mr-1" />
                             저장
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="text-xs"
-                            onClick={() => {
-                              // Share functionality
-                              if (navigator.share) {
-                                navigator.share({
-                                  title: meme.description,
-                                  url: meme.memeUrl
-                                });
-                              } else {
-                                navigator.clipboard.writeText(meme.memeUrl);
-                              }
-                            }}
-                          >
-                            <Share2 className="w-3 h-3 mr-1" />
-                            공유
-                          </Button>
                         </div>
-                      </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {identityMemes.length === 0 && (
