@@ -1,0 +1,22 @@
+name = "moodminder"
+compatibility_date = "2025-01-01"
+main = "dist/index.js"
+
+[vars]
+NODE_ENV = "production"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "your-kv-namespace-id"
+preview_id = "your-kv-preview-id"
+
+[build]
+command = "npm run build"
+cwd = "."
+watch_dir = ["server", "client", "shared"]
+
+[env.production.vars]
+DATABASE_URL = "your-production-database-url"
+OPENAI_API_KEY = "your-openai-api-key"
+SESSION_SECRET = "your-session-secret"
+PORT = "8787"
