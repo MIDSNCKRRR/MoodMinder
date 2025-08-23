@@ -24,7 +24,19 @@ export default function Step2BodyMap({
 
   const handleFeelingChange = useCallback(
     (part: string, feeling: string) => {
-      const newFeelings = { ...selectedBodyFeelings, [part]: feeling };
+      console.log(`handleFeelingChange called: part=${part}, feeling="${feeling}"`);
+      let newFeelings;
+      if (feeling === "" || !feeling) {
+        // 감정 삭제: 키를 아예 제거
+        const { [part]: removed, ...remainingFeelings } = selectedBodyFeelings;
+        newFeelings = remainingFeelings;
+        console.log(`Removing feeling for ${part}:`, newFeelings);
+      } else {
+        // 감정 추가/변경
+        newFeelings = { ...selectedBodyFeelings, [part]: feeling };
+        console.log(`Adding/changing feeling for ${part}:`, newFeelings);
+      }
+      
       localStorage.setItem(
         "bodyJournal_bodyFeelings",
         JSON.stringify(newFeelings),
@@ -85,11 +97,11 @@ export default function Step2BodyMap({
           {/* Body Mapping Tabs */}
           <div className="bg-white/80 p-4 rounded-stone relative">
             {/* Floating Emoji Palette */}
-            <div className="mb-4 p-3 bg-stone-50 rounded-stone border border-stone-200">
+            <div className="mb-4 py-3 px-6 bg-stone-50 rounded-stone border border-stone-200">
               <p className="text-xs text-stone-600 mb-2 font-medium">
                 Drag feelings onto body parts:
               </p>
-              <div className="flex flex-wrap gap-1 justify-center">
+              <div className="grid grid-cols-4 gap-2">
                 {[
                   { id: "tense", emoji: "😬" },
                   { id: "relaxed", emoji: "😌" },
@@ -114,6 +126,21 @@ export default function Step2BodyMap({
                   </div>
                 ))}
               </div>
+              {/* Clear All Button */}
+              {totalSelectedFeelings > 0 && (
+                <div className="text-center mt-2">
+                  <button
+                    onClick={() => {
+                      onBodyFeelingsChange({});
+                      localStorage.setItem("bodyJournal_bodyFeelings", JSON.stringify({}));
+                    }}
+                    className="text-xs text-red-500 hover:text-red-600 underline"
+                    data-testid="clear-all-feelings"
+                  >
+                    Clear All ({totalSelectedFeelings})
+                  </button>
+                </div>
+              )}
             </div>
 
             <Tabs defaultValue="head" className="w-full">

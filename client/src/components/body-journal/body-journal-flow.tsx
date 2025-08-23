@@ -6,6 +6,10 @@ import ProgressBar from "./progress-bar";
 import Step1Emotion from "./step-1-emotion";
 import Step2BodyMap from "./step-2-body-map";
 import Step3Journal from "./step-3-journal";
+// Preload body map images
+import headNeckImage from "@assets/ChatGPT Image Aug 8, 2025, 03_28_00 PM_1754634489490.png";
+import upperBodyImage from "@assets/image_1754643452084.png";
+import lowerBodyImage from "@assets/image_1754642975195.png";
 
 interface BodyJournalFlowProps {
   onBack: () => void;
@@ -21,8 +25,15 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   const [selectedBodyFeelings, setSelectedBodyFeelings] = useState<Record<string, string>>({});
   const [journalContent, setJournalContent] = useState("");
 
-  // Load saved data on component mount
+  // Load saved data and preload images on component mount
   useEffect(() => {
+    // Preload body map images
+    const preloadImages = [headNeckImage, upperBodyImage, lowerBodyImage];
+    preloadImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
     const savedEmotion = localStorage.getItem('bodyJournal_emotion');
     const savedIntensity = localStorage.getItem('bodyJournal_intensity');
     const savedBodyFeelings = localStorage.getItem('bodyJournal_bodyFeelings');

@@ -15,7 +15,7 @@ function Router() {
   const journalResetRef = useRef<(() => void) | null>(null);
 
   return (
-    <div className="max-w-sm mx-auto bg-white min-h-screen relative pb-20">
+    <div className="max-w-sm mx-auto min-h-screen relative pb-20 shadow-lg" style={{ background: 'var(--app-container-bg)' }}>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/journal" component={() => <Journal onResetRef={journalResetRef} />} />

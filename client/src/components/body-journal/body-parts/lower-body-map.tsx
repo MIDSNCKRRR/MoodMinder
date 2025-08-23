@@ -116,7 +116,7 @@ export default function LowerBodyMap({
                     pointerEvents: "auto",
                     transformOrigin: "center",
                   }}
-                  onClick={() => handlePartClick(part.id)}
+                  // onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
                   data-testid={`lower-body-part-${part.id}`}
@@ -138,7 +138,7 @@ export default function LowerBodyMap({
               }}
             >
               {selectedFeelings[part.id] && (
-                <div className="relative group">
+                <div className="relative">
                   <span className="text-lg cursor-pointer">
                     {
                       feelingEmojis.find(
@@ -146,12 +146,18 @@ export default function LowerBodyMap({
                       )?.emoji
                     }
                   </span>
-                  {/* Delete button - appears on hover */}
+                  {/* Delete button - always visible */}
                   <button
-                    onClick={() => onFeelingChange(part.id, "")}
-                    className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log(`Deleting feeling for part: ${part.id}`);
+                      onFeelingChange(part.id, "");
+                    }}
+                    className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 transition-colors duration-200 z-50"
                     title="Remove feeling"
                     data-testid={`remove-feeling-${part.id}`}
+                    style={{ pointerEvents: 'auto' }}
                   >
                     ×
                   </button>

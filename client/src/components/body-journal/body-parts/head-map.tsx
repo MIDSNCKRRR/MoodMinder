@@ -22,12 +22,12 @@ export default function HeadMap({
   const feelingEmojis = [
     { id: "tense", label: "Tense", emoji: "😬" },
     { id: "relaxed", label: "Relaxed", emoji: "😌" },
-    { id: "painful", label: "Painful", emoji: "😣" },
-    { id: "warm", label: "Warm", emoji: "🌞" },
-    { id: "cold", label: "Cold", emoji: "❄️" },
-    { id: "heavy", label: "Heavy", emoji: "⚡" },
-    { id: "light", label: "Light", emoji: "🪶" },
-    { id: "numb", label: "Numb", emoji: "😶" },
+    { id: "warm", label: "Warm", emoji: "🔥" },
+    { id: "cool", label: "Cool", emoji: "❄️" },
+    { id: "fluttery", label: "Fluttery", emoji: "🦋" },
+    { id: "racing", label: "Racing", emoji: "💓" },
+    { id: "calm", label: "Calm", emoji: "🌊" },
+    { id: "buzzing", label: "Buzzing", emoji: "⚡" },
   ];
 
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
@@ -119,7 +119,7 @@ export default function HeadMap({
                     pointerEvents: "auto",
                     transformOrigin: "center",
                   }}
-                  onClick={() => handlePartClick(part.id)}
+                  // onClick={() => handlePartClick(part.id)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, part.id)}
                   data-testid={`head-part-${part.id}`}
@@ -141,19 +141,25 @@ export default function HeadMap({
               }}
             >
               {selectedFeelings[part.id] && (
-                <div className="relative group">
+                <div className="relative">
                   <span className="text-lg cursor-pointer">
                     {
                       feelingEmojis.find((f) => f.id === selectedFeelings[part.id])
                         ?.emoji
                     }
                   </span>
-                  {/* Delete button - appears on hover */}
+                  {/* Delete button - always visible */}
                   <button
-                    onClick={() => onFeelingChange(part.id, "")}
-                    className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log(`Deleting feeling for part: ${part.id}`);
+                      onFeelingChange(part.id, "");
+                    }}
+                    className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 transition-colors duration-200 z-50"
                     title="Remove feeling"
                     data-testid={`remove-feeling-${part.id}`}
+                    style={{ pointerEvents: 'auto' }}
                   >
                     ×
                   </button>
@@ -176,7 +182,7 @@ export default function HeadMap({
                 ?.label.toLowerCase()}{" "}
               feel?
             </p>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2 max-w-sm mx-auto">
               {feelingEmojis.map((feeling) => (
                 <Button
                   key={feeling.id}

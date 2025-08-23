@@ -8,6 +8,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import EmotionFace from "@/components/emotion-face";
 import type { JournalEntry, DailyReflection } from "@shared/schema";
+import logoImage from "@/assets/image/logo.png";
 
 export default function Home() {
   const { toast } = useToast();
@@ -53,7 +54,7 @@ export default function Home() {
   const recentEntries = journalEntries.slice(0, 3);
 
   return (
-    <div className="px-6 space-y-6">
+    <div className="px-6 space-y-8 pb-8">
       {/* Status Bar */}
       <div className="flex justify-between items-center pt-8 text-stone-400 text-sm">
         {/* <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> */}
@@ -66,8 +67,14 @@ export default function Home() {
 
       {/* Header with App Icon */}
       <div className="text-center pt-4">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-stone bg-gradient-to-br from-stone-100 to-stone-200 stone-shadow flex items-center justify-center relative">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-200 to-stone-300 opacity-80"></div>
+        {/* <div className="logo w-16 h-16 mx-auto mb-4  bg-gradient-to-br from-stone-100 to-stone-200 stone-shadow flex items-center justify-center relative"> */}
+          <div className="logo w-20 h-20 mx-auto mb-0  bg-gradient-to-br flex items-center justify-center relative">
+          <img 
+            src={logoImage} 
+            alt="Soft Moves Logo" 
+            className="w-24 h-24 object-contain" 
+            loading="eager"
+          />
         </div>
         <h1 className="text-2xl font-serif font-semibold text-stone-600">
           Soft Moves
@@ -81,10 +88,12 @@ export default function Home() {
       <div className="relative">
         <Link href="/crisis-support">
           <Button
-            className="crisis-button w-full py-4 px-6 rounded-organic stone-shadow transition-all duration-300 font-medium border-2"
+            className="crisis-button w-full py-12 px-18 rounded-organic stone-shadow transition-all duration-300 font-medium border-2 text-xl"
             style={{
-              backgroundColor: "hsl(260, 45%, 65%)",
-              borderColor: "hsl(260, 45%, 65%)",
+              backgroundColor: "hsl(260, 25%, 65%)",
+              // backgroundColor: "linear-gradient(135deg,hsl(260, 25%, 25%) 0%, hsl(260, 20%, 78%) 100%)",
+              // backgroundColor: "linear-gradienthsl(260, 45%, 65%)",
+              // borderColor: "hsl(260, 45%, 65%)",
               color: "white",
             }}
             data-testid="crisis-button"
@@ -102,21 +111,22 @@ export default function Home() {
         style={{
           background:
             "linear-gradient(135deg, hsl(25, 35%, 85%) 0%, hsl(25, 30%, 78%) 100%)",
+            // "linear-gradient(135deg, hsl(260, 25%, 85%) 0%, hsl(260, 20%, 78%) 100%)",
         }}
       >
-        <CardContent className="p-6">
+        <CardContent className="p-8">
           <div className="botanical-accent relative"></div>
-          <h3 className="font-serif font-semibold text-stone-600 text-lg mb-3">
+          <h3 className="font-serif font-semibold text-stone-600 text-3xl mb-6">
             Today's Reflection
           </h3>
-          <p className="text-stone-500 mb-4">
+          <p className="text-stone-500 text-xl mb-8">
             {todayReflection?.question ||
               "What three things brought you peace today?"}
           </p>
           <Link href="/journal?type=reframing">
             <Button
               variant="secondary"
-              className="bg-white/80 text-stone-600 hover:bg-white transition-colors rounded-full"
+              className="bg-white/80 text-stone-600 hover:bg-white transition-colors rounded-full text-xl py-5 px-10"
               data-testid="reflect-now-button"
             >
               {todayReflection?.answer ? "Update Reflection" : "Reflect Now"}

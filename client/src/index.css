@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(46, 24%, 96%);
+  --background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  --app-container-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   --foreground: hsl(25, 20%, 25%);
   --muted: hsl(45, 15%, 92%);
   --muted-foreground: hsl(25, 10%, 45%);

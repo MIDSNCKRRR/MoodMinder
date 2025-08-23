@@ -15,7 +15,7 @@ export default function BottomNavigation({ onJournalClick }: BottomNavigationPro
   ];
 
   return (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t border-stone-200 stone-shadow z-50">
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm stone-shadow z-50" style={{ backgroundColor: '#ffffff' }}>
       <div className="flex justify-around py-4">
         {tabs.map((tab) => {
           const Icon = tab.icon;

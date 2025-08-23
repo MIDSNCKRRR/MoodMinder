@@ -51,6 +51,21 @@ export default function Step3Journal({
     return category?.type || "neutral";
   };
 
+  // Map feeling ID to emoji for body feelings display
+  const getEmotionEmoji = (feelingId: string): string => {
+    const feelingEmojis: Record<string, string> = {
+      tense: "😬",
+      relaxed: "😌", 
+      warm: "🔥",
+      cool: "❄️",
+      fluttery: "🦋",
+      racing: "💓",
+      calm: "🌊",
+      buzzing: "⚡"
+    };
+    return feelingEmojis[feelingId] || "❓";
+  };
+
   const createEntryMutation = useMutation({
     mutationFn: async () => {
       // Get emotion data using the same mapping as body-journal-flow
@@ -118,15 +133,28 @@ export default function Step3Journal({
           <h4 className="font-medium text-stone-600 text-sm mb-3">
             Your selections:
           </h4>
-          <div className="flex items-center gap-4 text-sm text-stone-500">
-            <div className="flex items-center gap-1">
-              <span className="text-lg">{selectedEmotionData?.emoji}</span>
-              <span>{selectedEmotionData?.label}</span>
+          <div className="space-y-3 text-sm text-stone-500">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Primary emotion:</span>
+              <div className="flex items-center gap-1">
+                <span className="text-lg">{selectedEmotionData?.emoji}</span>
+                <span>{selectedEmotionData?.label}</span>
+              </div>
             </div>
             {Object.keys(selectedBodyFeelings).length > 0 && (
-              <div>
-                • {Object.keys(selectedBodyFeelings).length} body feeling
-                {Object.keys(selectedBodyFeelings).length > 1 ? "s" : ""}
+              <div className="space-y-2">
+                <div className="font-medium">
+                  Body feelings ({Object.keys(selectedBodyFeelings).length}):
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {Object.entries(selectedBodyFeelings).map(([bodyPart, feeling]) => (
+                    <div key={bodyPart} className="flex items-center gap-1 bg-white/60 px-2 py-1 rounded-full">
+                      <span className="capitalize font-medium">{bodyPart.replace(/([A-Z])/g, ' $1').trim()}</span>
+                      <span>•</span>
+                      <span className="text-stone-600">{getEmotionEmoji(feeling)} {feeling}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
