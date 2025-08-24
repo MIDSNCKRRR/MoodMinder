@@ -5,6 +5,8 @@ A comprehensive mental health and wellness mobile application that empowers user
 ## 🌐 Live Demo
 **[Try MoodMinder Now →](https://softmoves-sujinsuh200-5975s-projects.vercel.app/)**
 
+**[How it works →](https://drive.google.com/file/d/1rNhs8ixBJU5VtPI2NK4O255i9s5N2AFI/view?usp=sharing)**
+
 *Experience the full-featured mental wellness app with AI-powered journaling, emotion tracking, and personalized meme generation.*
 
 ## ✨ Features
