@@ -96,6 +96,14 @@ export const insertCrisisEventSchema = createInsertSchema(crisisEvents).omit({
   resolved: true,
 });
 
+export const profiles = pgTable("profiles", {
+  id: varchar("id").primaryKey(),
+  nickname: varchar("nickname", { length: 32 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+
 export type InsertJournalEntry = z.infer<typeof insertJournalEntrySchema>;
 export type JournalEntry = typeof journalEntries.$inferSelect;
 export type InsertDailyReflection = z.infer<typeof insertDailyReflectionSchema>;

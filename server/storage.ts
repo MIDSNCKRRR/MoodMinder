@@ -1,29 +1,31 @@
-import { 
-  type JournalEntry, 
+import {
+  type JournalEntry,
   type InsertJournalEntry,
   type DailyReflection,
   type InsertDailyReflection,
   type CrisisEvent,
-  type InsertCrisisEvent
+  type InsertCrisisEvent,
+  journalEntries,
+  dailyReflections,
+  crisisEvents,
 } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { db } from "./db";
+import { desc, eq, gte } from "drizzle-orm";
 
 export interface IStorage {
-  // Journal Entries
   createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry>;
   getJournalEntries(): Promise<JournalEntry[]>;
   getJournalEntry(id: string): Promise<JournalEntry | undefined>;
-  
-  // Daily Reflections
-  createDailyReflection(reflection: InsertDailyReflection): Promise<DailyReflection>;
+
+  createDailyReflection(
+    reflection: InsertDailyReflection,
+  ): Promise<DailyReflection>;
   getTodayReflection(): Promise<DailyReflection | undefined>;
   getDailyReflections(): Promise<DailyReflection[]>;
-  
-  // Crisis Events
+
   createCrisisEvent(event: InsertCrisisEvent): Promise<CrisisEvent>;
   getCrisisEvents(): Promise<CrisisEvent[]>;
-  
-  // Analytics
+
   getEmotionStats(): Promise<{
     averageEmotion: number;
     totalEntries: number;
@@ -32,81 +34,136 @@ export interface IStorage {
   }>;
 }
 
-export class MemStorage implements IStorage {
-  private journalEntries: Map<string, JournalEntry>;
-  private dailyReflections: Map<string, DailyReflection>;
-  private crisisEvents: Map<string, CrisisEvent>;
+class HybridStorage implements IStorage {
+  private journalCache = new Map<string, JournalEntry>();
+  private reflectionCache = new Map<string, DailyReflection>();
+  private crisisCache = new Map<string, CrisisEvent>();
 
-  constructor() {
-    this.journalEntries = new Map();
-    this.dailyReflections = new Map();
-    this.crisisEvents = new Map();
-  }
-
-  async createJournalEntry(insertEntry: InsertJournalEntry): Promise<JournalEntry> {
-    const id = randomUUID();
-    const entry: JournalEntry = {
-      ...insertEntry,
-      id,
-      journalType: insertEntry.journalType || "emotion",
-      createdAt: new Date(),
-      bodyMapping: insertEntry.bodyMapping || {},
-    };
-    this.journalEntries.set(id, entry);
-    return entry;
+  async createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry> {
+    const [row] = await db
+      .insert(journalEntries)
+      .values({
+        ...entry,
+        journalType: entry.journalType ?? "emotion",
+        bodyMapping: entry.bodyMapping ?? {},
+      })
+      .returning();
+    const normalized = this.normalizeJournal(row);
+    this.journalCache.set(normalized.id, normalized);
+    return normalized;
   }
 
   async getJournalEntries(): Promise<JournalEntry[]> {
-    return Array.from(this.journalEntries.values()).sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    try {
+      const rows = await db
+        .select()
+        .from(journalEntries)
+        .orderBy(desc(journalEntries.createdAt));
+      const normalized = rows.map((row) => this.normalizeJournal(row));
+      normalized.forEach((entry) => this.journalCache.set(entry.id, entry));
+      return normalized;
+    } catch {
+      return Array.from(this.journalCache.values()).sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      );
+    }
   }
 
   async getJournalEntry(id: string): Promise<JournalEntry | undefined> {
-    return this.journalEntries.get(id);
+    try {
+      const [row] = await db
+        .select()
+        .from(journalEntries)
+        .where(eq(journalEntries.id, id))
+        .limit(1);
+      if (!row) return this.journalCache.get(id);
+      const normalized = this.normalizeJournal(row);
+      this.journalCache.set(id, normalized);
+      return normalized;
+    } catch {
+      return this.journalCache.get(id);
+    }
   }
 
-  async createDailyReflection(insertReflection: InsertDailyReflection): Promise<DailyReflection> {
-    const id = randomUUID();
-    const reflection: DailyReflection = {
-      ...insertReflection,
-      id,
-      date: new Date(),
-      answer: insertReflection.answer || null,
-    };
-    this.dailyReflections.set(id, reflection);
-    return reflection;
+  async createDailyReflection(
+    reflection: InsertDailyReflection,
+  ): Promise<DailyReflection> {
+    const [row] = await db
+      .insert(dailyReflections)
+      .values({
+        ...reflection,
+        answer: reflection.answer ?? null,
+      })
+      .returning();
+    const normalized = this.normalizeReflection(row);
+    this.reflectionCache.set(normalized.id, normalized);
+    return normalized;
   }
 
   async getTodayReflection(): Promise<DailyReflection | undefined> {
-    const today = new Date().toDateString();
-    return Array.from(this.dailyReflections.values()).find(
-      reflection => reflection.date.toDateString() === today
-    );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    try {
+      const [row] = await db
+        .select()
+        .from(dailyReflections)
+        .where(gte(dailyReflections.date, today))
+        .orderBy(desc(dailyReflections.date))
+        .limit(1);
+      if (!row) return undefined;
+      const normalized = this.normalizeReflection(row);
+      this.reflectionCache.set(normalized.id, normalized);
+      return normalized;
+    } catch {
+      for (const reflection of this.reflectionCache.values()) {
+        if (reflection.date >= today) {
+          return reflection;
+        }
+      }
+      return undefined;
+    }
   }
 
   async getDailyReflections(): Promise<DailyReflection[]> {
-    return Array.from(this.dailyReflections.values()).sort(
-      (a, b) => b.date.getTime() - a.date.getTime()
-    );
+    try {
+      const rows = await db
+        .select()
+        .from(dailyReflections)
+        .orderBy(desc(dailyReflections.date));
+      const normalized = rows.map((row) => this.normalizeReflection(row));
+      normalized.forEach((reflection) =>
+        this.reflectionCache.set(reflection.id, reflection),
+      );
+      return normalized;
+    } catch {
+      return Array.from(this.reflectionCache.values()).sort(
+        (a, b) => b.date.getTime() - a.date.getTime(),
+      );
+    }
   }
 
-  async createCrisisEvent(insertEvent: InsertCrisisEvent): Promise<CrisisEvent> {
-    const id = randomUUID();
-    const event: CrisisEvent = {
-      ...insertEvent,
-      id,
-      timestamp: new Date(),
-      resolved: 0,
-    };
-    this.crisisEvents.set(id, event);
-    return event;
+  async createCrisisEvent(event: InsertCrisisEvent): Promise<CrisisEvent> {
+    const [row] = await db.insert(crisisEvents).values(event).returning();
+    const normalized = this.normalizeCrisis(row);
+    this.crisisCache.set(normalized.id, normalized);
+    return normalized;
   }
 
   async getCrisisEvents(): Promise<CrisisEvent[]> {
-    return Array.from(this.crisisEvents.values()).sort(
-      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-    );
+    try {
+      const rows = await db
+        .select()
+        .from(crisisEvents)
+        .orderBy(desc(crisisEvents.timestamp));
+      const normalized = rows.map((row) => this.normalizeCrisis(row));
+      normalized.forEach((event) => this.crisisCache.set(event.id, event));
+      return normalized;
+    } catch {
+      return Array.from(this.crisisCache.values()).sort(
+        (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
+      );
+    }
   }
 
   async getEmotionStats(): Promise<{
@@ -115,33 +172,32 @@ export class MemStorage implements IStorage {
     weeklyAverage: number;
     monthlyStreak: number;
   }> {
-    const entries = Array.from(this.journalEntries.values());
+    const entries = await this.getJournalEntries();
     const totalEntries = entries.length;
-    
+
     if (totalEntries === 0) {
-      return {
-        averageEmotion: 0,
-        totalEntries: 0,
-        weeklyAverage: 0,
-        monthlyStreak: 0,
-      };
+      return { averageEmotion: 0, totalEntries: 0, weeklyAverage: 0, monthlyStreak: 0 };
     }
 
-    const averageEmotion = entries.reduce((sum, entry) => sum + entry.emotionLevel, 0) / totalEntries;
-    
-    // Calculate weekly average (last 7 days)
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const weeklyEntries = entries.filter(entry => entry.createdAt >= weekAgo);
-    const weeklyAverage = weeklyEntries.length > 0 
-      ? weeklyEntries.reduce((sum, entry) => sum + entry.emotionLevel, 0) / weeklyEntries.length 
+    const averageEmotion =
+      entries.reduce((sum, entry) => sum + entry.emotionLevel, 0) / totalEntries;
+
+    const now = new Date();
+    const weekAgo = new Date(now);
+    weekAgo.setDate(now.getDate() - 7);
+    const monthAgo = new Date(now);
+    monthAgo.setDate(now.getDate() - 30);
+
+    const weeklyEntries = entries.filter((entry) => entry.createdAt >= weekAgo);
+    const weeklyAverage = weeklyEntries.length
+      ? weeklyEntries.reduce((sum, entry) => sum + entry.emotionLevel, 0) /
+        weeklyEntries.length
       : 0;
 
-    // Calculate monthly streak (days with entries in the last 30 days)
-    const monthAgo = new Date();
-    monthAgo.setDate(monthAgo.getDate() - 30);
-    const monthlyEntries = entries.filter(entry => entry.createdAt >= monthAgo);
-    const uniqueDays = new Set(monthlyEntries.map(entry => entry.createdAt.toDateString()));
+    const monthlyEntries = entries.filter((entry) => entry.createdAt >= monthAgo);
+    const uniqueDays = new Set(
+      monthlyEntries.map((entry) => entry.createdAt.toDateString()),
+    );
     const monthlyStreak = uniqueDays.size;
 
     return {
@@ -151,6 +207,32 @@ export class MemStorage implements IStorage {
       monthlyStreak,
     };
   }
+
+  private normalizeJournal(row: JournalEntry): JournalEntry {
+    return {
+      ...row,
+      createdAt:
+        row.createdAt instanceof Date ? row.createdAt : new Date(row.createdAt),
+      bodyMapping: row.bodyMapping ?? {},
+    };
+  }
+
+  private normalizeReflection(row: DailyReflection): DailyReflection {
+    return {
+      ...row,
+      date: row.date instanceof Date ? row.date : new Date(row.date),
+      answer: row.answer ?? null,
+    };
+  }
+
+  private normalizeCrisis(row: CrisisEvent): CrisisEvent {
+    return {
+      ...row,
+      timestamp:
+        row.timestamp instanceof Date ? row.timestamp : new Date(row.timestamp),
+      resolved: row.resolved ?? 0,
+    };
+  }
 }
 
-export const storage = new MemStorage();
+export const storage: IStorage = new HybridStorage();

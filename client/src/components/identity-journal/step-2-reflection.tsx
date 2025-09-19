@@ -169,7 +169,7 @@ export default function Step2Reflection({
           ) : (
             <>
               <Wand2 className="mr-2 h-4 w-4" />
-              저장 & 밈 생성
+              저장 & 밈 생성d
             </>
           )}
         </Button>

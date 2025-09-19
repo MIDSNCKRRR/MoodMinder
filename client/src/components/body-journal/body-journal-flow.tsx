@@ -18,6 +18,7 @@ interface BodyJournalFlowProps {
 export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [showInfo, setShowInfo] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   // State for all steps
   const [selectedEmotion, setSelectedEmotion] = useState<number>(4);
@@ -70,6 +71,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
   };
 
   const handleComplete = async () => {
+    setIsSaving(true);
     try {
       // Prepare journal entry data
       const emotionData = getEmotionData(selectedEmotion);
@@ -123,6 +125,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       onBack();
     } catch (error) {
       console.error('Error saving journal entry:', error);
+       setIsSaving(false);
       // You could show a toast notification here
     }
   };
@@ -179,6 +182,7 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
             selectedEmotion={selectedEmotion}
             selectedBodyFeelings={selectedBodyFeelings}
             onComplete={handleComplete}
+            isSaving={isSaving} 
           />
         );
       default:

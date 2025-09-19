@@ -14,6 +14,7 @@ interface Step3JournalProps {
   selectedEmotion: number;
   selectedBodyFeelings: Record<string, string>;
   onComplete: () => void;
+  isSaving: boolean;
 }
 
 export default function Step3Journal({
@@ -23,6 +24,7 @@ export default function Step3Journal({
   selectedEmotion,
   selectedBodyFeelings,
   onComplete,
+  isSaving,
 }: Step3JournalProps) {
   const { toast } = useToast();
 
@@ -200,8 +202,11 @@ export default function Step3Journal({
         </Button>
 
         <Button
-          onClick={() => createEntryMutation.mutate()}
-          disabled={createEntryMutation.isPending || !journalContent.trim()}
+          // onClick={() => createEntryMutation.mutate()}
+     
+          onClick={onComplete}
+          disabled={isSaving || !journalContent.trim()}
+          // disabled={createEntryMutation.isPending || !journalContent.trim()}
           className="px-6 py-3 rounded-stone font-medium transition-all"
           style={{
             background:
@@ -211,7 +216,8 @@ export default function Step3Journal({
           data-testid="save-body-journal"
         >
           <Heart className="mr-2 h-4 w-4" />
-          {createEntryMutation.isPending ? "Saving..." : "Save Entry"}
+          {isSaving ? "Saving…" : "Save Entry"}
+          {/* {createEntryMutation.isPending ? "Saving..." : "Save Entry"} */}
         </Button>
       </div>
     </div>
