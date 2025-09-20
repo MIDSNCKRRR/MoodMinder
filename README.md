@@ -78,24 +78,8 @@ For the new auth server, load `.env.local` when you start it so Supabase keys ar
 $ npm install --save-dev dotenv-cli
 $ npm run dev:auth          # runs: dotenv -e .env.local -- tsx src/server.ts
 
+```
 If you prefer manual exports, run export $(grep -v '^#' .env.local | xargs) before npx tsx src/server.ts
-
-
-
-새 인증 흐름을 검증하는 curl 예시 (signup, login, me, logout, 반복 실패 시 429)와 기대 응답을 README에 넣어두면 팀원이 바로 확인할 수 있습니다.
-Supabase 대시보드에서 profiles 테이블이 upsert되는지 체크하라는 설명도 추가하세요.
-Rate limit / 소프트 락 안내
-
-/api/auth/login은 1분당 5회, 5번 연속 실패 시 5분 잠금이라는 정책을 README에 명시하세요. 이 부분은 보안/UX 참고를 위해 꼭 문서화해야 합니다.
-서버 실행 방법 정리
-
-현재 npm run dev는 구(舊) Express 서버를 올리는 스크립트이니, 인증용 서버는 npm run dev:auth(또는 npx tsx src/server.ts)로 띄워야 한다는 점을 README에 추가하세요.
-프런트(Vite)와 백엔드(/src/server.ts)를 동시에 실행하려면 어떤 명령어를 사용해야 하는지도 설명하면 좋습니다.
-
-
-
-
-
 
 ### Mobile-First Design
 - **PWA-Ready** with offline capabilities
