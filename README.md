@@ -139,28 +139,28 @@ SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, JWT_JWKS_URL, FRONTE
 
 ### Auth Testing Quickstart
 **Sign up:**
-
+```bash
 curl -i -X POST http://localhost:8787/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email":"test.user+$(date +%s)@example.com","password":"Passw0rd1","nickname":"test"}'
+```
 **Log in (stores cookies in cookies.txt):**
-
+```bash
 curl -i -c cookies.txt -X POST http://localhost:8787/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test.user@example.com","password":"Passw0rd1"}'
+```
 **Get current user:**
-
+``bash
 curl -i -b cookies.txt http://localhost:8787/api/auth/me
 Trigger lockout (repeat wrong password ≥5 times) to verify 429 response.
 
 **Log out:**
-
+``bash
 curl -i -b cookies.txt -X POST http://localhost:8787/api/auth/logout
 Follow-up GET /api/auth/me should return 401.
-
-These commands verify cookies (HttpOnly, SameSite=Lax), rate limits, and Supabase profile upsert without needing a frontend.
-
-
+```
+- These commands verify cookies (HttpOnly, SameSite=Lax), rate limits, and Supabase profile upsert without needing a frontend.
 
 
 ## 📱 Usage
@@ -191,11 +191,7 @@ MoodMinder aims to make mental health tracking accessible, engaging, and insight
 - **AI Assistance**: Providing intelligent emotional support and reframing
 - **Accessibility**: Voice features and intuitive design for all users
 - **Privacy**: Secure, user-controlled data with local processing options
-- **Evidence-Based**: Incorporating proven therapeutic techniques like CBT reframing
-
-## 🤝 Contributing
-
-We welcome contributions! Please read our contributing guidelines and submit pull requests for any improvements.
+- **Evidence-Based**: Incorporating proven therapeutic techniques like CBT reframings
 
 ### Development Scripts
 
