@@ -89,7 +89,6 @@ export default function Step3Journal({
       const emotionData = getEmotionData(selectedEmotion);
       
       await apiRequest("POST", "/api/journal-entries", {
-        userId: "temp-user",
         journalType: "body",
         emotionLevel: emotionData.level,
         emotionType: emotionData.type,

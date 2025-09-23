@@ -177,6 +177,7 @@ async function handleSignup(req: any, res: any, next: any) {
         {
           id: data.user.id,
           nickname: nickname ?? null,
+         email: data.user.email ?? null
         },
         { onConflict: "id" },
       );

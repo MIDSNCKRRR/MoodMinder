@@ -1,10 +1,58 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+// Auth related config
+import 'dotenv/config';
+import { FRONTEND_URL, PORT, isProd } from "../src/config/env";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import cors from "cors";
+import { authRouter } from "./routers/auth.router";
+import rateLimit from "express-rate-limit";
+import { httpLogger, logger } from "./utils/logger";
+
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  }),
+);
+
+const allowUrls = [
+  "'self'",
+  FRONTEND_URL,
+  `ws://localhost:${PORT}`,
+  `ws://127.0.0.1:${PORT}`,
+  `http://localhost:${PORT}`,
+  `http://127.0.0.1:${PORT}`,
+  "ws://localhost:8787",
+  "*.supabase.co",
+];
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+        connectSrc : allowUrls,
+        
+        // connectSrc: ["'self'", FRONTEND_URL, "*.supabase.co"],
+        imgSrc: ["'self'", "data:", "blob:"],
+        // scriptSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  }),
+);
+
+app.use("/api", rateLimit({ windowMs: 60_000, max: 100 })); // 기존 전역
+app.use("/api/auth", authRouter);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -36,6 +84,8 @@ app.use((req, res, next) => {
   next();
 });
 
+
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -46,6 +96,9 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
+
+
+
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

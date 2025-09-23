@@ -1,3 +1,4 @@
+// server/middleware/auth.ts
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/errors";
 import { COOKIE_DOMAIN, isProd } from "../config/env";
@@ -6,7 +7,6 @@ import { createSupabaseAuthClient } from "../lib/supabase";
 export interface AuthenticatedUser {
   id: string;
   email?: string;
-  exp?: number;
   [claim: string]: any;
 }
 
@@ -21,9 +21,11 @@ declare global {
 async function verifyWithSupabase(accessToken: string): Promise<AuthenticatedUser> {
   const supabase = createSupabaseAuthClient();
   const { data, error } = await supabase.auth.getUser(accessToken);
+
   if (error || !data.user) {
     throw new AppError(401, error?.message ?? "Invalid or expired session");
   }
+
   return {
     id: data.user.id,
     email: data.user.email ?? undefined,

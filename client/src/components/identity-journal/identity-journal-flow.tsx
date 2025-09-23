@@ -120,7 +120,6 @@ export default function IdentityJournalFlow({
 
       // Prepare journal entry data with meme
       const journalData = {
-        userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
         journalType: "identity" as const,
         emotionLevel: 3, // Default neutral for identity journal
         emotionType: "reflective",

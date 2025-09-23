@@ -79,7 +79,6 @@ export default function BodyJournalFlow({ onBack }: BodyJournalFlowProps) {
       console.log("Emotion data:", emotionData);
       
       const journalData = {
-        userId: "temp-user", // This will be replaced with actual user ID when auth is implemented
         journalType: "body" as const,
         emotionLevel: emotionData.level, // Convert to 1-5 scale for database compatibility
         emotionType: emotionData.type,

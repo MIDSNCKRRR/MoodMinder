@@ -99,6 +99,7 @@ export const insertCrisisEventSchema = createInsertSchema(crisisEvents).omit({
 export const profiles = pgTable("profiles", {
   id: varchar("id").primaryKey(),
   nickname: varchar("nickname", { length: 32 }),
+  email: varchar("email").unique().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

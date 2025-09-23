@@ -10,21 +10,21 @@ import {
   crisisEvents,
 } from "@shared/schema";
 import { db } from "./db";
-import { desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 
 export interface IStorage {
   createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry>;
-  getJournalEntries(): Promise<JournalEntry[]>;
-  getJournalEntry(id: string): Promise<JournalEntry | undefined>;
+  getJournalEntries(userId: string): Promise<JournalEntry[]>;
+  getJournalEntry(id: string, userId: string): Promise<JournalEntry | undefined>;
 
   createDailyReflection(
     reflection: InsertDailyReflection,
   ): Promise<DailyReflection>;
-  getTodayReflection(): Promise<DailyReflection | undefined>;
-  getDailyReflections(): Promise<DailyReflection[]>;
+  getTodayReflection(userId: string): Promise<DailyReflection | undefined>;
+  getDailyReflections(userId: string): Promise<DailyReflection[]>;
 
   createCrisisEvent(event: InsertCrisisEvent): Promise<CrisisEvent>;
-  getCrisisEvents(): Promise<CrisisEvent[]>;
+  getCrisisEvents(userId: string): Promise<CrisisEvent[]>;
 
   getEmotionStats(): Promise<{
     averageEmotion: number;
@@ -53,35 +53,38 @@ class HybridStorage implements IStorage {
     return normalized;
   }
 
-  async getJournalEntries(): Promise<JournalEntry[]> {
+  async getJournalEntries(userId: string): Promise<JournalEntry[]> {
     try {
       const rows = await db
         .select()
         .from(journalEntries)
+        .where(eq(journalEntries.userId, userId))
         .orderBy(desc(journalEntries.createdAt));
       const normalized = rows.map((row) => this.normalizeJournal(row));
       normalized.forEach((entry) => this.journalCache.set(entry.id, entry));
       return normalized;
     } catch {
-      return Array.from(this.journalCache.values()).sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-      );
+      return Array.from(this.journalCache.values())
+        .filter((entry) => entry.userId === userId)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
   }
 
-  async getJournalEntry(id: string): Promise<JournalEntry | undefined> {
+  async getJournalEntry(id: string, userId: string): Promise<JournalEntry | undefined> {
     try {
       const [row] = await db
         .select()
         .from(journalEntries)
         .where(eq(journalEntries.id, id))
         .limit(1);
-      if (!row) return this.journalCache.get(id);
+      if (!row || row.userId !== userId) return undefined;
       const normalized = this.normalizeJournal(row);
       this.journalCache.set(id, normalized);
       return normalized;
     } catch {
-      return this.journalCache.get(id);
+      const cached = this.journalCache.get(id);
+      if (cached?.userId !== userId) return undefined;
+      return cached;
     }
   }
 
@@ -100,7 +103,7 @@ class HybridStorage implements IStorage {
     return normalized;
   }
 
-  async getTodayReflection(): Promise<DailyReflection | undefined> {
+  async getTodayReflection(userId: string): Promise<DailyReflection | undefined> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -108,7 +111,12 @@ class HybridStorage implements IStorage {
       const [row] = await db
         .select()
         .from(dailyReflections)
-        .where(gte(dailyReflections.date, today))
+        .where(
+          and(
+            eq(dailyReflections.userId, userId),
+            gte(dailyReflections.date, today),
+          ),
+        )
         .orderBy(desc(dailyReflections.date))
         .limit(1);
       if (!row) return undefined;
@@ -117,7 +125,7 @@ class HybridStorage implements IStorage {
       return normalized;
     } catch {
       for (const reflection of this.reflectionCache.values()) {
-        if (reflection.date >= today) {
+        if (reflection.userId === userId && reflection.date >= today) {
           return reflection;
         }
       }
@@ -125,11 +133,12 @@ class HybridStorage implements IStorage {
     }
   }
 
-  async getDailyReflections(): Promise<DailyReflection[]> {
+  async getDailyReflections(userId: string): Promise<DailyReflection[]> {
     try {
       const rows = await db
         .select()
         .from(dailyReflections)
+        .where(eq(dailyReflections.userId, userId))
         .orderBy(desc(dailyReflections.date));
       const normalized = rows.map((row) => this.normalizeReflection(row));
       normalized.forEach((reflection) =>
@@ -137,9 +146,9 @@ class HybridStorage implements IStorage {
       );
       return normalized;
     } catch {
-      return Array.from(this.reflectionCache.values()).sort(
-        (a, b) => b.date.getTime() - a.date.getTime(),
-      );
+      return Array.from(this.reflectionCache.values())
+        .filter((reflection) => reflection.userId === userId)
+        .sort((a, b) => b.date.getTime() - a.date.getTime());
     }
   }
 
@@ -150,29 +159,30 @@ class HybridStorage implements IStorage {
     return normalized;
   }
 
-  async getCrisisEvents(): Promise<CrisisEvent[]> {
+  async getCrisisEvents(userId: string): Promise<CrisisEvent[]> {
     try {
       const rows = await db
         .select()
         .from(crisisEvents)
+        .where(eq(crisisEvents.userId, userId))
         .orderBy(desc(crisisEvents.timestamp));
       const normalized = rows.map((row) => this.normalizeCrisis(row));
       normalized.forEach((event) => this.crisisCache.set(event.id, event));
       return normalized;
     } catch {
-      return Array.from(this.crisisCache.values()).sort(
-        (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
-      );
+      return Array.from(this.crisisCache.values())
+        .filter((event) => event.userId === userId)
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     }
   }
 
-  async getEmotionStats(): Promise<{
+  async getEmotionStats(userId: string): Promise<{
     averageEmotion: number;
     totalEntries: number;
     weeklyAverage: number;
     monthlyStreak: number;
   }> {
-    const entries = await this.getJournalEntries();
+    const entries = await this.getJournalEntries(userId);
     const totalEntries = entries.length;
 
     if (totalEntries === 0) {

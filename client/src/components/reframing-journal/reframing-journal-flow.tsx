@@ -96,6 +96,7 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
+      
       return apiRequest("POST", "/api/journal-entries", data);
     },
     onSuccess: () => {
@@ -193,7 +194,6 @@ export function ReframingJournalFlow({ onBack }: ReframingJournalFlowProps) {
       : answers.map((answer) => answer.content).join("\n\n");
 
     const journalData = {
-      userId: "temp-user",
       journalType: "reframing",
       emotionLevel: 3,
       emotionType: selectedEmotion.id,

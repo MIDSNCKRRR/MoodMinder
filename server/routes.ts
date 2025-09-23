@@ -1,19 +1,30 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertJournalEntrySchema, insertDailyReflectionSchema, insertCrisisEventSchema } from "@shared/schema";
+import {
+  insertJournalEntrySchema,
+  insertDailyReflectionSchema,
+  insertCrisisEventSchema, 
+} from "@shared/schema";
+import { requireAuth } from "../src/middleware/auth";
 
+
+//기존에 쓰던 REST API 엔드포인트
 export async function registerRoutes(app: Express): Promise<Server> {
   // Journal Entries
-  app.post("/api/journal-entries", async (req, res) => {
+  app.post("/api/journal-entries", requireAuth, async (req, res) => {
+    
     try {
-      console.log("Received journal entry data:", JSON.stringify(req.body, null, 2));
-      const validatedData = insertJournalEntrySchema.parse(req.body);
+      console.log("incoming payload:", req.body);
+      const userId = req.user!.id;
+      const validatedData = insertJournalEntrySchema.parse({
+        ...req.body,
+        userId,
+      });
+       console.log("validated for DB:", validatedData);
       const entry = await storage.createJournalEntry(validatedData);
       res.json(entry);
     } catch (error) {
-      console.error("Journal entry validation error:", error);
-      console.error("Request body was:", JSON.stringify(req.body, null, 2));
       res.status(400).json({ 
         error: "Invalid journal entry data",
         details: error instanceof Error ? error.message : String(error)
@@ -21,18 +32,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/journal-entries", async (req, res) => {
+  app.get("/api/journal-entries", requireAuth, async (req, res) => {
     try {
-      const entries = await storage.getJournalEntries();
+      const entries = await storage.getJournalEntries(req.user!.id);
       res.json(entries);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch journal entries" });
     }
   });
 
-  app.get("/api/journal-entries/:id", async (req, res) => {
+  app.get("/api/journal-entries/:id", requireAuth, async (req, res) => {
     try {
-      const entry = await storage.getJournalEntry(req.params.id);
+      const entry = await storage.getJournalEntry(req.params.id, req.user!.id);
       if (!entry) {
         return res.status(404).json({ error: "Journal entry not found" });
       }
@@ -43,9 +54,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Daily Reflections
-  app.post("/api/daily-reflections", async (req, res) => {
+  app.post("/api/daily-reflections", requireAuth, async (req, res) => {
     try {
-      const validatedData = insertDailyReflectionSchema.parse(req.body);
+      const validatedData = insertDailyReflectionSchema.parse({
+        ...req.body,
+        userId: req.user!.id,
+      });
       const reflection = await storage.createDailyReflection(validatedData);
       res.json(reflection);
     } catch (error) {
@@ -53,18 +67,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/daily-reflections", async (req, res) => {
+  app.get("/api/daily-reflections", requireAuth, async (req, res) => {
     try {
-      const reflections = await storage.getDailyReflections();
+      const reflections = await storage.getDailyReflections(req.user!.id);
       res.json(reflections);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch reflections" });
     }
   });
 
-  app.get("/api/daily-reflections/today", async (req, res) => {
+  app.get("/api/daily-reflections/today", requireAuth, async (req, res) => {
     try {
-      const reflection = await storage.getTodayReflection();
+      const reflection = await storage.getTodayReflection(req.user!.id);
       res.json(reflection);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch today's reflection" });
@@ -72,9 +86,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Crisis Events
-  app.post("/api/crisis-events", async (req, res) => {
+  app.post("/api/crisis-events", requireAuth, async (req, res) => {
     try {
-      const validatedData = insertCrisisEventSchema.parse(req.body);
+      const validatedData = insertCrisisEventSchema.parse({
+        ...req.body,
+        userId: req.user!.id,
+      });
       const event = await storage.createCrisisEvent(validatedData);
       res.json(event);
     } catch (error) {
@@ -82,9 +99,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/crisis-events", async (req, res) => {
+  app.get("/api/crisis-events", requireAuth, async (req, res) => {
     try {
-      const events = await storage.getCrisisEvents();
+      const events = await storage.getCrisisEvents(req.user!.id);
       res.json(events);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch crisis events" });
